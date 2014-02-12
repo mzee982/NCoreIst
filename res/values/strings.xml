@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">nCORE</string>
+
+    <!-- Start Activity -->
+    <string name="start_activity_label">nCORE</string>
+    <string name="logo_text">nCORE</string>
+    <string name="progress_text">. . .</string>
+
+    <!-- Login Activity -->
+    <string name="login_activity_label">nCORE login</string>
+    <string name="login_name_text">Felhasználónév</string>
+    <string name="login_password_text">Jelszó</string>
+    <string name="captcha_text">Captcha</string>
+    <string name="login_button_text">Bejelentkezés</string>
+
+    <!-- Index Activity -->
+    <string name="index_activity_label">nCORE index</string>
+
+</resources>
