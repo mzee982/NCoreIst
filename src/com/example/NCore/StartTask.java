@@ -20,6 +20,7 @@ public class StartTask extends AsyncTask<StartTask.StartTaskListener,Void,Map<St
     private static final String EXCEPTION_GET_CAPTCHA_IMAGE = "Cannot get the reCAPTCA image. HTTP response code: %";
 
     // Parameters
+    public static final String PARAM_OUT_LOGIN_WITH_CAPTCHA = "PARAM_OUT_LOGIN_WITH_CAPTCHA";
     public static final String PARAM_OUT_CAPTCHA_CHALLENGE_VALUE = "PARAM_OUT_CAPTCHA_CHALLENGE_VALUE";
     public static final String PARAM_OUT_CAPTCHA_CHALLENGE_BITMAP = "PARAM_OUT_CAPTCHA_CHALLENGE_BITMAP";
 
@@ -70,6 +71,7 @@ public class StartTask extends AsyncTask<StartTask.StartTaskListener,Void,Map<St
                     else {
                         throw new IOException(EXCEPTION_GET_LOGIN_PAGE.replace("%", String.valueOf(responseCode)));
                     }
+
                 }
 
                 /*
@@ -109,6 +111,7 @@ public class StartTask extends AsyncTask<StartTask.StartTaskListener,Void,Map<St
                         throw new IOException(EXCEPTION_GET_CAPTCHA_IMAGE.replace("%", String.valueOf(responseCode)));
                     }
 
+                    // TODO: Optimize the image size
                     // Decode the bitmap from the HTML input stream
                     captchaChallengeBitmap = BitmapFactory.decodeStream(imgInputStream);
 
@@ -120,6 +123,7 @@ public class StartTask extends AsyncTask<StartTask.StartTaskListener,Void,Map<St
 
                 if (!isCancelled() && (captchaChallengeValue != null) && (captchaChallengeBitmap != null)) {
                     HashMap<String,Object> result = new HashMap<String,Object>();
+                    result.put(PARAM_OUT_LOGIN_WITH_CAPTCHA, Boolean.TRUE);
                     result.put(PARAM_OUT_CAPTCHA_CHALLENGE_VALUE, captchaChallengeValue);
                     result.put(PARAM_OUT_CAPTCHA_CHALLENGE_BITMAP, captchaChallengeBitmap);
 
@@ -127,7 +131,10 @@ public class StartTask extends AsyncTask<StartTask.StartTaskListener,Void,Map<St
                 }
 
                 else {
-                    return null;
+                    HashMap<String,Object> result = new HashMap<String,Object>();
+                    result.put(PARAM_OUT_LOGIN_WITH_CAPTCHA, Boolean.FALSE);
+
+                    return result;
                 }
 
             } catch (MalformedURLException e) {

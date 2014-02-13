@@ -14,6 +14,7 @@ public final class NCoreSession {
     private static String mLoginPassword;
     private static boolean bLoggedIn;
     private static Date mLoginDate;
+    private static String mLogoutUrl;
 
     public static NCoreSession getInstance() {
         if (instance == null) {
@@ -30,6 +31,7 @@ public final class NCoreSession {
         instance.mLoginPassword = null;
         instance.bLoggedIn = false;
         instance.mLoginDate = null;
+        instance.mLogoutUrl = null;
     }
 
     private NCoreSession() {
@@ -52,6 +54,14 @@ public final class NCoreSession {
 
     public boolean isLoggedIn() {
         return bLoggedIn;
+    }
+
+    public String getLogoutUrl() {
+        return mLogoutUrl;
+    }
+
+    public void setLogoutUrl(String url) {
+        mLogoutUrl = url;
     }
 
 }

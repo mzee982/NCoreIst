@@ -35,18 +35,18 @@ public class LoginTask extends AsyncTask<Map<String,Object>,Void,String> {
         int responseCode = 0;
         Map<String, List<String>> headerFields = null;
 
-        // Get intent extras
-        Map<String,Object> extraParams = maps[0];
+        // Get input parameters
+        Map<String,Object> inputParams = maps[0];
 
         // Get the executor activity of the task
-        mExecutor = (LoginTaskListener) extraParams.get(PARAM_IN_EXECUTOR);
+        mExecutor = (LoginTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
 
         // Extract input parameters
-        String loginName = (String) extraParams.get(PARAM_IN_LOGIN_NAME);
-        String loginPassword = (String) extraParams.get(PARAM_IN_LOGIN_PASSWORD);
-        boolean loginWithCaptcha = ((Boolean) extraParams.get(PARAM_IN_LOGIN_WITH_CAPTCHA)).booleanValue();
-        String captchaChallengeValue = (String) extraParams.get(PARAM_IN_CAPTCHA_CHALLENGE_VALUE);
-        String captchaResponseValue = (String) extraParams.get(PARAM_IN_CAPTCHA_RESPONSE_VALUE);
+        String loginName = (String) inputParams.get(PARAM_IN_LOGIN_NAME);
+        String loginPassword = (String) inputParams.get(PARAM_IN_LOGIN_PASSWORD);
+        boolean loginWithCaptcha = ((Boolean) inputParams.get(PARAM_IN_LOGIN_WITH_CAPTCHA)).booleanValue();
+        String captchaChallengeValue = (String) inputParams.get(PARAM_IN_CAPTCHA_CHALLENGE_VALUE);
+        String captchaResponseValue = (String) inputParams.get(PARAM_IN_CAPTCHA_RESPONSE_VALUE);
 
         try {
 

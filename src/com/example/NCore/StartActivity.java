@@ -5,9 +5,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.TextView;
-import org.jsoup.helper.StringUtil;
 
 import java.util.Map;
 
@@ -24,61 +24,73 @@ public class StartActivity extends Activity implements StartTask.StartTaskListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Setup layout
-        setContentView(R.layout.start);
-
         // nCORE session object
         mNCoreSession = NCoreSession.getInstance();
 
+        // Setup layout
+        setContentView(R.layout.start);
+
         // Execute the StartTask
         mStartTask = (StartTask) new StartTask().execute(new StartTask.StartTaskListener[]{this});
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Animate
-        mAnimation = ValueAnimator.ofInt(0, 30);
-        mAnimation.setDuration(1000);
-        mAnimation.setRepeatCount(ValueAnimator.INFINITE);
-        mAnimation.setRepeatMode(ValueAnimator.REVERSE);
-        mAnimation.addUpdateListener(
-                new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        int animatedValue = ((Integer) valueAnimator.getAnimatedValue()).intValue();
-                        String dot1 = ".";
-                        String dot2 = ".";
-                        String dot3 = ".";
-                        String ten = "          ";
-                        char[] tenChars = ten.toCharArray();
+        // Check runtime version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 
-                        if ((0 <= animatedValue) && (animatedValue < 10)) {
-                            tenChars[animatedValue] = '.';
-                            dot3 = new String(tenChars);
-                        }
-                        else if ((10 <= animatedValue) && (animatedValue < 20)) {
-                            tenChars[animatedValue - 10] = '.';
-                            dot2 = new String(tenChars);
-                        }
-                        else if ((20 <= animatedValue) && (animatedValue < 30)) {
-                            tenChars[animatedValue - 20] = '.';
-                            dot1 = new String(tenChars);
-                        }
+            // Animate
+            mAnimation = ValueAnimator.ofInt(0, 30);
+            mAnimation.setDuration(1000);
+            mAnimation.setRepeatCount(ValueAnimator.INFINITE);
+            mAnimation.setRepeatMode(ValueAnimator.REVERSE);
+            mAnimation.addUpdateListener(
+                    new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            int animatedValue = ((Integer) valueAnimator.getAnimatedValue()).intValue();
+                            String dot1 = ".";
+                            String dot2 = ".";
+                            String dot3 = ".";
+                            String ten = "          ";
+                            char[] tenChars = ten.toCharArray();
 
-                        ((TextView) findViewById(R.id.ProgressTextView)).setText(dot1 + dot2 + dot3);
+                            if ((0 <= animatedValue) && (animatedValue < 10)) {
+                                tenChars[animatedValue] = '.';
+                                dot3 = new String(tenChars);
+                            }
+                            else if ((10 <= animatedValue) && (animatedValue < 20)) {
+                                tenChars[animatedValue - 10] = '.';
+                                dot2 = new String(tenChars);
+                            }
+                            else if ((20 <= animatedValue) && (animatedValue < 30)) {
+                                tenChars[animatedValue - 20] = '.';
+                                dot1 = new String(tenChars);
+                            }
+
+                            ((TextView) findViewById(R.id.ProgressTextView)).setText(dot1 + dot2 + dot3);
+                        }
                     }
-                }
-        );
+            );
 
-        mAnimation.start();
+            // TODO: Disabled animation
+            //mAnimation.start();
+
+        }
+
     }
 
     @Override
     protected void onPause() {
-        if (mAnimation.isStarted()) {
-            mAnimation.cancel();
+
+        // Check runtime version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (mAnimation.isStarted()) {
+                mAnimation.cancel();
+            }
         }
 
         super.onPause();
@@ -114,6 +126,9 @@ public class StartActivity extends Activity implements StartTask.StartTaskListen
         // Put the extras
         if (extras != null) {
             intent.putExtra(
+                    LoginActivity.EXTRA_LOGIN_WITH_CAPTHCA,
+                    ((Boolean) extras.get(StartTask.PARAM_OUT_LOGIN_WITH_CAPTCHA)).booleanValue());
+            intent.putExtra(
                     LoginActivity.EXTRA_CAPTCHA_CHALLENGE_VALUE,
                     (String) extras.get(StartTask.PARAM_OUT_CAPTCHA_CHALLENGE_VALUE));
             intent.putExtra(
@@ -121,7 +136,10 @@ public class StartActivity extends Activity implements StartTask.StartTaskListen
                     (Bitmap) extras.get(StartTask.PARAM_OUT_CAPTCHA_CHALLENGE_BITMAP));
         }
 
-        startActivity(intent);
+        // Jump back to the login page
+        setResult(RESULT_OK, intent);
+        finish();
+
     }
 
 }

@@ -11,8 +11,12 @@ public class AlertDialogFragment extends DialogFragment {
 
     // Interface
     public interface AlertDialogListener {
-        public void onAlertDialogPositiveClick(DialogFragment dialogFragment);
+        public void onAlertDialogResult(int responseCode, DialogFragment dialogFragment);
     }
+
+    // Responses
+    public static final int RESPONSE_OK = -1;
+    public static final int RESPONSE_CANCEL = 0;
 
     // Members
     private AlertDialogListener mListener;
@@ -44,11 +48,18 @@ public class AlertDialogFragment extends DialogFragment {
                 android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onAlertDialogPositiveClick(AlertDialogFragment.this);
+                        mListener.onAlertDialogResult(RESPONSE_OK, AlertDialogFragment.this);
                     }
                 });
 
         return builder.create();
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        mListener.onAlertDialogResult(RESPONSE_CANCEL, this);
+
+        super.onCancel(dialog);
     }
 
 }
