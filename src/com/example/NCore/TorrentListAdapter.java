@@ -24,7 +24,8 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
     // Members
     private final LayoutInflater mInflater;
-    private int mLastPageIndex;
+    private int mLastShowedPageIndex;
+    private boolean mHasMoreResults;
 
     /*
      * Constructor
@@ -35,12 +36,13 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        mLastPageIndex = 0;
+        mLastShowedPageIndex = 0;
     }
 
     public void setData(List<TorrentEntry> data) {
         clear();
-        mLastPageIndex = 0;
+        mHasMoreResults = false;
+        mLastShowedPageIndex = 0;
 
         appendData(data);
     }
@@ -58,7 +60,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
                 }
             }
 
-            mLastPageIndex++;
+            mLastShowedPageIndex++;
         }
     }
 
@@ -95,8 +97,16 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         return convertView;
     }
 
-    public int getLastPageIndex() {
-        return mLastPageIndex;
+    public int getLastShowedPageIndex() {
+        return mLastShowedPageIndex;
+    }
+
+    public void setHasMoreResults(boolean aMore) {
+        mHasMoreResults = aMore;
+    }
+
+    public boolean hasMoreResults() {
+        return mHasMoreResults;
     }
 
 }

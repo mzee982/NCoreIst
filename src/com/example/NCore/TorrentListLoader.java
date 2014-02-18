@@ -27,6 +27,7 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
     private int mTorrentListPageIndex;
     private String mTorrentListSearchQuery;
     private List<TorrentEntry> mTorrentList;
+    private boolean mHasMoreResults;
 
     /*
      * Constructor
@@ -119,6 +120,12 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
 
                     // Parse the HTML torrent list page
                     entries = NCoreParser.parseTorrentList(torrentListInputStream);
+
+                    // Has more results
+                    mHasMoreResults = (entries.size() > 0) && (entries.get(entries.size() - 1).isEmpty());
+                    if (mHasMoreResults) {
+                        entries.remove(entries.size() - 1);
+                    }
 
                 }
 
@@ -214,6 +221,10 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
             aTorrentList = null;
         }
 
+    }
+
+    public boolean hasMoreResults() {
+        return mHasMoreResults;
     }
 
 }

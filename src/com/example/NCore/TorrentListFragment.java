@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     public static final String ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX = "ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX";
     public static final String ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY = "ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY";
 
+    // Toast
+    private static final String TOAST_NO_MORE_RESULTS = "No more results";
+
     // Loaders
     private static final int LOADER_TORRENT_LIST = 1;
     private static final int LOADER_TORRENT_SEARCH_LIST = 2;
@@ -27,6 +31,7 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     private int mTorrentListCategoryIndex;
     private String mTorrentListSearchQuery;
     private TorrentListAdapter mAdapter;
+    private Button mMoreButton;
 
     /**
      * More button click listener
@@ -70,13 +75,13 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
          * Torrent list
          */
 
-        Button moreButton = new Button(getActivity());
-        moreButton.setText(getResources().getText(R.string.more_button_label));
-        moreButton.setLayoutParams(
+        mMoreButton = new Button(getActivity());
+        mMoreButton.setText(getResources().getText(R.string.more_button_label));
+        mMoreButton.setLayoutParams(
                 new AbsListView.LayoutParams(
                         AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
-        moreButton.setOnClickListener(new MoreButtonClickListener());
-        getListView().addFooterView(moreButton);
+        mMoreButton.setOnClickListener(new MoreButtonClickListener());
+        getListView().addFooterView(mMoreButton);
 
         mAdapter = new TorrentListAdapter(getActivity());
         setListAdapter(mAdapter);
@@ -130,8 +135,18 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<List<TorrentEntry>> listLoader, List<TorrentEntry> torrentEntries) {
 
+        // Load data into adapter
         if ((listLoader.getId() == LOADER_TORRENT_LIST) || (listLoader.getId() == LOADER_TORRENT_SEARCH_LIST)) {
             mAdapter.appendData(torrentEntries);
+            mAdapter.setHasMoreResults(((TorrentListLoader) listLoader).hasMoreResults());
+        }
+
+        // Show/hide more button
+        if (mAdapter.hasMoreResults()) {
+            mMoreButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            mMoreButton.setVisibility(View.GONE);
         }
 
         // Notify the list view that the data has changed
@@ -164,23 +179,32 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
     public void onMoreButtonClick(View view) {
 
-        // Start out with a progress indicator
-        setListShown(false);
+        // Has more results
+        if (mAdapter.hasMoreResults()) {
 
-        // Set input arguments
-        Bundle args = new Bundle();
-        args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, mTorrentListCategoryIndex);
-        args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
-        args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, mAdapter.getLastPageIndex() + 1);
+            // Start out with a progress indicator
+            setListShown(false);
 
-        // Restart the torrent list loader
-        if (mTorrentListSearchQuery != null) {
-            getLoaderManager().restartLoader(LOADER_TORRENT_SEARCH_LIST, args, this);
+            // Set input arguments
+            Bundle args = new Bundle();
+            args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, mTorrentListCategoryIndex);
+            args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
+            args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, mAdapter.getLastShowedPageIndex() + 1);
+
+            // Restart the torrent list loader
+            if (mTorrentListSearchQuery != null) {
+                getLoaderManager().restartLoader(LOADER_TORRENT_SEARCH_LIST, args, this);
+            }
+
+            // Restart the torrent search loader
+            else {
+                getLoaderManager().restartLoader(LOADER_TORRENT_LIST, args, this);
+            }
+
         }
 
-        // Restart the torrent search loader
         else {
-            getLoaderManager().restartLoader(LOADER_TORRENT_LIST, args, this);
+            Toast.makeText(getActivity(), TOAST_NO_MORE_RESULTS, Toast.LENGTH_SHORT).show();
         }
 
     }

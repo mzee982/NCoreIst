@@ -36,6 +36,7 @@ public final class NCoreParser {
     private static final String HTML_ID_RECAPTCHA_CHALLENGE = "recaptcha_challenge_field";
     private static final String HTML_ID_RECAPTCHA_IMAGE = "recaptcha_challenge_image";
     private static final String HTML_ID_LOGOUT_LINK = "menu_11";
+    private static final String HTML_ID_NPA = "nPa";
     private static final String HTML_CLASS_BOX_TORRENT_ALL = "box_torrent_all";
     private static final String HTML_CLASS_BOX_TORRENT = "box_torrent";
     private static final String HTML_CLASS_BOX_ALAP_IMG = "box_alap_img";
@@ -190,6 +191,12 @@ public final class NCoreParser {
                 }
 
             }
+
+            // Looking for next list page
+            Element nextPageElement = document.getElementById(HTML_ID_NPA);
+
+            // Has more results
+            if (nextPageElement != null) entries.add(new TorrentEntry());
 
         } catch (IOException e) {
             throw new IOException(EXCEPTION_TORRENT_LIST_PAGE_PARSE, e);

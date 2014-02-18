@@ -51,4 +51,8 @@ public class TorrentEntry {
         mTitle = aTitle;
     }
 
+    public boolean isEmpty() {
+        return (mCategory == null) && (mName == null) && (mTitle == null);
+    }
+
 }
