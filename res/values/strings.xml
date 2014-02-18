@@ -16,5 +16,10 @@
 
     <!-- Index Activity -->
     <string name="index_activity_label">nCORE index</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="index_action_search">Torrent search</string>
 
+    <!-- Torrent List Fragment -->
+    <string name="more_button_label">More</string>
 </resources>

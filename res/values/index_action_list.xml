@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="index_action_list">
+        <item>Összes</item>
+        <item>Film</item>
+        <item>Sorozat</item>
+        <item>Zene</item>
+        <item>XXX</item>
+        <item>Játék</item>
+        <item>Program</item>
+        <item>Könyv</item>
+    </string-array>
+</resources>

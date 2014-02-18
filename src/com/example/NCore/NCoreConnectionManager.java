@@ -1,5 +1,6 @@
 package com.example.NCore;
 
+import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 
 import java.io.DataOutputStream;
@@ -32,23 +33,65 @@ public final class NCoreConnectionManager {
     public static final String BASE_URI = "https://ncore.cc";
     private static final String URL_LOGIN_PAGE = "/login.php";
     private static final String URL_INDEX_PAGE = "/index.php";
+    private static final String URL_TORRENT_LIST_PAGE = "/torrents.php";
     public static final String URL_LOGIN = BASE_URI + URL_LOGIN_PAGE; // "https://ncore.cc/login.php"
     public static final String URL_INDEX = BASE_URI + URL_INDEX_PAGE; // "https://ncore.cc/index.php"
+    public static final String URL_TORRENT_LIST = BASE_URI + URL_TORRENT_LIST_PAGE; // "https://ncore.cc/torrents.php"
 
     // URL query keys
     private static final String URL_QUERY_KEY_PROBLEM = "problema";
+    private static final String URL_QUERY_KEY_TORRENT_CATEGORY = "csoport_listazas";
+    private static final String URL_QUERY_KEY_TORRENT_LIST_PAGE = "oldal";
 
-    // HTTP POST parameters
+    // URL query values
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_MOVIE = "osszes_film";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_SERIES = "osszes_sorozat";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_MUSIC = "osszes_zene";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_XXX = "osszes_xxx";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_GAME = "osszes_jatek";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_SOFTWARE = "osszes_program";
+    private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_BOOK = "osszes_konyv";
+
+    // HTTP POST parameter keys
     private static final String POST_PARAM_KEY_LANG = "set_lang";
-    private static final String POST_PARAM_VALUE_LANG_HU = "hu";
     private static final String POST_PARAM_KEY_SUBMITTED = "submitted";
-    private static final String POST_PARAM_VALUE_SUBMITTED_1 = "1";
     private static final String POST_PARAM_KEY_SUBMIT = "submit";
-    private static final String POST_PARAM_VALUE_SUBMIT = "Belépés!";
     private static final String POST_PARAM_KEY_LOGIN_NAME = "nev";
     private static final String POST_PARAM_KEY_LOGIN_PASSWORD = "pass";
     private static final String POST_PARAM_KEY_CAPTCHA_CHALLENGE = "recaptcha_challenge_field";
     private static final String POST_PARAM_KEY_CAPTCHA_RESPONSE = "recaptcha_response_field";
+    private static final String POST_PARAM_KEY_SEARCH_QUERY = "mire";
+    private static final String POST_PARAM_KEY_SEARCH_TARGET = "miben";
+    private static final String POST_PARAM_KEY_SEARCH_TYPE = "tipus";
+    private static final String POST_PARAM_KEY_SEARCH_SELECTED_TYPE = "kivalasztott_tipus";
+    private static final String POST_PARAM_KEY_SEARCH_PAGE_INDEX = "oldal";
+    private static final String POST_PARAM_KEY_SEARCH_SUBMIT_X = "submit.x";
+    private static final String POST_PARAM_KEY_SEARCH_SUBMIT_Y = "submit.y";
+    private static final String POST_PARAM_KEY_SEARCH_TAGS = "tags";
+
+    // HTTP POST parameter values
+    private static final String POST_PARAM_VALUE_LANG_HU = "hu";
+    private static final String POST_PARAM_VALUE_SUBMITTED_1 = "1";
+    private static final String POST_PARAM_VALUE_SUBMIT = "Belépés!";
+    private static final String POST_PARAM_VALUE_SEARCH_TARGET_NAME = "name";
+    private static final String POST_PARAM_VALUE_SEARCH_TARGET_DESC = "leiras";
+    private static final String POST_PARAM_VALUE_SEARCH_TARGET_LABEL = "cimke";
+    private static final String POST_PARAM_VALUE_SEARCH_TYPE_ALL_OWN = "all_own";
+    private static final String POST_PARAM_VALUE_SEARCH_TYPE_ALL = "all";
+    private static final String POST_PARAM_VALUE_SEARCH_TYPE_SELECTED = "kivalasztottak_kozott";
+    private static final String POST_PARAM_VALUE_SEARCH_TYPE_ORIGINAL = "eredeti_releasekben";
+
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_MOVIE =
+            "xvid_hun,xvid,dvd_hun,dvd,dvd9_hun,dvd9,hd_hun,hd";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_SERIES =
+            "xvidser_hun,xvidser,dvdser_hun,dvdser,hdser_hun,hdser";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_MUSIC = "mp3_hun,mp3,lossless_hun,lossless,clip";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_XXX = "xxx_xvid,xxx_dvd,xxx_imageset,xxx_hd";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_GAME = "game_iso,game_rip,console";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_SOFTWARE = "iso,misc,mobil";
+    private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_BOOK = "ebook_hun,ebook";
+    private static final String POST_PARAM_VALUE_SEARCH_SUBMIT_X = "0";
+    private static final String POST_PARAM_VALUE_SEARCH_SUBMIT_Y = "0";
 
     // HTTP header fields
     private static final String HTTP_HEADER_FIELD_LOCATION = "Location";
@@ -151,6 +194,30 @@ public final class NCoreConnectionManager {
         return connection;
     }
 
+    public static HttpURLConnection openPostConnectionForResult(String aUrlString, Map<String, String> aPostParamsMap)
+            throws MalformedURLException, IOException {
+
+        // Initialize the connection
+        HttpURLConnection connection = openConnection(aUrlString);
+
+        // Prepare for HTTP POST request
+        connection.setRequestMethod(REQUEST_METHOD_POST);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+
+        // Prepare POST params
+        byte[] postParams = preparePostParams(aPostParamsMap);
+
+        // Posting content
+        connection.setFixedLengthStreamingMode(postParams.length);
+        DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
+        dataOutputStream.write(postParams);
+        dataOutputStream.flush();
+
+        return connection;
+    }
+
+
     /**
      * Initialize a default cookie manager
      */
@@ -192,7 +259,7 @@ public final class NCoreConnectionManager {
     }
 
     /**
-     * Concatenate the params for the login HTTP POST
+     * Map the params for the login HTTP POST
      *
      * @param loginName                Mandatory login name
      * @param loginPassword            Mandatory login password
@@ -227,6 +294,117 @@ public final class NCoreConnectionManager {
         }
 
         return postParams;
+    }
+
+    /**
+     * Map the params for the torrent list search HTTP POST
+     *
+     * @param aCategoryIndex    Index of the torrent list category
+     * @param aQuery            Mandatory search query string
+     * @param aPageIndex        Index of the torrent list page
+     * @return          Map of the search parameters
+     * @throws UnsupportedEncodingException
+     */
+    public static Map<String,String> prepareSearchPostParams(
+            int aCategoryIndex, String aQuery, int aPageIndex) throws UnsupportedEncodingException {
+
+        HashMap<String,String> postParams = new HashMap<String,String>();
+
+        // Constants
+        postParams.put(POST_PARAM_KEY_SEARCH_TARGET, POST_PARAM_VALUE_SEARCH_TARGET_NAME);
+
+        if (aCategoryIndex == 0) {
+            postParams.put(POST_PARAM_KEY_SEARCH_TYPE, POST_PARAM_VALUE_SEARCH_TYPE_ALL_OWN);
+        }
+        else {
+            postParams.put(POST_PARAM_KEY_SEARCH_TYPE, POST_PARAM_VALUE_SEARCH_TYPE_SELECTED);
+        }
+
+        // Selected types
+        switch (aCategoryIndex) {
+            case 0:
+                break;
+            case 1:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_MOVIE);
+                break;
+            case 2:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_SERIES);
+                break;
+            case 3:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_MUSIC);
+                break;
+            case 4:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_XXX);
+                break;
+            case 5:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_GAME);
+                break;
+            case 6:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_SOFTWARE);
+                break;
+            case 7:
+                postParams.put(POST_PARAM_KEY_SEARCH_SELECTED_TYPE, POST_PARAM_VALUE_SEARCH_SEL_TYPE_BOOK);
+                break;
+            default:
+                // None
+        }
+
+        // Search query
+        postParams.put(POST_PARAM_KEY_SEARCH_QUERY, aQuery.replaceAll("\\s+", "+"));
+
+        // Search results page index
+        postParams.put(POST_PARAM_KEY_SEARCH_PAGE_INDEX, String.valueOf(aPageIndex));
+
+        return postParams;
+    }
+
+
+    /**
+     * Prepare the URL for querying torrent list for the given category
+     *
+     * @param aCategoryIndex    Index of the torrent list category
+     * @param aPageIndex        Index of the torrent list page
+     * @return                  URL string
+     */
+    public static String prepareTorrentListUrlForCategory(int aCategoryIndex, int aPageIndex) {
+
+        // URI builder for the base torrent list URL
+        Uri uri = Uri.parse(URL_TORRENT_LIST);
+        Uri.Builder uriBuilder = uri.buildUpon();
+
+        // Append torrent category query parameters
+        switch (aCategoryIndex) {
+            case 0:
+                break;
+            case 1:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_MOVIE);
+                break;
+            case 2:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_SERIES);
+                break;
+            case 3:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_MUSIC);
+                break;
+            case 4:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_XXX);
+                break;
+            case 5:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_GAME);
+                break;
+            case 6:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_SOFTWARE);
+                break;
+            case 7:
+                uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_CATEGORY, URL_QUERY_VALUE_TORRENT_CATEGORY_BOOK);
+                break;
+            default:
+                // None
+        }
+
+        // Append torrent list page query parameters
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_TORRENT_LIST_PAGE, String.valueOf(aPageIndex));
+
+        return uriBuilder.build().toString();
     }
 
     /**
