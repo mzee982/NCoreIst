@@ -46,13 +46,13 @@ public class IndexActivity
     private static final String TAG_TORRENT_LIST_GAME_FRAGMENT = "TAG_TORRENT_LIST_GAME_FRAGMENT";
     private static final String TAG_TORRENT_LIST_SOFTWARE_FRAGMENT = "TAG_TORRENT_LIST_SOFTWARE_FRAGMENT";
     private static final String TAG_TORRENT_LIST_BOOK_FRAGMENT = "TAG_TORRENT_LIST_BOOK_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_SEARCH_FRAGMENT = "TAG_TORRENT_LIST_SEARCH_FRAGMENT";
 
     //
     private static final String QUESTION_LOGOUT = "Do you really want to logout?";
     private static final String ALERT_LOGOUT = "Logout failed. Try again.";
 
     // Members
+    private MenuItem mSearchItem;
     private String[] mIndexLeftDrawerItems;
     private DrawerLayout mIndexDrawerLayout;
     private IndexActionBarDrawerToggle mIndexDrawerToggle;
@@ -207,11 +207,6 @@ public class IndexActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onDestroy() {
 
         // Cancel the running LogoutTask
@@ -244,8 +239,8 @@ public class IndexActivity
 
         // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.index_activity_actions, menu);
-        MenuItem searchItem = menu.findItem(R.id.index_action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchItem = menu.findItem(R.id.index_action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
 
         // Configure the search info and add any event listeners
         searchView.setOnQueryTextListener(new IndexQueryTextListener());
@@ -487,27 +482,17 @@ public class IndexActivity
     }
 
     private boolean submitIndexQueryText(String query) {
-        mFragmentTag = null;
-        Bundle fragmentArguments = null;
 
-        // Fragment tag
-        mFragmentTag = TAG_TORRENT_LIST_SEARCH_FRAGMENT;
+        // Start the search activity
+        Intent intent = new Intent(this, SearchActivity.class);
 
-        // Create a new fragment
-        Fragment torrentListFragment = new TorrentListFragment();
+        intent.putExtra(SearchActivity.EXTRA_TORRENT_LIST_CATEGORY_INDEX, getSupportActionBar().getSelectedNavigationIndex());
+        intent.putExtra(SearchActivity.EXTRA_TORRENT_LIST_SEARCH_QUERY, query);
 
-        // Set input arguments
-        fragmentArguments = new Bundle();
-        fragmentArguments.putInt(
-                TorrentListFragment.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX,
-                getSupportActionBar().getSelectedNavigationIndex());
-        fragmentArguments.putString(TorrentListFragment.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, query);
+        startActivity(intent);
 
-        torrentListFragment.setArguments(fragmentArguments);
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.IndexContentFrame, torrentListFragment, mFragmentTag).commit();
+        // Close the search action view
+        MenuItemCompat.collapseActionView(mSearchItem);
 
         return true;
     }

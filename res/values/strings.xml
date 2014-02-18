@@ -20,6 +20,9 @@
     <string name="drawer_close">Close</string>
     <string name="index_action_search">Torrent search</string>
 
+    <!-- Search Activity -->
+    <string name="search_activity_label">nCORE search</string>
+
     <!-- Torrent List Fragment -->
     <string name="more_button_label">More</string>
 </resources>

@@ -2,5 +2,6 @@
 <resources>
     <string-array name="index_left_drawer_items">
         <item>Letöltés</item>
+        <item>Keresés</item>
     </string-array>
 </resources>

@@ -17,6 +17,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="SearchActivity"
+                  android:label="@string/search_activity_label"
+                  android:theme="@style/Theme.AppCompat"
+                  android:parentActivityName="IndexActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value="com.example.NCore.IndexActivity" />
+        </activity>
+
         <activity android:name="LoginActivity" android:label="@string/login_activity_label"/>
 
         <activity android:name="StartActivity" android:label="@string/start_activity_label"/>
