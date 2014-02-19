@@ -1,15 +1,12 @@
 package com.example.NCore;
 
-import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +38,8 @@ public final class NCoreParser {
     private static final String HTML_CLASS_BOX_TORRENT = "box_torrent";
     private static final String HTML_CLASS_BOX_ALAP_IMG = "box_alap_img";
     private static final String HTML_CLASS_TORRENT_TXT = "torrent_txt";
+    private static final String HTML_CLASS_TABLA_SZOVEG = "tabla_szoveg";
+    private static final String HTML_CLASS_INFOLINK = "infolink";
 
     /**
      * Private constructor to prevent instantiation
@@ -166,11 +165,11 @@ public final class NCoreParser {
 
                     }
 
-                    Elements torrentTxtElements = element.getElementsByClass(HTML_CLASS_TORRENT_TXT);
+                    Elements tablaSzoveg = element.getElementsByClass(HTML_CLASS_TABLA_SZOVEG);
 
                     // Get torrent name and title
-                    if ((torrentTxtElements != null) && (torrentTxtElements.size() > 0)) {
-                        Elements hrefElements = torrentTxtElements.get(0).getElementsByAttribute(HTML_ATTR_TITLE);
+                    if ((tablaSzoveg != null) && (tablaSzoveg.size() > 0)) {
+                        Elements hrefElements = tablaSzoveg.get(0).getElementsByAttribute(HTML_ATTR_TITLE);
 
                         //
                         if (hrefElements != null) {
@@ -184,6 +183,14 @@ public final class NCoreParser {
                         }
 
                     }
+
+                    Elements infoLinkElements = element.getElementsByClass(HTML_CLASS_INFOLINK);
+
+                    // Get IMDB info
+                    if ((infoLinkElements != null) && (infoLinkElements.size() > 0)) {
+                        torrentEntry.setImdb(infoLinkElements.get(0).text());
+                    }
+
 
                     // Add torrent entry
                     entries.add(torrentEntry);

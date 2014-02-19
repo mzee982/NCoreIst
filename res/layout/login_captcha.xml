@@ -7,7 +7,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_name_text"
-            android:id="@+id/LoginNameTextView"/>
+            android:id="@+id/LoginNameTextView"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -16,7 +17,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_password_text"
-            android:id="@+id/LoginPasswordTextView"/>
+            android:id="@+id/LoginPasswordTextView"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -31,11 +33,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/captcha_text"
-            android:id="@+id/CaptchaTextView"/>
+            android:id="@+id/CaptchaTextView"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/CaptchaEditText"/>
+    <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/login_remember_text"
+            android:id="@+id/RememberCheckBox"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -25,7 +25,7 @@ public class StartActivity extends Activity implements StartTask.StartTaskListen
         super.onCreate(savedInstanceState);
 
         // nCORE session object
-        mNCoreSession = NCoreSession.getInstance();
+        mNCoreSession = NCoreSession.getInstance(this);
 
         // Setup layout
         setContentView(R.layout.start);

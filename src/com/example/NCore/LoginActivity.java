@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -51,7 +52,7 @@ public class LoginActivity
         super.onCreate(savedInstanceState);
 
         // nCORE session object
-        mNCoreSession = NCoreSession.getInstance();
+        mNCoreSession = NCoreSession.getInstance(this);
 
         // Get the login page
         if (!getIntent().hasExtra(EXTRA_LOGIN_WITH_CAPTHCA)) {
@@ -81,6 +82,17 @@ public class LoginActivity
             // Simple login layout
             else {
                 setContentView(R.layout.login);
+            }
+
+            // Set default field values
+            if (mNCoreSession.isRememberCredentials()) {
+                EditText loginNameEditText = (EditText) findViewById(R.id.LoginNameEditText);
+                EditText loginPasswordEditText = (EditText) findViewById(R.id.LoginPasswordEditText);
+                CheckBox rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.RememberCheckBox);
+
+                loginNameEditText.setText(mNCoreSession.getLoginName());
+                loginPasswordEditText.setText(mNCoreSession.getLoginPassword());
+                rememberCredentialsCheckBox.setChecked(mNCoreSession.isRememberCredentials());
             }
 
         }
@@ -254,7 +266,8 @@ public class LoginActivity
     private void loginSuccess() {
 
         // Start the login session
-        mNCoreSession.login(mLoginName, mLoginPassword);
+        mNCoreSession.login(
+                this, mLoginName, mLoginPassword, ((CheckBox) findViewById(R.id.RememberCheckBox)).isChecked());
 
         // Go to the index page
         jumpToIndexActivity(null);

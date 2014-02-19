@@ -27,7 +27,7 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         // nCORE session object
-        mNCoreSession = NCoreSession.getInstance();
+        mNCoreSession = NCoreSession.getInstance(this);
 
         /*
          * Intent extras

@@ -142,12 +142,14 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         }
 
         // Show/hide more button
+        /*
         if (mAdapter.hasMoreResults()) {
             mMoreButton.setVisibility(View.VISIBLE);
         }
         else {
             mMoreButton.setVisibility(View.GONE);
         }
+        */
 
         // Notify the list view that the data has changed
         mAdapter.notifyDataSetChanged();

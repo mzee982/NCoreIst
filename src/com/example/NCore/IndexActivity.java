@@ -132,7 +132,7 @@ public class IndexActivity
         super.onCreate(savedInstanceState);
 
         // nCORE session object
-        mNCoreSession = NCoreSession.getInstance();
+        mNCoreSession = NCoreSession.getInstance(this);
 
         // Check the login status
         if (!mNCoreSession.isLoggedIn()) {

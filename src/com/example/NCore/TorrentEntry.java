@@ -6,6 +6,7 @@ public class TorrentEntry {
     private String mCategory;
     private String mName;
     private String mTitle;
+    private String mImdb;
 
     /*
      * Constructor
@@ -15,12 +16,14 @@ public class TorrentEntry {
         mCategory = null;
         mName = null;
         mTitle = null;
+        mImdb = null;
     }
 
-    public TorrentEntry(String aCategory, String aName, String aTitle) {
+    public TorrentEntry(String aCategory, String aName, String aTitle, String aImdb) {
         mCategory = aCategory;
         mName = aName;
         mTitle = aTitle;
+        mImdb = aImdb;
     }
 
     /*
@@ -49,6 +52,14 @@ public class TorrentEntry {
 
     public void setTitle(String aTitle) {
         mTitle = aTitle;
+    }
+
+    public String getImdb() {
+        return mImdb;
+    }
+
+    public void setImdb(String aImdb) {
+        mImdb = aImdb;
     }
 
     public boolean isEmpty() {
