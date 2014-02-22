@@ -10,6 +10,8 @@ import java.net.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Static class for managing NCore related HTTP connections
@@ -42,6 +44,8 @@ public final class NCoreConnectionManager {
     private static final String URL_QUERY_KEY_PROBLEM = "problema";
     private static final String URL_QUERY_KEY_TORRENT_CATEGORY = "csoport_listazas";
     private static final String URL_QUERY_KEY_TORRENT_LIST_PAGE = "oldal";
+    private static final String URL_QUERY_KEY_ACTION = "action";
+    private static final String URL_QUERY_KEY_ID = "id";
 
     // URL query values
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_MOVIE = "osszes_film";
@@ -51,6 +55,7 @@ public final class NCoreConnectionManager {
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_GAME = "osszes_jatek";
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_SOFTWARE = "osszes_program";
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_BOOK = "osszes_konyv";
+    private static final String URL_QUERY_VALUE_ACTION_DOWNLOAD = "download";
 
     // HTTP POST parameter keys
     private static final String POST_PARAM_KEY_LANG = "set_lang";
@@ -95,9 +100,11 @@ public final class NCoreConnectionManager {
 
     // HTTP header fields
     private static final String HTTP_HEADER_FIELD_LOCATION = "Location";
+    private static final String HTTP_HEADER_FIELD_CONTENT_DISPOSITION = "Content-Disposition";
 
     // Login response messages
     private static final String LOGIN_RESPONSE_UNEXPECTED = "Unexpected login response";
+    private static final String DOWNLOAD_RESPONSE_UNEXPECTED = "Unexpected download response";
     private static final String LOGIN_RESPONSE_PROBLEM_1 = "Hibás felhasználónév vagy jelszó!";
 
     /**
@@ -407,6 +414,19 @@ public final class NCoreConnectionManager {
         return uriBuilder.build().toString();
     }
 
+    public static String prepareTorrentDownloadUrl(long aTorrentId) {
+
+        // URI builder for the base torrent list URL
+        Uri uri = Uri.parse(URL_TORRENT_LIST);
+        Uri.Builder uriBuilder = uri.buildUpon();
+
+        // Append torrent download query parameters
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ACTION, URL_QUERY_VALUE_ACTION_DOWNLOAD);
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ID, String.valueOf(aTorrentId));
+
+        return uriBuilder.build().toString();
+    }
+
     /**
      * Evaluate the login HTTP response
      *
@@ -473,6 +493,36 @@ public final class NCoreConnectionManager {
         // Unexpected response
         else {
             return LOGIN_RESPONSE_UNEXPECTED;
+        }
+
+    }
+
+    public static String evaluateTorrentDownloadResponse(Map<String, List<String>> headerFields) {
+
+        // Get Content-Disposition header field
+        List<String> contentDispositionStrings = headerFields.get(HTTP_HEADER_FIELD_CONTENT_DISPOSITION);
+
+        if ((contentDispositionStrings != null) &&(contentDispositionStrings.size() > 0)) {
+
+            // Looking for the filename
+            Pattern extractFileNamePattern = Pattern.compile("^.*filename=\"(.*)\".*$");
+
+            // Extract filename
+            Matcher matcher = extractFileNamePattern.matcher(contentDispositionStrings.get(0));
+
+            // Return filename
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+            else {
+                return null;
+            }
+
+        }
+
+        else {
+            return null;
         }
 
     }

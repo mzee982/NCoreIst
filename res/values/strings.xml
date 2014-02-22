@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">nCORE</string>
+    <string name="app_name">nCOREist</string>
 
     <!-- NCoreSession -->
     <string name="shared_pref_login_name">login_name</string>
@@ -8,12 +8,12 @@
     <string name="shared_pref_remember_credentials">remember_credentials</string>
 
     <!-- Start Activity -->
-    <string name="start_activity_label">nCORE</string>
-    <string name="logo_text">nCORE</string>
+    <string name="start_activity_label">nCOREist</string>
+    <string name="logo_text">nCOREist</string>
     <string name="progress_text">. . .</string>
 
     <!-- Login Activity -->
-    <string name="login_activity_label">nCORE Login</string>
+    <string name="login_activity_label">nCOREist Login</string>
     <string name="login_name_text">Felhasználónév</string>
     <string name="login_password_text">Jelszó</string>
     <string name="captcha_text">Captcha</string>
@@ -21,13 +21,14 @@
     <string name="login_button_text">Bejelentkezés</string>
 
     <!-- Index Activity -->
-    <string name="index_activity_label">nCORE</string>
+    <string name="index_activity_label">nCOREist</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="index_action_search">Torrent search</string>
+    <string name="index_action_refresh">Torrent list refresh</string>
 
     <!-- Search Activity -->
-    <string name="search_activity_label">nCORE Search</string>
+    <string name="search_activity_label">nCOREist Search</string>
 
     <!-- Torrent List Fragment -->
     <string name="more_button_label">More</string>

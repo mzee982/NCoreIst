@@ -4,8 +4,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:background="#616161">
+        android:paddingRight="4dp">
+<!-- android:background="@drawable/torrent_list_item_odd_selector" -->
     <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             android:layout_toRightOf="@id/imageCategory"
             android:singleLine="true"
             android:textStyle="bold"
-            android:textColor="#E7E7E7"/>
+            android:textColor="@color/torrent_list_item_text1"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:layout_below="@+id/textName"
             android:layout_alignParentEnd="true"
             android:singleLine="true"
-            android:textColor="#BFBFBF"/>
+            android:textColor="@color/torrent_list_item_text2"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,5 +46,5 @@
             android:layout_toRightOf="@id/imageCategory"
             android:layout_toLeftOf="@id/textImdb"
             android:singleLine="true"
-            android:textColor="#BFBFBF"/>
+            android:textColor="@color/torrent_list_item_text2"/>
 </RelativeLayout>

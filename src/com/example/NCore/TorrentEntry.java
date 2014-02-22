@@ -3,6 +3,7 @@ package com.example.NCore;
 public class TorrentEntry {
 
     // Members
+    private long mId;
     private String mCategory;
     private String mName;
     private String mTitle;
@@ -13,13 +14,15 @@ public class TorrentEntry {
      */
 
     public TorrentEntry() {
+        mId = -1L;
         mCategory = null;
         mName = null;
         mTitle = null;
         mImdb = null;
     }
 
-    public TorrentEntry(String aCategory, String aName, String aTitle, String aImdb) {
+    public TorrentEntry(long id, String aCategory, String aName, String aTitle, String aImdb) {
+        mId = id;
         mCategory = aCategory;
         mName = aName;
         mTitle = aTitle;
@@ -60,6 +63,14 @@ public class TorrentEntry {
 
     public void setImdb(String aImdb) {
         mImdb = aImdb;
+    }
+
+    public long getId() {
+        return mId;
+    }
+
+    public void setId(long aId) {
+        mId = aId;
     }
 
     public boolean isEmpty() {

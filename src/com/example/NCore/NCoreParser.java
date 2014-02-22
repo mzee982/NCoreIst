@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class NCoreParser {
 
@@ -30,6 +32,7 @@ public final class NCoreParser {
     private static final String HTML_ATTR_HREF = "href";
     private static final String HTML_ATTR_TITLE = "title";
     private static final String HTML_ATTR_ALT = "alt";
+    private static final String HTML_ATTR_ONCLICK = "onclick";
     private static final String HTML_ID_RECAPTCHA_CHALLENGE = "recaptcha_challenge_field";
     private static final String HTML_ID_RECAPTCHA_IMAGE = "recaptcha_challenge_image";
     private static final String HTML_ID_LOGOUT_LINK = "menu_11";
@@ -134,6 +137,9 @@ public final class NCoreParser {
     public static List<TorrentEntry> parseTorrentList(InputStream inputStream) throws IOException {
         List<TorrentEntry> entries = new ArrayList<TorrentEntry>();
 
+        //
+        Pattern extractIdPattern = Pattern.compile("^.*'(.*)'.*$");
+
         // Parse the input stream
         try {
 
@@ -169,16 +175,31 @@ public final class NCoreParser {
 
                     // Get torrent name and title
                     if ((tablaSzoveg != null) && (tablaSzoveg.size() > 0)) {
-                        Elements hrefElements = tablaSzoveg.get(0).getElementsByAttribute(HTML_ATTR_TITLE);
+                        Elements titleElements = tablaSzoveg.get(0).getElementsByAttribute(HTML_ATTR_TITLE);
 
                         //
-                        if (hrefElements != null) {
+                        if (titleElements != null) {
 
                             // Add torrent name
-                            if (hrefElements.size() > 0) torrentEntry.setName(hrefElements.get(0).attr(HTML_ATTR_TITLE));
+                            if (titleElements.size() > 0) torrentEntry.setName(titleElements.get(0).attr(HTML_ATTR_TITLE));
 
                             // Add torrent title
-                            if (hrefElements.size() > 1) torrentEntry.setTitle(hrefElements.get(1).attr(HTML_ATTR_TITLE));
+                            if (titleElements.size() > 1) torrentEntry.setTitle(titleElements.get(1).attr(HTML_ATTR_TITLE));
+
+                        }
+
+                        Elements onClickElements = tablaSzoveg.get(0).getElementsByAttribute(HTML_ATTR_ONCLICK);
+
+                        // Get torrent id
+                        if ((onClickElements != null) && (onClickElements.size() > 0)) {
+                            String onClickString = onClickElements.get(0).attr(HTML_ATTR_ONCLICK);
+
+                            // Extract id
+                            Matcher matcher = extractIdPattern.matcher(onClickString);
+
+                            if (matcher.find()) {
+                                torrentEntry.setId(Long.parseLong(matcher.group(1)));
+                            }
 
                         }
 

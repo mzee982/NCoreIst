@@ -15,10 +15,6 @@ import java.util.List;
 
 public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
-    // Colors
-    private static final int BACKGROUND_COLOR_ODD_ROW = Color.rgb(0x61, 0x61, 0x61);
-    private static final int BACKGROUND_COLOR_EVEN_ROW = Color.rgb(0x54, 0x54, 0x54);
-
     /**
      * ViewHolder
      */
@@ -43,14 +39,23 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        // Defaults
         mLastShowedPageIndex = 0;
+        mHasMoreResults = false;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
     }
 
     public void setData(List<TorrentEntry> data) {
         clear();
-        mHasMoreResults = false;
-        mLastShowedPageIndex = 0;
-
         appendData(data);
     }
 
@@ -108,13 +113,24 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
         // Background color of the odd/even row
         if (position % 2 == 0) {
-            convertView.setBackgroundColor(BACKGROUND_COLOR_EVEN_ROW);
+            convertView.setBackgroundResource(R.drawable.torrent_list_item_even_selector);
         }
         else {
-            convertView.setBackgroundColor(BACKGROUND_COLOR_ODD_ROW);
+            convertView.setBackgroundResource(R.drawable.torrent_list_item_odd_selector);
         }
 
         return convertView;
+    }
+
+    @Override
+    public void clear() {
+
+        // Reset
+        mLastShowedPageIndex = 0;
+        mHasMoreResults = false;
+
+        super.clear();
+
     }
 
     public int getLastShowedPageIndex() {

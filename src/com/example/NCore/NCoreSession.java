@@ -10,8 +10,14 @@ import java.util.Date;
  */
 // TODO: Reconsider of using Application context instead
 public final class NCoreSession {
+
+    //
+    private static final String FILE_EXTENSION_TORRENT = ".torrent";
+
+    // Singleton
     private static NCoreSession instance = null;
 
+    // Members
     private static Date mSessionStartDate;
     private static String mLoginName;
     private static String mLoginPassword;
@@ -91,7 +97,7 @@ public final class NCoreSession {
 
     }
 
-    public void logout() {
+    public void logout(Context aContext) {
 
         // Forget credentials
         if (!bRememberCredentials) {
@@ -102,6 +108,14 @@ public final class NCoreSession {
         // Defaults
         bLoggedIn = false;
         mLoginDate = null;
+
+        // Garbage downloaded torrent files
+        String[] fileList = aContext.fileList();
+
+        for (String fileName : fileList) {
+            if (fileName.indexOf(FILE_EXTENSION_TORRENT) > -1) aContext.deleteFile(fileName);
+        }
+
     }
 
     public String getLoginName() {

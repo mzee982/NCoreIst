@@ -7,17 +7,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SpinnerAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +39,14 @@ public class IndexActivity
     private static final String TAG_LOGOUT_ALERT_DIALOG_FRAGMENT = "TAG_LOGOUT_ALERT_DIALOG_FRAGMENT";
 
     // Torrent list fragment tags
-    private static final String TAG_TORRENT_LIST_ALL_FRAGMENT = "TAG_TORRENT_LIST_ALL_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_MOVIE_FRAGMENT = "TAG_TORRENT_LIST_MOVIE_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_SERIES_FRAGMENT = "TAG_TORRENT_LIST_SERIES_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_MUSIC_FRAGMENT = "TAG_TORRENT_LIST_MUSIC_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_XXX_FRAGMENT = "TAG_TORRENT_LIST_XXX_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_GAME_FRAGMENT = "TAG_TORRENT_LIST_GAME_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_SOFTWARE_FRAGMENT = "TAG_TORRENT_LIST_SOFTWARE_FRAGMENT";
-    private static final String TAG_TORRENT_LIST_BOOK_FRAGMENT = "TAG_TORRENT_LIST_BOOK_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_ALL_FRAGMENT = "TAG_TORRENT_LIST_ALL_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_MOVIE_FRAGMENT = "TAG_TORRENT_LIST_MOVIE_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_SERIES_FRAGMENT = "TAG_TORRENT_LIST_SERIES_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_MUSIC_FRAGMENT = "TAG_TORRENT_LIST_MUSIC_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_XXX_FRAGMENT = "TAG_TORRENT_LIST_XXX_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_GAME_FRAGMENT = "TAG_TORRENT_LIST_GAME_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_SOFTWARE_FRAGMENT = "TAG_TORRENT_LIST_SOFTWARE_FRAGMENT";
+    public static final String TAG_TORRENT_LIST_BOOK_FRAGMENT = "TAG_TORRENT_LIST_BOOK_FRAGMENT";
 
     //
     private static final String QUESTION_LOGOUT = "Do you really want to logout?";
@@ -61,6 +62,8 @@ public class IndexActivity
     private LogoutTask mLogoutTask;
     private IndexTask mIndexTask;
     private String mFragmentTag;
+    private IndexPagerAdapter mIndexPagerAdapter;
+    private ViewPager mViewPager;
 
     /**
      * Navigation drawer listener
@@ -83,6 +86,34 @@ public class IndexActivity
         public boolean onNavigationItemSelected(int position, long itemId) {
             return selectIndexNavigationItem(position, itemId);
         }
+    }
+
+    private class IndexTabNavigationListener implements ActionBar.TabListener {
+
+        @Override
+        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+            mViewPager.setCurrentItem(tab.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+        }
+
+        @Override
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+        }
+
+    }
+
+    private class IndexViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
+
+        @Override
+        public void onPageSelected(int position) {
+            getSupportActionBar().setSelectedNavigationItem(position);
+        }
+
     }
 
     /**
@@ -181,17 +212,43 @@ public class IndexActivity
              * Action bar
              */
 
-            // Drop-down navigation
-            SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
-                    this, R.array.index_action_list, android.R.layout.simple_spinner_dropdown_item);
+            // Get tab labels
+            String[] tabs = getResources().getStringArray(R.array.index_action_list);
 
-            getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            getSupportActionBar().setListNavigationCallbacks(spinnerAdapter, new IndexNavigationListener());
+            // Drop-down navigation
+            //SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
+            //        this, R.array.index_action_list, android.R.layout.simple_spinner_dropdown_item);
+
+            //getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            //getSupportActionBar().setListNavigationCallbacks(spinnerAdapter, new IndexNavigationListener());
+
+            /*
+             * View pager
+             */
+
+            mIndexPagerAdapter = new IndexPagerAdapter(getSupportFragmentManager(), tabs);
+            mViewPager = (ViewPager) findViewById(R.id.IndexContentPager);
+            mViewPager.setOnPageChangeListener(new IndexViewPagerListener());
+            mViewPager.setAdapter(mIndexPagerAdapter);
+
+            // Tab navigation
+            getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+            // Add navigation tabs
+            IndexTabNavigationListener listener = new IndexTabNavigationListener();
+
+            for (int i = 0; i < tabs.length; i++) {
+                getSupportActionBar()
+                        .addTab(getSupportActionBar()
+                                .newTab()
+                                        .setText(tabs[i])
+                                                .setTabListener(listener));
+            }
 
             // Action bar
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         }
 
@@ -244,22 +301,6 @@ public class IndexActivity
 
         // Configure the search info and add any event listeners
         searchView.setOnQueryTextListener(new IndexQueryTextListener());
-
-        /*
-        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                // Do something when collapsed
-                return true;  // Return true to collapse action view
-            }
-
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                // Do something when expanded
-                return true;  // Return true to expand action view
-            }
-        });
-        */
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -353,7 +394,7 @@ public class IndexActivity
         if ((result != null) && result.booleanValue()) {
 
             // Close the session
-            mNCoreSession.logout();
+            mNCoreSession.logout(this);
 
             finish();
         }
@@ -435,6 +476,7 @@ public class IndexActivity
     }
 
     private boolean selectIndexNavigationItem(int position, long itemId) {
+/*
         mFragmentTag = null;
         Bundle fragmentArguments = null;
 
@@ -477,6 +519,7 @@ public class IndexActivity
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.IndexContentFrame, torrentListFragment, mFragmentTag).commit();
+*/
 
         return true;
     }

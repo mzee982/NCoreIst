@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="torrent_list_item_bg_odd">#ff616161</color>
+    <color name="torrent_list_item_bg_even">#ff545454</color>
+    <color name="torrent_list_item_highlighted">#ffffa500</color>
+    <color name="torrent_list_item_focused">#ffffd000</color>
+    <color name="torrent_list_item_text1">#ffe7e7e7</color>
+    <color name="torrent_list_item_text2">#ffbfbfbf</color>
+    <color name="torrent_list_item_text_highlighted">#ffffa500</color>
+    <color name="torrent_list_item_text_focused">#ffffd000</color>
+</resources>
