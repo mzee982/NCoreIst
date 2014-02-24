@@ -2,31 +2,32 @@ package com.example.NCore;
 
 public class TorrentEntry {
 
-    // Members
-    private long mId;
-    private String mCategory;
-    private String mName;
-    private String mTitle;
-    private String mImdb;
+    // Properties
+    private long id;
+    private String category;
+    private String name;
+    private String title;
+    private String imdb;
+    private String size;
 
     /*
      * Constructor
      */
 
     public TorrentEntry() {
-        mId = -1L;
-        mCategory = null;
-        mName = null;
-        mTitle = null;
-        mImdb = null;
+        id = -1L;
+        category = null;
+        name = null;
+        title = null;
+        imdb = null;
     }
 
-    public TorrentEntry(long id, String aCategory, String aName, String aTitle, String aImdb) {
-        mId = id;
-        mCategory = aCategory;
-        mName = aName;
-        mTitle = aTitle;
-        mImdb = aImdb;
+    public TorrentEntry(long aId, String aCategory, String aName, String aTitle, String aImdb) {
+        this.id = aId;
+        category = aCategory;
+        name = aName;
+        title = aTitle;
+        imdb = aImdb;
     }
 
     /*
@@ -34,47 +35,55 @@ public class TorrentEntry {
      */
 
     public String getCategory() {
-        return mCategory;
+        return category;
     }
 
     public void setCategory(String aCategory) {
-        mCategory = aCategory;
+        category = aCategory;
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public void setName(String aName) {
-        mName = aName;
+        name = aName;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public void setTitle(String aTitle) {
-        mTitle = aTitle;
+        title = aTitle;
     }
 
     public String getImdb() {
-        return mImdb;
+        return imdb;
     }
 
     public void setImdb(String aImdb) {
-        mImdb = aImdb;
+        imdb = aImdb;
     }
 
     public long getId() {
-        return mId;
+        return id;
     }
 
     public void setId(long aId) {
-        mId = aId;
+        id = aId;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String aSize) {
+        size = aSize;
     }
 
     public boolean isEmpty() {
-        return (mCategory == null) && (mName == null) && (mTitle == null);
+        return (category == null) && (name == null) && (title == null);
     }
 
 }

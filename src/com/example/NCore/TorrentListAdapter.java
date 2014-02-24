@@ -23,6 +23,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         TextView name;
         TextView title;
         TextView imdb;
+        TextView size;
     }
 
     // Members
@@ -94,6 +95,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
             holder.name = (TextView) convertView.findViewById(R.id.textName);
             holder.title = (TextView) convertView.findViewById(R.id.textTitle);
             holder.imdb = (TextView) convertView.findViewById(R.id.textImdb);
+            holder.size = (TextView) convertView.findViewById(R.id.textSize);
 
             convertView.setTag(holder);
         } else {
@@ -109,6 +111,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
             holder.name.setText(item.getName());
             holder.title.setText(item.getTitle());
             holder.imdb.setText(item.getImdb());
+            holder.size.setText(item.getSize());
         }
 
         // Background color of the odd/even row
@@ -148,49 +151,49 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
     private int getIconResIdByTorrentCategory(String torrentCategory) {
 
         // Movie
-        if ("XviD/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid_hun;
-        if ("XviD/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid;
-        if ("DVDR/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd_hun;
-        if ("DVDR/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd;
-        if ("DVD9/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9_hun;
-        if ("DVD9/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9;
-        if ("HD/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd_hun;
-        if ("HD/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd;
+        if ("xvid_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid_hun;
+        if ("xvid".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid;
+        if ("dvd_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd_hun;
+        if ("dvd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd;
+        if ("dvd9_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9_hun;
+        if ("dvd9".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9;
+        if ("hd_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd_hun;
+        if ("hd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd;
 
         // Series
-        if ("XviD/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser_hun;
-        if ("XviD/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser;
-        if ("DVDR/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser_hun;
-        if ("DVDR/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser;
-        if ("HD/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser_hun;
-        if ("HD/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser;
+        if ("xvidser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser_hun;
+        if ("xvidser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser;
+        if ("dvdser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser_hun;
+        if ("dvdser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser;
+        if ("hdser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser_hun;
+        if ("hdser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser;
 
         // Music
-        if ("MP3/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3_hun;
-        if ("MP3/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3;
-        if ("Lossless/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless_hun;
-        if ("Lossless/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless;
-        if ("Klip".equals(torrentCategory)) return R.drawable.ic_torrent_cat_clip;
+        if ("mp3_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3_hun;
+        if ("mp3".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3;
+        if ("lossless_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless_hun;
+        if ("lossless".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless;
+        if ("clip".equals(torrentCategory)) return R.drawable.ic_torrent_cat_clip;
 
         // XXX
-        if ("XviD".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_xvid;
-        if ("DVDR".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_dvd;
-        if ("Imageset".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_imageset;
-        if ("HD".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_hd;
+        if ("xxx_xvid".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_xvid;
+        if ("xxx_dvd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_dvd;
+        if ("xxx_imageset".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_imageset;
+        if ("xxx_hd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_hd;
 
         // Game
-        if ("PC/ISO".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_iso;
-        if ("PC/RIP".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_rip;
-        if ("Konzol".equals(torrentCategory)) return R.drawable.ic_torrent_cat_console;
+        if ("game_iso".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_iso;
+        if ("game_rip".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_rip;
+        if ("console".equals(torrentCategory)) return R.drawable.ic_torrent_cat_console;
 
         // Software
-        if ("Prog/ISO".equals(torrentCategory)) return R.drawable.ic_torrent_cat_iso;
-        if ("Prog/RIP".equals(torrentCategory)) return R.drawable.ic_torrent_cat_misc;
-        if ("Prog/Mobil".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mobil;
+        if ("iso".equals(torrentCategory)) return R.drawable.ic_torrent_cat_iso;
+        if ("misc".equals(torrentCategory)) return R.drawable.ic_torrent_cat_misc;
+        if ("mobil".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mobil;
 
         // Book
-        if ("eBook/HU".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook_hun;
-        if ("eBook/EN".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook;
+        if ("ebook_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook_hun;
+        if ("ebook".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook;
 
         //
         return android.R.drawable.ic_dialog_alert;

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.*;
 import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
