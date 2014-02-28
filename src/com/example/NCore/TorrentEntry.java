@@ -9,6 +9,10 @@ public class TorrentEntry {
     private String title;
     private String imdb;
     private String size;
+    private String uploaded;
+    private String downloaded;
+    private String seeders;
+    private String leechers;
 
     /*
      * Constructor
@@ -20,14 +24,14 @@ public class TorrentEntry {
         name = null;
         title = null;
         imdb = null;
+        uploaded = null;
+        downloaded = null;
+        seeders = null;
+        leechers = null;
     }
 
-    public TorrentEntry(long aId, String aCategory, String aName, String aTitle, String aImdb) {
-        this.id = aId;
-        category = aCategory;
-        name = aName;
-        title = aTitle;
-        imdb = aImdb;
+    public boolean isEmpty() {
+        return (category == null) && (name == null) && (title == null);
     }
 
     /*
@@ -82,8 +86,36 @@ public class TorrentEntry {
         size = aSize;
     }
 
-    public boolean isEmpty() {
-        return (category == null) && (name == null) && (title == null);
+    public String getUploaded() {
+        return uploaded;
+    }
+
+    public void setUploaded(String uploaded) {
+        this.uploaded = uploaded;
+    }
+
+    public String getDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(String downloaded) {
+        this.downloaded = downloaded;
+    }
+
+    public String getSeeders() {
+        return seeders;
+    }
+
+    public void setSeeders(String seeders) {
+        this.seeders = seeders;
+    }
+
+    public String getLeechers() {
+        return leechers;
+    }
+
+    public void setLeechers(String leechers) {
+        this.leechers = leechers;
     }
 
 }

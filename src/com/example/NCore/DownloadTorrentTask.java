@@ -1,7 +1,7 @@
 package com.example.NCore;
 
+import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
-public class DownloadTask extends AsyncTask<Map<String,Object>,Void,File> {
+public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File> {
 
     // Exceptions
     private static final String EXCEPTION_GET_TORRENT = "Cannot get the torrent. HTTP response code: %";
@@ -22,14 +22,13 @@ public class DownloadTask extends AsyncTask<Map<String,Object>,Void,File> {
     public static final String PARAM_IN_TORRENT_ID = "PARAM_IN_TORRENT_ID";
 
     // Members
-    private DownloadTaskListener mExecutor;
+    private DownloadTorrentTaskListener mExecutor;
 
     /**
      * Interface to communicate with the task executor activity
      */
-    public interface DownloadTaskListener {
-        public Context getActivity();
-        public void onDownloadTaskResult(File aFile);
+    public interface DownloadTorrentTaskListener {
+        public void onDownloadTorrentTaskResult(File aFile);
     }
 
     @Override
@@ -45,10 +44,10 @@ public class DownloadTask extends AsyncTask<Map<String,Object>,Void,File> {
         Map<String,Object> inputParams = maps[0];
 
         // Get the executor activity of the task
-        mExecutor = (DownloadTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
+        mExecutor = (DownloadTorrentTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
 
         // Context
-        Context context = mExecutor.getActivity();
+        Context context = (Activity) mExecutor;
 
         // Extract input parameters
         long torrentId = (Long) inputParams.get(PARAM_IN_TORRENT_ID);
@@ -150,7 +149,7 @@ public class DownloadTask extends AsyncTask<Map<String,Object>,Void,File> {
 
     @Override
     protected void onPostExecute(File aFile) {
-        mExecutor.onDownloadTaskResult(aFile);
+        mExecutor.onDownloadTorrentTaskResult(aFile);
     }
 
     @Override

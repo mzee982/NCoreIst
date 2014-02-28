@@ -36,9 +36,11 @@ public final class NCoreConnectionManager {
     private static final String URL_LOGIN_PAGE = "/login.php";
     private static final String URL_INDEX_PAGE = "/index.php";
     private static final String URL_TORRENT_LIST_PAGE = "/torrents.php";
+    private static final String URL_OTHER_VERSIONS_PAGE = "/ajax.php";
     public static final String URL_LOGIN = BASE_URI + URL_LOGIN_PAGE; // "https://ncore.cc/login.php"
     public static final String URL_INDEX = BASE_URI + URL_INDEX_PAGE; // "https://ncore.cc/index.php"
     public static final String URL_TORRENT_LIST = BASE_URI + URL_TORRENT_LIST_PAGE; // "https://ncore.cc/torrents.php"
+    public static final String URL_OTHER_VERSIONS = BASE_URI + URL_OTHER_VERSIONS_PAGE; // "https://ncore.cc/ajax.php"
 
     // URL query keys
     private static final String URL_QUERY_KEY_PROBLEM = "problema";
@@ -46,6 +48,8 @@ public final class NCoreConnectionManager {
     private static final String URL_QUERY_KEY_TORRENT_LIST_PAGE = "oldal";
     private static final String URL_QUERY_KEY_ACTION = "action";
     private static final String URL_QUERY_KEY_ID = "id";
+    private static final String URL_QUERY_KEY_FID = "fid";
+    private static final String URL_QUERY_KEY_DETAILS = "details";
 
     // URL query values
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_MOVIE = "osszes_film";
@@ -56,6 +60,9 @@ public final class NCoreConnectionManager {
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_SOFTWARE = "osszes_program";
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_BOOK = "osszes_konyv";
     private static final String URL_QUERY_VALUE_ACTION_DOWNLOAD = "download";
+    private static final String URL_QUERY_VALUE_ACTION_DETAILS = "details";
+    private static final String URL_QUERY_VALUE_ACTION_OTHER_VERSIONS = "other_versions";
+    private static final String URL_QUERY_VALUE_DETAILS_1 = "1";
 
     // HTTP POST parameter keys
     private static final String POST_PARAM_KEY_LANG = "set_lang";
@@ -85,7 +92,6 @@ public final class NCoreConnectionManager {
     private static final String POST_PARAM_VALUE_SEARCH_TYPE_ALL = "all";
     private static final String POST_PARAM_VALUE_SEARCH_TYPE_SELECTED = "kivalasztottak_kozott";
     private static final String POST_PARAM_VALUE_SEARCH_TYPE_ORIGINAL = "eredeti_releasekben";
-
     private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_MOVIE =
             "xvid_hun,xvid,dvd_hun,dvd,dvd9_hun,dvd9,hd_hun,hd";
     private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_SERIES =
@@ -97,6 +103,12 @@ public final class NCoreConnectionManager {
     private static final String POST_PARAM_VALUE_SEARCH_SEL_TYPE_BOOK = "ebook_hun,ebook";
     private static final String POST_PARAM_VALUE_SEARCH_SUBMIT_X = "0";
     private static final String POST_PARAM_VALUE_SEARCH_SUBMIT_Y = "0";
+
+    // HTTP request property keys
+    private static final String REQUEST_PROPERTY_KEY_REQUESTED_WITH = "X-Requested-With";
+
+    // HTTP request property values
+    private static final String REQUEST_PROPERTY_VALUE_XMLHTTPREQUEST = "XMLHttpRequest";
 
     // HTTP header fields
     private static final String HTTP_HEADER_FIELD_LOCATION = "Location";
@@ -160,6 +172,22 @@ public final class NCoreConnectionManager {
 
         // Initialize the connection
         HttpURLConnection connection = openConnection(aUrlString);
+
+        // Prepare for HTTP GET request
+        connection.setRequestMethod(REQUEST_METHOD_GET);
+        connection.setDoInput(true);
+        connection.setDoOutput(false);
+
+        return connection;
+    }
+
+    public static HttpURLConnection openAjaxGetConnection(String aUrlString) throws MalformedURLException, IOException {
+
+        // Initialize the connection
+        HttpURLConnection connection = openConnection(aUrlString);
+
+        // AJAX request property
+        connection.setRequestProperty(REQUEST_PROPERTY_KEY_REQUESTED_WITH, REQUEST_PROPERTY_VALUE_XMLHTTPREQUEST);
 
         // Prepare for HTTP GET request
         connection.setRequestMethod(REQUEST_METHOD_GET);
@@ -425,6 +453,35 @@ public final class NCoreConnectionManager {
         uriBuilder.appendQueryParameter(URL_QUERY_KEY_ID, String.valueOf(aTorrentId));
 
         return uriBuilder.build().toString();
+    }
+
+    public static String prepareTorrentDetailsUrl(long aTorrentId) {
+
+        // URI builder for the base torrent list URL
+        Uri uri = Uri.parse(URL_TORRENT_LIST);
+        Uri.Builder uriBuilder = uri.buildUpon();
+
+        // Append torrent download query parameters
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ACTION, URL_QUERY_VALUE_ACTION_DETAILS);
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ID, String.valueOf(aTorrentId));
+
+        return uriBuilder.build().toString();
+    }
+
+    public static String prepareOtherVersionsUrl(String aOtherVersionsId, String aOtherVersionsFid) {
+
+        // URI builder for the base URL
+        Uri uri = Uri.parse(URL_OTHER_VERSIONS);
+        Uri.Builder uriBuilder = uri.buildUpon();
+
+        // Append query parameters
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ACTION, URL_QUERY_VALUE_ACTION_OTHER_VERSIONS);
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_ID, aOtherVersionsId);
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_FID, aOtherVersionsFid);
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_DETAILS, URL_QUERY_VALUE_DETAILS_1);
+
+        return uriBuilder.build().toString();
+
     }
 
     /**

@@ -30,6 +30,31 @@
     <!-- Search Activity -->
     <string name="search_activity_label">nCOREist Search</string>
 
+    <!-- Torrent Details Activty -->
+    <string name="torrent_details_activity_label">nCOREist</string>
+    <string name="torrent_details_action_download">Download</string>
+    <string name="torrent_details_name_text">Név:</string>
+    <string name="torrent_details_type_text">Típus:</string>
+    <string name="torrent_details_uploaded_text">Feltöltve:</string>
+    <string name="torrent_details_uploader_text">Feltöltő:</string>
+    <string name="torrent_details_seeders_text">Seederek:</string>
+    <string name="torrent_details_leechers_text">Leecherek:</string>
+    <string name="torrent_details_downloaded_text">Letöltve:</string>
+    <string name="torrent_details_speed_text">Sebesség:</string>
+    <string name="torrent_details_size_text">Méret:</string>
+    <string name="torrent_details_files_text">Fájlok:</string>
+    <string name="torrent_details_title_text">Cím:</string>
+    <string name="torrent_details_release_date_text">Megjenelés éve:</string>
+    <string name="torrent_details_director_text">Rendező:</string>
+    <string name="torrent_details_cast_text">Szereplők:</string>
+    <string name="torrent_details_country_text">Ország:</string>
+    <string name="torrent_details_duration_text">Hossz:</string>
+    <string name="torrent_details_labels_text">Címkék:</string>
+    <string name="torrent_details_imdb_text">IMDB értékelés:</string>
+
+    <!-- SlideShow Activty -->
+    <string name="slideshow_activity_label">nCOREist</string>
+
     <!-- Torrent List Fragment -->
     <string name="more_button_label">More</string>
 </resources>

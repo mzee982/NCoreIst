@@ -135,7 +135,6 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
 
                 return entries;
 
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {

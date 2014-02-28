@@ -37,6 +37,20 @@
                        android:value="com.example.NCore.IndexActivity" />
         </activity>
 
+        <activity android:name="TorrentDetailsActivity"
+                  android:label="@string/torrent_details_activity_label"
+                  android:parentActivityName="IndexActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value="com.example.NCore.IndexActivity" />
+        </activity>
+
+        <activity android:name="SlideShowActivity"
+                  android:label="@string/slideshow_activity_label"
+                  android:parentActivityName="TorrentDetailsActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value="com.example.NCore.TorrentDetailsActivity" />
+        </activity>
+
         <activity android:name="LoginActivity" android:label="@string/login_activity_label"/>
 
         <activity android:name="StartActivity" android:label="@string/start_activity_label"/>

@@ -2,7 +2,6 @@ package com.example.NCore;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,28 +14,40 @@ import java.util.List;
 
 public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
+    // Adapter types
+    public static final int TYPE_TORRENT_LIST = 1;
+    public static final int TYPE_OTHER_VERSIONS = 2;
+
     /**
      * ViewHolder
      */
-    private static class ViewHolder {
+    public static class ViewHolder {
+        long id;
         ImageView category;
         TextView name;
         TextView title;
         TextView imdb;
         TextView size;
+        TextView uploaded;
+        TextView downloaded;
+        TextView seeders;
+        TextView leechers;
     }
 
     // Members
     private final LayoutInflater mInflater;
     private int mLastShowedPageIndex;
     private boolean mHasMoreResults;
+    private int mAdapterType;
 
     /*
      * Constructor
      */
 
-    public TorrentListAdapter(Context context) {
+    public TorrentListAdapter(Context context, int adapterType) {
         super(context, android.R.layout.simple_list_item_1);
+
+        mAdapterType = adapterType;
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -83,6 +94,14 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        if (TYPE_TORRENT_LIST == mAdapterType) return getTorrentListView(position, convertView, parent);
+        else if (TYPE_OTHER_VERSIONS == mAdapterType) return getOtherVersionsView(position, convertView, parent);
+        else return null;
+
+    }
+
+    public View getTorrentListView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
         // List row view and holder
@@ -107,11 +126,60 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
         // Populate values to views
         if (item != null) {
+            holder.id = item.getId();
             holder.category.setImageResource(getIconResIdByTorrentCategory(item.getCategory()));
             holder.name.setText(item.getName());
             holder.title.setText(item.getTitle());
             holder.imdb.setText(item.getImdb());
             holder.size.setText(item.getSize());
+        }
+
+        // Background color of the odd/even row
+        if (position % 2 == 0) {
+            convertView.setBackgroundResource(R.drawable.torrent_list_item_even_selector);
+        }
+        else {
+            convertView.setBackgroundResource(R.drawable.torrent_list_item_odd_selector);
+        }
+
+        return convertView;
+    }
+
+    public View getOtherVersionsView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+
+        // List row view and holder
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.other_versions_list_item, parent, false);
+
+            holder = new ViewHolder();
+
+            holder.category = (ImageView) convertView.findViewById(R.id.imageCategory);
+            holder.name = (TextView) convertView.findViewById(R.id.textName);
+            holder.uploaded = (TextView) convertView.findViewById(R.id.textUploaded);
+            holder.size = (TextView) convertView.findViewById(R.id.textSize);
+            holder.downloaded = (TextView) convertView.findViewById(R.id.textDownloaded);
+            holder.seeders = (TextView) convertView.findViewById(R.id.textSeeders);
+            holder.leechers = (TextView) convertView.findViewById(R.id.textLeechers);
+
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        // Item to show
+        TorrentEntry item = getItem(position);
+
+        // Populate values to views
+        if (item != null) {
+            holder.id = item.getId();
+            holder.category.setImageResource(getIconResIdByTorrentCategory(item.getCategory()));
+            holder.name.setText(item.getName());
+            holder.uploaded.setText(item.getUploaded());
+            holder.size.setText(item.getSize());
+            holder.downloaded.setText("D:" + item.getDownloaded());
+            holder.seeders.setText("S:" + item.getSeeders());
+            holder.leechers.setText("L:" + item.getLeechers());
         }
 
         // Background color of the odd/even row

@@ -1,25 +1,20 @@
 package com.example.NCore;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
-import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 
 public class TorrentListFragment extends ListFragment
-        implements LoaderManager.LoaderCallbacks<List<TorrentEntry>>, DownloadTask.DownloadTaskListener {
+        implements LoaderManager.LoaderCallbacks<List<TorrentEntry>> {
 
     // Arguments
     public static final String ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX = "ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX";
@@ -27,11 +22,6 @@ public class TorrentListFragment extends ListFragment
 
     // Toast
     private static final String TOAST_NO_MORE_RESULTS = "No more results";
-    private static final String TOAST_TORRENT_DOWNLOAD_IN_PROGRESS = "Downloading the torrent...";
-    private static final String TOAST_TORRENT_DOWNLOAD_READY = "Download finished";
-
-    // App chooser
-    private static final String APP_CHOOSER_TORRENT_TITLE = "Open torrent via";
 
     // File provider authority
     private static final String FILE_PROVIDER_AUTHORITY = "com.example.NCore.FileProvider";
@@ -45,7 +35,6 @@ public class TorrentListFragment extends ListFragment
     private String mTorrentListSearchQuery;
     private TorrentListAdapter mAdapter;
     private Button mMoreButton;
-    private DownloadTask mDownloadTask;
 
     /**
      * More button click listener
@@ -100,7 +89,7 @@ public class TorrentListFragment extends ListFragment
         mMoreButton.setOnClickListener(new MoreButtonClickListener());
         getListView().addFooterView(mMoreButton);
 
-        mAdapter = new TorrentListAdapter(getActivity());
+        mAdapter = new TorrentListAdapter(getActivity(), TorrentListAdapter.TYPE_TORRENT_LIST);
         setListAdapter(mAdapter);
 
         // Start out with a progress indicator
@@ -127,20 +116,6 @@ public class TorrentListFragment extends ListFragment
             getLoaderManager().initLoader(LOADER_TORRENT_LIST, args, this);
         }
 
-    }
-
-    @Override
-    public void onDestroy() {
-
-        // Cancel the running StartTask
-        if ((mDownloadTask != null) && (mDownloadTask.getStatus() == AsyncTask.Status.RUNNING)) {
-            mDownloadTask.cancel(true);
-        }
-
-        // Release
-        mDownloadTask = null;
-
-        super.onDestroy();
     }
 
     @Override
@@ -186,12 +161,14 @@ public class TorrentListFragment extends ListFragment
         }
 
         // Show/hide more button
+        /*
         if (mAdapter.hasMoreResults()) {
             mMoreButton.setVisibility(View.VISIBLE);
         }
         else {
             mMoreButton.setVisibility(View.GONE);
         }
+        */
 
         // The list should now be shown
         if (isResumed()) {
@@ -211,24 +188,12 @@ public class TorrentListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-        // Toast
-        Toast.makeText(getActivity(), TOAST_TORRENT_DOWNLOAD_IN_PROGRESS, Toast.LENGTH_LONG).show();
+        // Start the search activity
+        Intent intent = new Intent(getActivity(), TorrentDetailsActivity.class);
 
-        /*
-         * Download the torrent
-         */
+        intent.putExtra(TorrentDetailsActivity.EXTRA_TORRENT_DETAILS_ID, id);
 
-        // Setup DownloadTask input parameters
-        HashMap<String,Object> inputParams = new HashMap<String,Object>();
-
-        inputParams.put(DownloadTask.PARAM_IN_EXECUTOR, this);
-        inputParams.put(DownloadTask.PARAM_IN_TORRENT_ID, id);
-
-        HashMap<String,Object>[] inputParamsArray = new HashMap[1];
-        inputParamsArray[0] = inputParams;
-
-        // Execute the DownloadTask
-        mDownloadTask = (DownloadTask) new DownloadTask().execute(inputParamsArray);
+        startActivity(intent);
 
     }
 
@@ -290,38 +255,6 @@ public class TorrentListFragment extends ListFragment
 
         // Reset adapter
         mAdapter.clear();
-
-    }
-
-    @Override
-    public void onDownloadTaskResult(File aFile) {
-
-        Toast.makeText(getActivity(), TOAST_TORRENT_DOWNLOAD_READY, Toast.LENGTH_SHORT).show();
-
-        // Get torrent file from the file provider
-        Uri torrentUri = Uri.fromFile(aFile);
-        //Uri torrentUri = FileProvider.getUriForFile(getActivity(), FILE_PROVIDER_AUTHORITY, aFile);
-
-        // Get MIME type
-        String fileName = aFile.getName();
-        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
-        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-        //String mimeType = getActivity().getContentResolver().getType(torrentUri);
-
-        // Intent
-        Intent torrentIntent = new Intent();
-        torrentIntent.setAction(Intent.ACTION_VIEW);
-        torrentIntent.setDataAndType(torrentUri, mimeType);
-        torrentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //torrentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //torrentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        // Show app chooser
-        Intent chooserIntent = Intent.createChooser(torrentIntent, APP_CHOOSER_TORRENT_TITLE);
-
-        if (chooserIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(chooserIntent);
-        }
 
     }
 
