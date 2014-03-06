@@ -2,6 +2,7 @@ package com.example.NCore;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -12,27 +13,50 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
-public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File> {
+public class DownloadTorrentTask extends NCoreAsyncTask<DownloadTorrentTask.DownloadTorrentTaskListener,Void> {
 
     // Exceptions
     private static final String EXCEPTION_GET_TORRENT = "Cannot get the torrent. HTTP response code: %";
 
-    // Parameters
-    public static final String PARAM_IN_EXECUTOR = "PARAM_IN_EXECUTOR";
-    public static final String PARAM_IN_TORRENT_ID = "PARAM_IN_TORRENT_ID";
-
-    // Members
-    private DownloadTorrentTaskListener mExecutor;
+    // File names
+    public static final String TORRENT_FILE_NAME = "nCOREist.torrent";
 
     /**
      * Interface to communicate with the task executor activity
      */
     public interface DownloadTorrentTaskListener {
-        public void onDownloadTorrentTaskResult(File aFile);
+        public void onDownloadTorrentTaskResult(Result result);
+        public void onDownloadTorrentTaskException(Exception e);
+    }
+
+    /**
+     * Param object of the task
+     */
+    public static class Param extends AbstractParam<DownloadTorrentTaskListener> {
+        public final long torrentId;
+
+        public Param(DownloadTorrentTaskListener executor, long torrentId) {
+            super(executor);
+
+            this.torrentId = torrentId;
+        }
+
+    }
+
+    /**
+     * Result object of the task
+     */
+    public class Result extends AbstractResult {
+        public File file;
+
+        public Result(File file) {
+            this.file = file;
+        }
+
     }
 
     @Override
-    protected File doInBackground(Map<String,Object>... maps) {
+    protected AbstractResult doInBackground(AbstractParam... params) {
         HttpURLConnection downloadConnection = null;
         InputStream downloadInputStream = null;
         FileOutputStream torrentFileOutputStream = null;
@@ -40,17 +64,16 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
         Map<String, List<String>> headerFields = null;
         File torrentFile = null;
 
-        // Get input parameters
-        Map<String,Object> inputParams = maps[0];
+        super.doInBackground(params);
 
-        // Get the executor activity of the task
-        mExecutor = (DownloadTorrentTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
+        // Get input parameters
+        Param param = (Param) params[0];
 
         // Context
-        Context context = (Activity) mExecutor;
+        //Context context = (Activity) mExecutor;
 
         // Extract input parameters
-        long torrentId = (Long) inputParams.get(PARAM_IN_TORRENT_ID);
+        long torrentId = param.torrentId;
 
         //
         try {
@@ -81,7 +104,7 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
                     }
 
                     // Extract the torrent file name from the response header
-                    String torrentFileName = "nCOREist.torrent";
+                    String torrentFileName = TORRENT_FILE_NAME;
                     //String torrentFileName = NCoreConnectionManager.evaluateTorrentDownloadResponse(headerFields);
 
                     /*
@@ -122,9 +145,7 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
                  */
 
                 if (!isCancelled() && (torrentFile != null)) {
-
-                    return torrentFile;
-
+                    return new Result(torrentFile);
                 }
 
                 else {
@@ -132,8 +153,10 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
                 }
 
             } catch (MalformedURLException e) {
+                mException = e;
                 e.printStackTrace();
             } catch (IOException e) {
+                mException = e;
                 e.printStackTrace();
             } finally {
                 if (torrentFileOutputStream != null) torrentFileOutputStream.close();
@@ -141,6 +164,7 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
                 if (downloadConnection != null) downloadConnection.disconnect();
             }
         } catch (IOException e) {
+            mException = e;
             e.printStackTrace();
         }
 
@@ -148,13 +172,13 @@ public class DownloadTorrentTask extends AsyncTask<Map<String,Object>,Void,File>
     }
 
     @Override
-    protected void onPostExecute(File aFile) {
-        mExecutor.onDownloadTorrentTaskResult(aFile);
+    protected void onTaskResult(AbstractResult result) {
+        mExecutor.onDownloadTorrentTaskResult((Result) result);
     }
 
     @Override
-    protected void onCancelled(File aFile) {
-        Log.d("onCancelled", "");
+    protected void onTaskException(Exception e) {
+        mExecutor.onDownloadTorrentTaskException(e);
     }
 
 }

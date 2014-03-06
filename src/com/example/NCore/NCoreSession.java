@@ -11,9 +11,6 @@ import java.util.Date;
 // TODO: Reconsider of using Application context instead
 public final class NCoreSession {
 
-    //
-    private static final String FILE_EXTENSION_TORRENT = ".torrent";
-
     // Singleton
     private static NCoreSession instance = null;
 
@@ -47,22 +44,19 @@ public final class NCoreSession {
         instance.mLogoutUrl = null;
 
         // Credentials from shared preferences
-        SharedPreferences sharedPref =
-                aContext.getSharedPreferences(NCoreSession.class.getName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = aContext.getSharedPreferences(NCoreSession.class.getName(),
+                Context.MODE_PRIVATE);
 
-        instance.bRememberCredentials =
-                sharedPref.getBoolean(
-                        aContext.getResources().getString(R.string.shared_pref_remember_credentials), false);
-        instance.mLoginName =
-                sharedPref.getString(aContext.getResources().getString(R.string.shared_pref_login_name), null);
-        instance.mLoginPassword =
-                sharedPref.getString(aContext.getResources().getString(R.string.shared_pref_login_password), null);
-
-    }
-
-    private NCoreSession() {
+        instance.bRememberCredentials = sharedPref.getBoolean(
+                aContext.getResources().getString(R.string.shared_pref_remember_credentials), false);
+        instance.mLoginName = sharedPref.getString(
+                aContext.getResources().getString(R.string.shared_pref_login_name), null);
+        instance.mLoginPassword = sharedPref.getString(
+                aContext.getResources().getString(R.string.shared_pref_login_password), null);
 
     }
+
+    private NCoreSession() {}
 
     public void login(Context context, String loginName, String loginPassword, boolean rememberCredentials) {
         mLoginName = loginName;
@@ -72,19 +66,17 @@ public final class NCoreSession {
         mLoginDate = new Date();
 
         // Save credentials to shared preferences
-        SharedPreferences sharedPref =
-                context.getSharedPreferences(NCoreSession.class.getName(), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(NCoreSession.class.getName(), Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
 
-        sharedPrefEditor.putBoolean(
-                context.getResources().getString(R.string.shared_pref_remember_credentials), bRememberCredentials);
+        sharedPrefEditor.putBoolean(context.getResources().getString(R.string.shared_pref_remember_credentials),
+                bRememberCredentials);
 
         // Save
         if (bRememberCredentials) {
-            sharedPrefEditor.putString(
-                    context.getResources().getString(R.string.shared_pref_login_name), mLoginName);
-            sharedPrefEditor.putString(
-                    context.getResources().getString(R.string.shared_pref_login_password), mLoginPassword);
+            sharedPrefEditor.putString(context.getResources().getString(R.string.shared_pref_login_name), mLoginName);
+            sharedPrefEditor.putString(context.getResources().getString(R.string.shared_pref_login_password),
+                    mLoginPassword);
         }
 
         // Remove
@@ -108,13 +100,6 @@ public final class NCoreSession {
         // Defaults
         bLoggedIn = false;
         mLoginDate = null;
-
-        // Garbage downloaded torrent files
-        String[] fileList = aContext.fileList();
-
-        for (String fileName : fileList) {
-            if (fileName.indexOf(FILE_EXTENSION_TORRENT) > -1) aContext.deleteFile(fileName);
-        }
 
     }
 

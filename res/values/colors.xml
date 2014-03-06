@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
+
+    <!-- Info Alert Toast -->
+    <color name="info_alert_toast_bg_info">#dd00ff00</color>
+    <color name="info_alert_toast_bg_alert">#ddff0000</color>
+
+    <!-- Torrent List -->
     <color name="torrent_list_item_bg_odd">#ff616161</color>
     <color name="torrent_list_item_bg_even">#ff545454</color>
     <color name="torrent_list_item_highlighted">#ffffa500</color>
@@ -8,4 +15,5 @@
     <color name="torrent_list_item_text2">#ffbfbfbf</color>
     <color name="torrent_list_item_text_highlighted">#ffffa500</color>
     <color name="torrent_list_item_text_focused">#ffffd000</color>
+
 </resources>

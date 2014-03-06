@@ -1,144 +1,115 @@
 package com.example.NCore;
 
-import android.animation.ValueAnimator;
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.os.Build;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 
-import java.util.Map;
+public class StartActivity extends FragmentActivity implements StartTask.StartTaskListener,
+        AlertDialogFragment.AlertDialogListener {
 
-/**
- *
- */
-public class StartActivity extends Activity implements StartTask.StartTaskListener {
+    // Dialog fragment tags
+    private static final String TAG_EXCEPTION_ALERT_DIALOG_FRAGMENT = "TAG_EXCEPTION_ALERT_DIALOG_FRAGMENT";
+    private static final String TAG_CONNECTION_ALERT_DIALOG_FRAGMENT = "TAG_CONNECTION_ALERT_DIALOG_FRAGMENT";
+
+    // Error messages
+    private static final String ERROR_MESSAGE_NO_NETWORK_CONNECTION = "Nincs hálózati kapcsolat!";
 
     // Members
-    private NCoreSession mNCoreSession;
     private StartTask mStartTask;
-    private ValueAnimator mAnimation;
+
+    public static void start(Context context) {
+        context.startActivity(new Intent(context, StartActivity.class));
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // nCORE session object
-        mNCoreSession = NCoreSession.getInstance(this);
-
         // Setup layout
-        setContentView(R.layout.start);
+        setContentView(R.layout.start_activity);
 
-        // Execute the StartTask
-        mStartTask = (StartTask) new StartTask().execute(new StartTask.StartTaskListener[]{this});
+        // Setup StartTask input parameters
+        StartTask.Param startTaskParam = new StartTask.Param(this);
 
-    }
+        // Get network information
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        // Check the connection
+        if ((networkInfo == null) || (!networkInfo.isConnected())) {
 
-        // Check runtime version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-
-            // Animate
-            mAnimation = ValueAnimator.ofInt(0, 30);
-            mAnimation.setDuration(1000);
-            mAnimation.setRepeatCount(ValueAnimator.INFINITE);
-            mAnimation.setRepeatMode(ValueAnimator.REVERSE);
-            mAnimation.addUpdateListener(
-                    new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            int animatedValue = ((Integer) valueAnimator.getAnimatedValue()).intValue();
-                            String dot1 = ".";
-                            String dot2 = ".";
-                            String dot3 = ".";
-                            String ten = "          ";
-                            char[] tenChars = ten.toCharArray();
-
-                            if ((0 <= animatedValue) && (animatedValue < 10)) {
-                                tenChars[animatedValue] = '.';
-                                dot3 = new String(tenChars);
-                            }
-                            else if ((10 <= animatedValue) && (animatedValue < 20)) {
-                                tenChars[animatedValue - 10] = '.';
-                                dot2 = new String(tenChars);
-                            }
-                            else if ((20 <= animatedValue) && (animatedValue < 30)) {
-                                tenChars[animatedValue - 20] = '.';
-                                dot1 = new String(tenChars);
-                            }
-
-                            ((TextView) findViewById(R.id.ProgressTextView)).setText(dot1 + dot2 + dot3);
-                        }
-                    }
-            );
-
-            // TODO: Disabled animation
-            //mAnimation.start();
+            // Alert dialog
+            AlertDialogFragment alertDialog = new AlertDialogFragment(ERROR_MESSAGE_NO_NETWORK_CONNECTION);
+            alertDialog.show(getSupportFragmentManager(), TAG_CONNECTION_ALERT_DIALOG_FRAGMENT);
 
         }
 
-    }
+        else {
 
-    @Override
-    protected void onPause() {
+            // Execute the StartTask
+            mStartTask = (StartTask) new StartTask().execute(new StartTask.Param[]{startTaskParam});
 
-        // Check runtime version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if (mAnimation.isStarted()) {
-                mAnimation.cancel();
-            }
         }
 
-        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
 
-        // Cancel the running StartTask
-        if ((mStartTask != null) && (mStartTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        // Cancel the StartTask if not finished yet
+        if ((mStartTask != null) && (mStartTask.getStatus() != StartTask.Status.FINISHED))
             mStartTask.cancel(true);
-        }
-
-        // Release
-        mStartTask = null;
 
         super.onDestroy();
     }
 
     @Override
-    public void onStartTaskResult(Map<String,Object> result) {
+    public void onStartTaskResult(StartTask.Result result) {
 
-        // Jump to the login page
-        jumpToLoginActivity(result);
+        // Navigate to the login activity
+        navigateToLoginActivity(result);
 
     }
 
-    private void jumpToLoginActivity(Map<String,Object> extras) {
+    @Override
+    public void onStartTaskException(Exception e) {
 
-        // Initialize the intent
-        Intent intent = new Intent(this, LoginActivity.class);
+        // Alert dialog
+        AlertDialogFragment alertDialog = new AlertDialogFragment(e.getMessage());
+        alertDialog.show(getSupportFragmentManager(), TAG_EXCEPTION_ALERT_DIALOG_FRAGMENT);
 
-        // Put the extras
-        if (extras != null) {
-            intent.putExtra(
-                    LoginActivity.EXTRA_LOGIN_WITH_CAPTHCA,
-                    ((Boolean) extras.get(StartTask.PARAM_OUT_LOGIN_WITH_CAPTCHA)).booleanValue());
-            intent.putExtra(
-                    LoginActivity.EXTRA_CAPTCHA_CHALLENGE_VALUE,
-                    (String) extras.get(StartTask.PARAM_OUT_CAPTCHA_CHALLENGE_VALUE));
-            intent.putExtra(
-                    LoginActivity.EXTRA_CAPTCHA_CHALLENGE_BITMAP,
-                    (Bitmap) extras.get(StartTask.PARAM_OUT_CAPTCHA_CHALLENGE_BITMAP));
+    }
+
+    @Override
+    public void onAlertDialogResult(int responseCode, DialogFragment dialogFragment) {
+
+        // On StartTask exception
+        if (TAG_EXCEPTION_ALERT_DIALOG_FRAGMENT.equals(dialogFragment.getTag())) {
+            finish();
         }
 
-        // Jump back to the login page
-        setResult(RESULT_OK, intent);
-        finish();
+        // No network connection
+        else if (TAG_CONNECTION_ALERT_DIALOG_FRAGMENT.equals(dialogFragment.getTag())) {
+            finish();
+        }
+
+    }
+
+    private void navigateToLoginActivity(StartTask.Result result) {
+
+        if (result != null) {
+
+            // Navigate to the login activity
+            LoginActivity.start(this, result.loginWithCaptcha, result.captchaChallengeValue,
+                    result.captchaChallengeBitmap);
+
+            // This activity should be finished
+            finish();
+
+        }
 
     }
 

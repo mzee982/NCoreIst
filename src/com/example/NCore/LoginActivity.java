@@ -1,42 +1,32 @@
 package com.example.NCore;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class LoginActivity
-        extends FragmentActivity
-        implements AlertDialogFragment.AlertDialogListener, LoginTask.LoginTaskListener {
+public class LoginActivity extends FragmentActivity implements AlertDialogFragment.AlertDialogListener,
+        LoginTask.LoginTaskListener {
 
     // Intent extras
-    public static final String EXTRA_LOGIN_WITH_CAPTHCA = "EXTRA_LOGIN_WITH_CAPTHCA";
-    public static final String EXTRA_CAPTCHA_CHALLENGE_VALUE = "EXTRA_CAPTCHA_CHALLENGE_VALUE";
-    public static final String EXTRA_CAPTCHA_CHALLENGE_BITMAP = "EXTRA_CAPTCHA_CHALLENGE_BITMAP";
-
-    // Request codes
-    private static final int REQUEST_CODE_START = 1;
+    private static final String EXTRA_LOGIN_WITH_CAPTCHA = "EXTRA_LOGIN_WITH_CAPTCHA";
+    private static final String EXTRA_CAPTCHA_CHALLENGE_VALUE = "EXTRA_CAPTCHA_CHALLENGE_VALUE";
+    private static final String EXTRA_CAPTCHA_CHALLENGE_BITMAP = "EXTRA_CAPTCHA_CHALLENGE_BITMAP";
 
     // Validation
-    private static final String VALIDATION_FAILED_LOGIN_NAME = "Mandatory login name";
-    private static final String VALIDATION_FAILED_LOGIN_PASSWORD = "Mandatory login password";
-    private static final String VALIDATION_FAILED_CAPTCHA_RESPONSE = "Mandatory CAPTCHA response";
+    private static final String VALIDATION_FAILED_LOGIN_NAME = "Felhasználónév kötelező!";
+    private static final String VALIDATION_FAILED_LOGIN_PASSWORD = "Jelszó kötelező!";
+    private static final String VALIDATION_FAILED_CAPTCHA_RESPONSE = "reCAPTCHA kötelező!";
 
     // Dialog fragment tags
-    private static final String TAG_VALIDATION_ALERT_DIALOG_FRAGMENT = "TAG_VALIDATION_ALERT_DIALOG_FRAGMENT";
     private static final String TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT = "TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT";
 
     // Members
@@ -45,7 +35,28 @@ public class LoginActivity
     private String mLoginName;
     private String mLoginPassword;
     private boolean bLoginWithCaptcha;
-    private String captchaChallengeValue;
+    private String mCaptchaChallengeValue;
+    private Bitmap mCaptchaChallengeBitmap;
+
+    public static void start(Context context, Boolean loginWithCaptcha, String captchaChallengeValue,
+                        Bitmap captchaChallengeBitmap) {
+        Intent intent = new Intent(context, LoginActivity.class);
+
+        intent.putExtra(EXTRA_LOGIN_WITH_CAPTCHA, loginWithCaptcha);
+        intent.putExtra(EXTRA_CAPTCHA_CHALLENGE_VALUE, captchaChallengeValue);
+        intent.putExtra(EXTRA_CAPTCHA_CHALLENGE_BITMAP, captchaChallengeBitmap);
+
+        context.startActivity(intent);
+    }
+
+    private void getIntentExtras(Intent intent) {
+
+        // Get the intent extra content
+        bLoginWithCaptcha = intent.getBooleanExtra(EXTRA_LOGIN_WITH_CAPTCHA, false);
+        mCaptchaChallengeValue = intent.getStringExtra(EXTRA_CAPTCHA_CHALLENGE_VALUE);
+        mCaptchaChallengeBitmap = intent.getParcelableExtra(EXTRA_CAPTCHA_CHALLENGE_BITMAP);
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,47 +65,33 @@ public class LoginActivity
         // nCORE session object
         mNCoreSession = NCoreSession.getInstance(this);
 
-        // Get the login page
-        if (!getIntent().hasExtra(EXTRA_LOGIN_WITH_CAPTHCA)) {
-            jumpToStartActivity();
+        // Get intent extra content
+        getIntentExtras(getIntent());
+
+        // Login layout with CAPTCHA
+        if (bLoginWithCaptcha) {
+            setContentView(R.layout.login_captcha_activity);
+
+            // Set the captcha bitmap
+            ImageView captchaImageView = (ImageView) findViewById(R.id.captcha_image);
+            if (captchaImageView != null) captchaImageView.setImageBitmap(mCaptchaChallengeBitmap);
+
         }
 
-        // Show the login page
+        // Simple login layout
         else {
+            setContentView(R.layout.login_activity);
+        }
 
-            // Get intent extra content
-            bLoginWithCaptcha = getIntent().getBooleanExtra(EXTRA_LOGIN_WITH_CAPTHCA, false);
-            captchaChallengeValue = getIntent().getStringExtra(EXTRA_CAPTCHA_CHALLENGE_VALUE);
-            Bitmap captchaChallengeBitmap = (Bitmap) getIntent().getParcelableExtra(EXTRA_CAPTCHA_CHALLENGE_BITMAP);
+        // Set default field values
+        if (mNCoreSession.isRememberCredentials()) {
+            EditText loginNameEditText = (EditText) findViewById(R.id.login_name_value);
+            EditText loginPasswordEditText = (EditText) findViewById(R.id.login_password_value);
+            CheckBox rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.remember_login_checkbox);
 
-            // Captcha login layout
-            if (bLoginWithCaptcha) {
-                setContentView(R.layout.login_captcha);
-
-                ImageView captchaImageView = (ImageView) findViewById(R.id.CaptchaImageView);
-
-                // Set the captcha bitmap
-                if (captchaImageView != null) {
-                    captchaImageView.setImageBitmap(captchaChallengeBitmap);
-                }
-            }
-
-            // Simple login layout
-            else {
-                setContentView(R.layout.login);
-            }
-
-            // Set default field values
-            if (mNCoreSession.isRememberCredentials()) {
-                EditText loginNameEditText = (EditText) findViewById(R.id.LoginNameEditText);
-                EditText loginPasswordEditText = (EditText) findViewById(R.id.LoginPasswordEditText);
-                CheckBox rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.RememberCheckBox);
-
-                loginNameEditText.setText(mNCoreSession.getLoginName());
-                loginPasswordEditText.setText(mNCoreSession.getLoginPassword());
-                rememberCredentialsCheckBox.setChecked(mNCoreSession.isRememberCredentials());
-            }
-
+            loginNameEditText.setText(mNCoreSession.getLoginName());
+            loginPasswordEditText.setText(mNCoreSession.getLoginPassword());
+            rememberCredentialsCheckBox.setChecked(mNCoreSession.isRememberCredentials());
         }
 
     }
@@ -102,15 +99,96 @@ public class LoginActivity
     @Override
     protected void onDestroy() {
 
-        // Cancel the running StartTask
-        if ((mLoginTask != null) && (mLoginTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        // Cancel the LoginTask if not finished yet
+        if ((mLoginTask != null) && (mLoginTask.getStatus() != LoginTask.Status.FINISHED)) {
             mLoginTask.cancel(true);
         }
 
-        // Release
-        mLoginTask = null;
-
         super.onDestroy();
+    }
+
+    public void onShowPassword(View aView) {
+        ImageButton showPasswordButton = (ImageButton) aView;
+        EditText loginPassword = (EditText) findViewById(R.id.login_password_value);
+
+        // Show
+        if (loginPassword.getTransformationMethod() != null) {
+            loginPassword.setTransformationMethod(null);
+            showPasswordButton.setImageResource(R.drawable.ic_secure);
+        }
+
+        // Hide
+        else {
+            loginPassword.setTransformationMethod(new PasswordTransformationMethod());
+            showPasswordButton.setImageResource(R.drawable.ic_not_secure);
+        }
+
+    }
+
+    public void onLogin(View aView) {
+
+        // Validate input field values
+        String validationResult = validateLoginInputs();
+
+        /*
+         * Validation succeeded
+         */
+        if (validationResult == null) {
+            mLoginName = null;
+            mLoginPassword = null;
+            String captchaResponseValue = null;
+
+            // Get login fields values
+            EditText loginNameEditText = (EditText) findViewById(R.id.login_name_value);
+            EditText loginPasswordEditText = (EditText) findViewById(R.id.login_password_value);
+            mLoginName = loginNameEditText.getText().toString();
+            mLoginPassword = loginPasswordEditText.getText().toString();
+
+            if (bLoginWithCaptcha) {
+                EditText captchaEditText = (EditText) findViewById(R.id.captcha_value);
+                captchaResponseValue = captchaEditText.getText().toString();
+            }
+
+            // Setup LoginTask input parameters
+            LoginTask.Param loginTaskParam = new LoginTask.Param(this, mLoginName, mLoginPassword,
+                    bLoginWithCaptcha, mCaptchaChallengeValue, captchaResponseValue);
+
+            // Execute the LoginTask
+            mLoginTask = (LoginTask) new LoginTask().execute(new LoginTask.Param[]{loginTaskParam});
+        }
+
+        /*
+         * Validation failed
+         */
+        else {
+
+            // Inform the user
+            new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, validationResult).show();
+
+        }
+
+    }
+
+    @Override
+    public void onLoginTaskResult(LoginTask.Result result) {
+
+        // Successful login
+        if ((result != null) && (result.result == null)) {
+            loginSuccess();
+        }
+
+        // Login failed
+        else {
+            loginFailure(result.result);
+        }
+
+    }
+
+    @Override
+    public void onLoginTaskException(Exception e) {
+
+        // Alert toast
+        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
 
     }
 
@@ -119,50 +197,7 @@ public class LoginActivity
 
         // Login failure alert
         if (TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT.equals(dialogFragment.getTag())) {
-            jumpToStartActivity();
-        }
-
-        // Validation failure alert
-        else if (TAG_VALIDATION_ALERT_DIALOG_FRAGMENT.equals(dialogFragment.getTag())) {
-            // Nothing to do
-        }
-
-    }
-
-    @Override
-    public void onLoginTaskResult(String response) {
-
-        // Successful login
-        if (response == null) {
-            loginSuccess();
-        }
-
-        // Login failed
-        else {
-            loginFailure(response);
-        }
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == REQUEST_CODE_START) {
-
-            switch (resultCode) {
-                case Activity.RESULT_CANCELED:
-                    finish();
-
-                    break;
-
-                // Activity.RESULT_OK, ...
-                default:
-
-                    // Restart the login activity
-                    restartActivity(data);
-
-            }
-
+            navigateToStartActivity();
         }
 
     }
@@ -170,14 +205,14 @@ public class LoginActivity
     private String validateLoginInputs() {
 
         // Mandatory login name
-        String loginName = ((EditText) findViewById(R.id.LoginNameEditText)).getText().toString();
+        String loginName = ((EditText) findViewById(R.id.login_name_value)).getText().toString();
 
         if (loginName.trim().length() == 0) {
             return new String(VALIDATION_FAILED_LOGIN_NAME);
         }
 
         // Mandatory password
-        String loginPassword = ((EditText) findViewById(R.id.LoginPasswordEditText)).getText().toString();
+        String loginPassword = ((EditText) findViewById(R.id.login_password_value)).getText().toString();
 
         if (loginPassword.trim().length() == 0) {
             return new String(VALIDATION_FAILED_LOGIN_PASSWORD);
@@ -185,7 +220,7 @@ public class LoginActivity
 
         // Mandatory captcha response
         if (bLoginWithCaptcha) {
-            String captchaResponseValue = ((EditText) findViewById(R.id.CaptchaEditText)).getText().toString();
+            String captchaResponseValue = ((EditText) findViewById(R.id.captcha_value)).getText().toString();
 
             if (captchaResponseValue.trim().length() == 0) {
                 return new String(VALIDATION_FAILED_CAPTCHA_RESPONSE);
@@ -195,82 +230,14 @@ public class LoginActivity
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public void login(View aView) {
-
-        // Validate input field values
-        String validationResult = validateLoginInputs();
-
-        // Validation succeeded
-        if (validationResult == null) {
-
-            // Get network information
-            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-
-            // Check the connection
-            if ((networkInfo != null) && (networkInfo.isConnected())) {
-                mLoginName = null;
-                mLoginPassword = null;
-                String captchaResponseValue = null;
-
-                // Get login fields values
-                EditText loginNameEditText = (EditText) findViewById(R.id.LoginNameEditText);
-                EditText loginPasswordEditText = (EditText) findViewById(R.id.LoginPasswordEditText);
-                mLoginName = loginNameEditText.getText().toString();
-                mLoginPassword = loginPasswordEditText.getText().toString();
-
-                if (bLoginWithCaptcha) {
-                    EditText captchaEditText = (EditText) findViewById(R.id.CaptchaEditText);
-                    captchaResponseValue = captchaEditText.toString();
-                }
-
-                // Setup LoginTask input parameters
-                HashMap<String,Object> inputParams = new HashMap<String,Object>();
-
-                inputParams.put(LoginTask.PARAM_IN_EXECUTOR, this);
-                inputParams.put(LoginTask.PARAM_IN_LOGIN_NAME, mLoginName);
-                inputParams.put(LoginTask.PARAM_IN_LOGIN_PASSWORD, mLoginPassword);
-                inputParams.put(LoginTask.PARAM_IN_LOGIN_WITH_CAPTCHA, new Boolean(bLoginWithCaptcha));
-
-                if (bLoginWithCaptcha) {
-                    inputParams.put(LoginTask.PARAM_IN_CAPTCHA_CHALLENGE_VALUE, captchaChallengeValue);
-                    inputParams.put(LoginTask.PARAM_IN_CAPTCHA_RESPONSE_VALUE, captchaResponseValue);
-                }
-
-                HashMap<String,Object>[] inputParamsArray = new HashMap[1];
-                inputParamsArray[0] = inputParams;
-
-                // Execute the LoginTask
-                mLoginTask = (LoginTask) new LoginTask().execute(inputParamsArray);
-            }
-
-            // No network connection is available
-            else {
-                // TODO: Error handling
-            }
-
-        }
-
-        // Validation failed
-        else {
-
-            // Inform the user
-            AlertDialogFragment alertDialog = new AlertDialogFragment(validationResult);
-            alertDialog.show(getSupportFragmentManager(), TAG_VALIDATION_ALERT_DIALOG_FRAGMENT);
-
-        }
-
-    }
-
     private void loginSuccess() {
 
         // Start the login session
         mNCoreSession.login(
-                this, mLoginName, mLoginPassword, ((CheckBox) findViewById(R.id.RememberCheckBox)).isChecked());
+                this, mLoginName, mLoginPassword, ((CheckBox) findViewById(R.id.remember_login_checkbox)).isChecked());
 
-        // Go to the index page
-        jumpToIndexActivity(null);
+        // Go to the categories page
+        navigateToCategoriesActivity();
 
     }
 
@@ -282,37 +249,23 @@ public class LoginActivity
 
     }
 
-    private void jumpToStartActivity() {
+    private void navigateToStartActivity() {
 
-        // Jump to the start activity
-        Intent intent = new Intent(this, StartActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_START);
+        // Navigate to the StartActivity
+        StartActivity.start(this);
 
-    }
-
-    private void jumpToIndexActivity(Map<String,Object> extras) {
-
-        // Initialize the intent
-        Intent intent = new Intent(this, IndexActivity.class);
-
-        // Put the extras
-        if (extras != null) {
-            // TODO: Put the extras into the intent
-        }
-
-        // Jump to the index page
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        // This activity should be finished
+        finish();
 
     }
 
-    private void restartActivity(Intent data) {
+    private void navigateToCategoriesActivity() {
 
-        // Restart the login activity
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtras(data);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        // Navigate to the CategoriesActivity
+        CategoriesActivity.start(this);
+
+        // This activity should be finished
+        finish();
 
     }
 

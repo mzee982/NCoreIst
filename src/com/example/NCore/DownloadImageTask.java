@@ -2,35 +2,59 @@ package com.example.NCore;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.Map;
 
-public class DownloadImageTask extends AsyncTask<Map<String,Object>,Void,Bitmap>  {
+public class DownloadImageTask extends NCoreAsyncTask<DownloadImageTask.DownloadImageTaskListener,Void>  {
 
     // Exceptions
     private static final String EXCEPTION_GET_IMAGE = "Cannot get the image. HTTP response code: %";
 
-    // Parameters
-    public static final String PARAM_IN_EXECUTOR = "PARAM_IN_EXECUTOR";
-    public static final String PARAM_IN_IMAGE_URL = "PARAM_IN_IMAGE_URL";
-    public static final String PARAM_IN_IMAGE_ID = "PARAM_IN_IMAGE_ID";
-    public static final String PARAM_IN_IMAGE_WIDTH = "PARAM_IN_IMAGE_WIDTH";
-    public static final String PARAM_IN_IMAGE_HEIGHT = "PARAM_IN_IMAGE_HEIGHT";
-
     // Members
-    private DownloadImageTaskListener mExecutor;
     private int mImageId;
 
     /**
      * Interface to communicate with the task executor activity
      */
     public interface DownloadImageTaskListener {
-        public void onDownloadImageTaskResult(int aImageId, Bitmap aBitmap);
+        public void onDownloadImageTaskResult(Result result);
+        public void onDownloadImageTaskException(Exception e);
+    }
+
+    /**
+     * Param object of the task
+     */
+    public static class Param extends AbstractParam<DownloadImageTaskListener> {
+        public final String imageUrl;
+        public final int imageId;
+        public final int imageWidth;
+        public final int imageHeight;
+
+        public Param(DownloadImageTaskListener executor, String imageUrl, int imageId, int imageWidth, int imageHeight) {
+            super(executor);
+
+            this.imageUrl = imageUrl;
+            this.imageId = imageId;
+            this.imageWidth = imageWidth;
+            this.imageHeight = imageHeight;
+        }
+
+    }
+
+    /**
+     * Result object of the task
+     */
+    public class Result extends AbstractResult {
+        public final int imageId;
+        public final Bitmap bitmap;
+
+        public Result(int imageId, Bitmap bitmap) {
+            this.imageId = imageId;
+            this.bitmap = bitmap;
+        }
+
     }
 
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -56,25 +80,22 @@ public class DownloadImageTask extends AsyncTask<Map<String,Object>,Void,Bitmap>
     }
 
     @Override
-    protected Bitmap doInBackground(Map<String,Object>... maps) {
+    protected AbstractResult doInBackground(AbstractParam... params) {
         HttpURLConnection downloadImageConnection = null;
         InputStream imageInputStream = null;
         int responseCode = 0;
         Bitmap bitmap = null;
 
-        // Get input parameters
-        Map<String,Object> inputParams = maps[0];
+        super.doInBackground(params);
 
-        // Get the executor activity of the task
-        mExecutor = (DownloadImageTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
+        // Get input parameters
+        Param param = (Param) params[0];
 
         // Extract input parameters
-        String imageUrl = (String) inputParams.get(PARAM_IN_IMAGE_URL);
-        mImageId = (Integer) inputParams.get(PARAM_IN_IMAGE_ID);
-        int imageWidth =
-                inputParams.get(PARAM_IN_IMAGE_WIDTH) == null ? 0 : (Integer) inputParams.get(PARAM_IN_IMAGE_WIDTH);
-        int imageHeight =
-                inputParams.get(PARAM_IN_IMAGE_HEIGHT) == null ? 0 : (Integer) inputParams.get(PARAM_IN_IMAGE_HEIGHT);
+        String imageUrl = param.imageUrl;
+        mImageId = param.imageId;
+        int imageWidth = param.imageWidth;
+        int imageHeight = param.imageHeight;
 
         //
         try {
@@ -149,7 +170,7 @@ public class DownloadImageTask extends AsyncTask<Map<String,Object>,Void,Bitmap>
                  */
 
                 if (!isCancelled() && (bitmap != null)) {
-                    return bitmap;
+                    return new Result(mImageId, bitmap);
                 }
 
                 else {
@@ -157,14 +178,17 @@ public class DownloadImageTask extends AsyncTask<Map<String,Object>,Void,Bitmap>
                 }
 
             } catch (MalformedURLException e) {
+                mException = e;
                 e.printStackTrace();
             } catch (IOException e) {
+                mException = e;
                 e.printStackTrace();
             } finally {
                 if (imageInputStream != null) imageInputStream.close();
                 if (downloadImageConnection != null) downloadImageConnection.disconnect();
             }
         } catch (IOException e) {
+            mException = e;
             e.printStackTrace();
         }
 
@@ -172,13 +196,13 @@ public class DownloadImageTask extends AsyncTask<Map<String,Object>,Void,Bitmap>
     }
 
     @Override
-    protected void onPostExecute(Bitmap aBitmap) {
-        mExecutor.onDownloadImageTaskResult(mImageId, aBitmap);
+    protected void onTaskResult(AbstractResult result) {
+        mExecutor.onDownloadImageTaskResult((Result) result);
     }
 
     @Override
-    protected void onCancelled(Bitmap aBitmap) {
-        Log.d("onCancelled", "");
+    protected void onTaskException(Exception e) {
+        mExecutor.onDownloadImageTaskException(e);
     }
 
 }

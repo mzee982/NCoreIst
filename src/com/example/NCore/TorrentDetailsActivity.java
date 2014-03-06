@@ -1,5 +1,6 @@
 package com.example.NCore;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,26 +17,20 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.*;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class TorrentDetailsActivity
-        extends ActionBarActivity
-        implements
-                LoaderManager.LoaderCallbacks<TorrentDetails>,
-                DownloadTorrentTask.DownloadTorrentTaskListener,
-                DownloadImageTask.DownloadImageTaskListener {
+public class TorrentDetailsActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<TorrentDetails>,
+                DownloadTorrentTask.DownloadTorrentTaskListener, DownloadImageTask.DownloadImageTaskListener {
+
+    // Intent extras
+    private static final String EXTRA_TORRENT_ID = "EXTRA_TORRENT_ID";
 
     // Toast
-    private static final String TOAST_TORRENT_DOWNLOAD_IN_PROGRESS = "Downloading the torrent...";
-    private static final String TOAST_TORRENT_DOWNLOAD_READY = "Download finished";
+    private static final String TOAST_TORRENT_DOWNLOAD_IN_PROGRESS = "Torrent letöltése...";
+    private static final String TOAST_TORRENT_DOWNLOAD_READY = "Torrent letöltése kész";
 
     // App chooser
     private static final String APP_CHOOSER_TORRENT_TITLE = "Open torrent via";
-
-    // Intent extras
-    public static final String EXTRA_TORRENT_DETAILS_ID = "EXTRA_TORRENT_DETAILS_ID";
 
     // Instance state
     private static final String INSTANCE_STATE_TORRENT_ID = "INSTANCE_STATE_TORRENT_ID";
@@ -51,14 +46,13 @@ public class TorrentDetailsActivity
     private static final int IMAGE_ID_SAMPLE_3 = 4;
 
     // Members
-    private long mTorrentId;
-    private TorrentDetails mTorrentDetails;
-    private NCoreSession mNCoreSession;
     private DownloadTorrentTask mDownloadTorrentTask;
     private DownloadImageTask mDownloadCoverImageTask;
     private DownloadImageTask mDownloadSampleImage1Task;
     private DownloadImageTask mDownloadSampleImage2Task;
     private DownloadImageTask mDownloadSampleImage3Task;
+    private long mTorrentId;
+    private TorrentDetails mTorrentDetails;
     private TorrentListAdapter mOtherVersionsAdapter;
 
     //
@@ -71,18 +65,26 @@ public class TorrentDetailsActivity
 
     }
 
+    public static void start(Context context, long torrentId) {
+        Intent intent = new Intent(context, TorrentDetailsActivity.class);
+
+        intent.putExtra(TorrentDetailsActivity.EXTRA_TORRENT_ID, torrentId);
+
+        context.startActivity(intent);
+    }
+
+    private void getIntentExtras(Intent intent) {
+        mTorrentId = intent.getLongExtra(EXTRA_TORRENT_ID, -1L);
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // nCORE session object
-        mNCoreSession = NCoreSession.getInstance(this);
 
         /*
          * Intent extras
          */
 
-        mTorrentId = getIntent().getLongExtra(EXTRA_TORRENT_DETAILS_ID, -1L);
+        getIntentExtras(getIntent());
 
         /*
          * Saved instance state
@@ -98,7 +100,7 @@ public class TorrentDetailsActivity
          * Layout
          */
 
-        setContentView(R.layout.torrent_details);
+        setContentView(R.layout.torrent_details_activity);
 
         /*
          * Action bar
@@ -134,32 +136,25 @@ public class TorrentDetailsActivity
     protected void onDestroy() {
 
         // Cancel the running tasks
-        if ((mDownloadTorrentTask != null) && (mDownloadTorrentTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mDownloadTorrentTask != null) && (mDownloadTorrentTask.getStatus() != AsyncTask.Status.FINISHED)) {
             mDownloadTorrentTask.cancel(true);
         }
 
-        if ((mDownloadCoverImageTask != null) && (mDownloadCoverImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mDownloadCoverImageTask != null) && (mDownloadCoverImageTask.getStatus() != AsyncTask.Status.FINISHED)) {
             mDownloadCoverImageTask.cancel(true);
         }
 
-        if ((mDownloadSampleImage1Task != null) && (mDownloadSampleImage1Task.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mDownloadSampleImage1Task != null) && (mDownloadSampleImage1Task.getStatus() != AsyncTask.Status.FINISHED)) {
             mDownloadSampleImage1Task.cancel(true);
         }
 
-        if ((mDownloadSampleImage2Task != null) && (mDownloadSampleImage2Task.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mDownloadSampleImage2Task != null) && (mDownloadSampleImage2Task.getStatus() != AsyncTask.Status.FINISHED)) {
             mDownloadSampleImage2Task.cancel(true);
         }
 
-        if ((mDownloadSampleImage3Task != null) && (mDownloadSampleImage3Task.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mDownloadSampleImage3Task != null) && (mDownloadSampleImage3Task.getStatus() != AsyncTask.Status.FINISHED)) {
             mDownloadSampleImage3Task.cancel(true);
         }
-
-        // Release
-        mDownloadTorrentTask = null;
-        mDownloadCoverImageTask = null;
-        mDownloadSampleImage1Task = null;
-        mDownloadSampleImage2Task = null;
-        mDownloadSampleImage3Task = null;
 
         super.onDestroy();
     }
@@ -255,7 +250,7 @@ public class TorrentDetailsActivity
         else if (LOADER_OTHER_VERSIONS == torrentDetailsLoader.getId()) {
 
             // Show other versions list
-            LinearLayout otherVersionsLayout = (LinearLayout) findViewById(R.id.OtherVersionsLayout);
+            LinearLayout otherVersionsLayout = (LinearLayout) findViewById(R.id.other_versions_layout);
             otherVersionsLayout.setVisibility(LinearLayout.VISIBLE);
 
             // Load data
@@ -296,73 +291,91 @@ public class TorrentDetailsActivity
     }
 
     @Override
-    public void onDownloadTorrentTaskResult(File aFile) {
+    public void onDownloadTorrentTaskResult(DownloadTorrentTask.Result result) {
 
-        Toast.makeText(this, TOAST_TORRENT_DOWNLOAD_READY, Toast.LENGTH_SHORT).show();
+        if (result != null) {
 
-        // Get torrent file from the file provider
-        Uri torrentUri = Uri.fromFile(aFile);
-        //Uri torrentUri = FileProvider.getUriForFile(getActivity(), FILE_PROVIDER_AUTHORITY, aFile);
+            // Info toast
+            InfoAlertToast infoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
+                    TOAST_TORRENT_DOWNLOAD_READY);
+            infoToast.setDuration(Toast.LENGTH_SHORT);
+            infoToast.show();
 
-        // Get MIME type
-        String fileName = aFile.getName();
-        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
-        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-        //String mimeType = getActivity().getContentResolver().getType(torrentUri);
+            // Get torrent file from the file provider
+            Uri torrentUri = Uri.fromFile(result.file);
+            //Uri torrentUri = FileProvider.getUriForFile(getActivity(), FILE_PROVIDER_AUTHORITY, aFile);
 
-        // Intent
-        Intent torrentIntent = new Intent();
-        torrentIntent.setAction(Intent.ACTION_VIEW);
-        torrentIntent.setDataAndType(torrentUri, mimeType);
-        torrentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //torrentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //torrentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // Get MIME type
+            String fileName = result.file.getName();
+            String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1, fileName.length());
+            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+            //String mimeType = getActivity().getContentResolver().getType(torrentUri);
 
-        // Show app chooser
-        Intent chooserIntent = Intent.createChooser(torrentIntent, APP_CHOOSER_TORRENT_TITLE);
+            // Intent
+            Intent torrentIntent = new Intent();
+            torrentIntent.setAction(Intent.ACTION_VIEW);
+            torrentIntent.setDataAndType(torrentUri, mimeType);
+            torrentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //torrentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            //torrentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        if (chooserIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(chooserIntent);
+            // Show app chooser
+            Intent chooserIntent = Intent.createChooser(torrentIntent, APP_CHOOSER_TORRENT_TITLE);
+
+            if (chooserIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(chooserIntent);
+            }
+
         }
 
     }
 
     @Override
-    public void onDownloadImageTaskResult(int aImageId, Bitmap aBitmap) {
+    public void onDownloadTorrentTaskException(Exception e) {
 
-        if (aBitmap != null) {
+        // Alert toast
+        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
+
+    }
+
+    @Override
+    public void onDownloadImageTaskResult(DownloadImageTask.Result result) {
+
+        if ((result != null) && (result.bitmap != null)) {
 
             // Show images layout
-            RelativeLayout torrentDetailsImageLayout = (RelativeLayout) findViewById(R.id.TorrentDetailsImageLayout);
+            RelativeLayout torrentDetailsImageLayout = (RelativeLayout) findViewById(
+                    R.id.torrent_details_images_layout);
+
             if (torrentDetailsImageLayout.getVisibility() != RelativeLayout.VISIBLE)
                 torrentDetailsImageLayout.setVisibility(RelativeLayout.VISIBLE);
 
-            switch (aImageId) {
+            switch (result.imageId) {
 
                 case IMAGE_ID_COVER:
-                    mTorrentDetails.setCoverImg(aBitmap);
-                    ImageView torrentDetailsImageView = (ImageView) findViewById(R.id.TorrentDetailsCover);
+                    mTorrentDetails.setCoverImg(result.bitmap);
+                    ImageView torrentDetailsImageView = (ImageView) findViewById(R.id.torrent_details_cover_image);
                     torrentDetailsImageView.setImageBitmap(mTorrentDetails.getCoverImg());
                     torrentDetailsImageView.setVisibility(ImageView.VISIBLE);
                     break;
 
                 case IMAGE_ID_SAMPLE_1:
-                    mTorrentDetails.setSampleImg1(aBitmap);
-                    ImageView torrentDetailsSampleImage1View = (ImageView) findViewById(R.id.TorrentDetailsSampleImage1);
+                    mTorrentDetails.setSampleImg1(result.bitmap);
+                    ImageView torrentDetailsSampleImage1View = (ImageView) findViewById(R.id.torrent_details_sample_image1);
                     torrentDetailsSampleImage1View.setImageBitmap(mTorrentDetails.getSampleImg1());
                     torrentDetailsSampleImage1View.setVisibility(ImageView.VISIBLE);
                     break;
 
                 case IMAGE_ID_SAMPLE_2:
-                    mTorrentDetails.setSampleImg2(aBitmap);
-                    ImageView torrentDetailsSampleImage2View = (ImageView) findViewById(R.id.TorrentDetailsSampleImage2);
+                    mTorrentDetails.setSampleImg2(result.bitmap);
+                    ImageView torrentDetailsSampleImage2View = (ImageView) findViewById(R.id.torrent_details_sample_image2);
                     torrentDetailsSampleImage2View.setImageBitmap(mTorrentDetails.getSampleImg2());
                     torrentDetailsSampleImage2View.setVisibility(ImageView.VISIBLE);
                     break;
 
                 case IMAGE_ID_SAMPLE_3:
-                    mTorrentDetails.setSampleImg3(aBitmap);
-                    ImageView torrentDetailsSampleImage3View = (ImageView) findViewById(R.id.TorrentDetailsSampleImage3);
+                    mTorrentDetails.setSampleImg3(result.bitmap);
+                    ImageView torrentDetailsSampleImage3View = (ImageView) findViewById(R.id.torrent_details_sample_image3);
                     torrentDetailsSampleImage3View.setImageBitmap(mTorrentDetails.getSampleImg3());
                     torrentDetailsSampleImage3View.setVisibility(ImageView.VISIBLE);
                     break;
@@ -372,11 +385,19 @@ public class TorrentDetailsActivity
 
     }
 
+    @Override
+    public void onDownloadImageTaskException(Exception e) {
+
+        // Alert toast
+        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
+
+    }
+
     public void onImagesClick(View aView) {
         String title;
         ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
         ArrayList<String> bitmapUrls = new ArrayList<String>();
-        DrawerLayout torrentDetailsDrawerLayout = (DrawerLayout) findViewById(R.id.TorrentDetailsDrawerLayout);
+        DrawerLayout torrentDetailsDrawerLayout = (DrawerLayout) findViewById(R.id.torrent_details_drawer_layout);
 
         // Intent extras
         title = mTorrentDetails.getMainTitle();
@@ -392,27 +413,18 @@ public class TorrentDetailsActivity
                 bitmapUrls.add(mTorrentDetails.getSampleLargeImg3Url());
         }
 
-        // Intent
-        Intent intent = new Intent(this, SlideShowActivity.class);
-        intent.putExtra(SlideShowActivity.EXTRA_IN_TITLE, title);
-        intent.putParcelableArrayListExtra(SlideShowActivity.EXTRA_IN_BITMAPS, bitmaps);
-        intent.putStringArrayListExtra(SlideShowActivity.EXTRA_IN_BITMAP_URLS, bitmapUrls);
-        intent.putExtra(SlideShowActivity.EXTRA_IN_BITMAP_WIDTH, torrentDetailsDrawerLayout.getWidth());
-        intent.putExtra(SlideShowActivity.EXTRA_IN_BITMAP_HEIGHT, torrentDetailsDrawerLayout.getHeight());
-
         // SlideShow Activity
-        startActivity(intent);
+        // TODO: maxWidth és maxHeight pontosabb meghatározása
+        navigateToSlideShowActivity(title, bitmaps, bitmapUrls, torrentDetailsDrawerLayout.getWidth(),
+                torrentDetailsDrawerLayout.getHeight());
 
     }
 
     private void onOtherVersionsItemClick(View view) {
         long torrentId = ((TorrentListAdapter.ViewHolder) view.getTag()).id;
 
-        // Start the search activity
-        Intent intent = new Intent(this, TorrentDetailsActivity.class);
-        intent.putExtra(TorrentDetailsActivity.EXTRA_TORRENT_DETAILS_ID, torrentId);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        // Start the TorrentDetailsActivity
+        navigateToTorrentDetailsActivity(torrentId);
 
     }
 
@@ -422,78 +434,78 @@ public class TorrentDetailsActivity
         setTitle(mTorrentDetails.getMainTitle());
 
         // Main title
-        ((TextView) findViewById(R.id.TorrentDetailsMainTitleValue)).setText(mTorrentDetails.getMainTitle());
+        ((TextView) findViewById(R.id.torrent_details_main_title_value)).setText(mTorrentDetails.getMainTitle());
 
         // Details
-        ((TextView) findViewById(R.id.TorrentDetailsNameValue)).setText(mTorrentDetails.getName());
-        ((TextView) findViewById(R.id.TorrentDetailsTypeValue)).setText(mTorrentDetails.getType());
-        ((TextView) findViewById(R.id.TorrentDetailsUploadedValue)).setText(mTorrentDetails.getUploaded());
-        ((TextView) findViewById(R.id.TorrentDetailsUploaderValue)).setText(mTorrentDetails.getUploader());
-        ((TextView) findViewById(R.id.TorrentDetailsSeedersValue)).setText(mTorrentDetails.getSeeders());
-        ((TextView) findViewById(R.id.TorrentDetailsLeechersValue)).setText(mTorrentDetails.getLeechers());
-        ((TextView) findViewById(R.id.TorrentDetailsDownloadedValue)).setText(mTorrentDetails.getDownloaded());
-        ((TextView) findViewById(R.id.TorrentDetailsSpeedValue)).setText(mTorrentDetails.getSpeed());
-        ((TextView) findViewById(R.id.TorrentDetailsSizeValue)).setText(mTorrentDetails.getSize());
-        ((TextView) findViewById(R.id.TorrentDetailsFilesValue)).setText(mTorrentDetails.getFiles());
+        ((TextView) findViewById(R.id.torrent_details_name_value)).setText(mTorrentDetails.getName());
+        ((TextView) findViewById(R.id.torrent_details_type_value)).setText(mTorrentDetails.getType());
+        ((TextView) findViewById(R.id.torrent_details_uploaded_value)).setText(mTorrentDetails.getUploaded());
+        ((TextView) findViewById(R.id.torrent_details_uploader_value)).setText(mTorrentDetails.getUploader());
+        ((TextView) findViewById(R.id.torrent_details_seeders_value)).setText(mTorrentDetails.getSeeders());
+        ((TextView) findViewById(R.id.torrent_details_leechers_value)).setText(mTorrentDetails.getLeechers());
+        ((TextView) findViewById(R.id.torrent_details_downloaded_value)).setText(mTorrentDetails.getDownloaded());
+        ((TextView) findViewById(R.id.torrent_details_speed_value)).setText(mTorrentDetails.getSpeed());
+        ((TextView) findViewById(R.id.torrent_details_size_value)).setText(mTorrentDetails.getSize());
+        ((TextView) findViewById(R.id.torrent_details_files_value)).setText(mTorrentDetails.getFiles());
 
         // Movie details
         if (mTorrentDetails.hasMovieDetails()) {
 
-            ((TableLayout) findViewById(R.id.TorrentMovieDetailsTable)).setVisibility(TableLayout.VISIBLE);
+            ((TableLayout) findViewById(R.id.torrent_details_movie_table)).setVisibility(TableLayout.VISIBLE);
 
             if (mTorrentDetails.getTitle() != null) {
-                TextView title = ((TextView) findViewById(R.id.TorrentDetailsTitleValue));
+                TextView title = ((TextView) findViewById(R.id.torrent_details_title_value));
                 title.setText(mTorrentDetails.getTitle());
-                ((TableRow) findViewById(R.id.TorrentDetailsTitleRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_title_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getReleaseDate() != null) {
-                TextView releaseDate = ((TextView) findViewById(R.id.TorrentDetailsReleaseDateValue));
+                TextView releaseDate = ((TextView) findViewById(R.id.torrent_details_release_date_value));
                 releaseDate.setText(mTorrentDetails.getReleaseDate());
                 releaseDate.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsReleaseDateRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_release_date_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getDirector() != null) {
-                TextView director = ((TextView) findViewById(R.id.TorrentDetailsDirectorValue));
+                TextView director = ((TextView) findViewById(R.id.torrent_details_director_value));
                 director.setText(mTorrentDetails.getDirector());
                 director.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsDirectorRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_director_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getCast() != null) {
-                TextView cast = ((TextView) findViewById(R.id.TorrentDetailsCastValue));
+                TextView cast = ((TextView) findViewById(R.id.torrent_details_cast_value));
                 cast.setText(mTorrentDetails.getCast());
                 cast.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsCastRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_cast_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getCountry() != null) {
-                TextView country = ((TextView) findViewById(R.id.TorrentDetailsCountryValue));
+                TextView country = ((TextView) findViewById(R.id.torrent_details_country_value));
                 country.setText(mTorrentDetails.getCountry());
                 country.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsCountryRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_country_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getDuration() != null) {
-                TextView duration = ((TextView) findViewById(R.id.TorrentDetailsDurationValue));
+                TextView duration = ((TextView) findViewById(R.id.torrent_details_duration_value));
                 duration.setText(mTorrentDetails.getDuration());
                 duration.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsDurationRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_duration_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getLabels() != null) {
-                TextView labels = ((TextView) findViewById(R.id.TorrentDetailsLabelsValue));
+                TextView labels = ((TextView) findViewById(R.id.torrent_details_labels_value));
                 labels.setText(mTorrentDetails.getLabels());
                 labels.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsLabelsRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_labels_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getImdb() != null) {
-                TextView imdb = ((TextView) findViewById(R.id.TorrentDetailsImdbValue));
+                TextView imdb = ((TextView) findViewById(R.id.torrent_details_imdb_value));
                 imdb.setText(mTorrentDetails.getImdb());
                 imdb.setVisibility(TextView.VISIBLE);
-                ((TableRow) findViewById(R.id.TorrentDetailsImdbRow)).setVisibility(TableRow.VISIBLE);
+                ((TableRow) findViewById(R.id.torrent_details_imdb_row)).setVisibility(TableRow.VISIBLE);
             }
 
         }
@@ -502,41 +514,33 @@ public class TorrentDetailsActivity
 
     private void downloadTorrent() {
 
-        // Toast
-        Toast.makeText(this, TOAST_TORRENT_DOWNLOAD_IN_PROGRESS, Toast.LENGTH_LONG).show();
+        // Info toast
+        InfoAlertToast infoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
+                TOAST_TORRENT_DOWNLOAD_IN_PROGRESS);
+        infoToast.setDuration(Toast.LENGTH_SHORT);
+        infoToast.show();
 
         /*
          * Download the torrent
          */
 
         // Setup DownloadTorrentTask input parameters
-        HashMap<String,Object> inputParams = new HashMap<String,Object>();
-
-        inputParams.put(DownloadTorrentTask.PARAM_IN_EXECUTOR, this);
-        inputParams.put(DownloadTorrentTask.PARAM_IN_TORRENT_ID, mTorrentId);
-
-        HashMap<String,Object>[] inputParamsArray = new HashMap[1];
-        inputParamsArray[0] = inputParams;
+        DownloadTorrentTask.Param downloadTorrentTaskParam = new DownloadTorrentTask.Param(this, mTorrentId);
 
         // Execute the DownloadTorrentTask
-        mDownloadTorrentTask = (DownloadTorrentTask) new DownloadTorrentTask().execute(inputParamsArray);
+        mDownloadTorrentTask = (DownloadTorrentTask) new DownloadTorrentTask().execute(
+                new DownloadTorrentTask.Param[]{downloadTorrentTaskParam});
 
     }
 
     private void downloadImage(int imageId, String imageUrl) {
 
         // Setup DownloadImageTask input parameters
-        HashMap<String,Object> inputParams = new HashMap<String,Object>();
-
-        inputParams.put(DownloadImageTask.PARAM_IN_EXECUTOR, this);
-        inputParams.put(DownloadImageTask.PARAM_IN_IMAGE_URL, imageUrl);
-        inputParams.put(DownloadImageTask.PARAM_IN_IMAGE_ID, imageId);
-
-        HashMap<String,Object>[] inputParamsArray = new HashMap[1];
-        inputParamsArray[0] = inputParams;
+        DownloadImageTask.Param downloadImageTaskParam = new DownloadImageTask.Param(this, imageUrl, imageId, 0, 0);
 
         // Execute the DownloadImageTask
-        DownloadImageTask downloadImageTask = (DownloadImageTask) new DownloadImageTask().execute(inputParamsArray);
+        DownloadImageTask downloadImageTask = (DownloadImageTask) new DownloadImageTask().execute(
+                new DownloadImageTask.Param[]{downloadImageTaskParam});
 
         switch (imageId) {
             case IMAGE_ID_COVER:
@@ -564,6 +568,21 @@ public class TorrentDetailsActivity
 
         // Init the other versions loader
         getSupportLoaderManager().initLoader(LOADER_OTHER_VERSIONS, args, this);
+
+    }
+
+    private void navigateToTorrentDetailsActivity(long torrentId) {
+
+        // Navigate to the TorrentDetailsActivity
+        TorrentDetailsActivity.start(this, torrentId);
+
+    }
+
+    private void navigateToSlideShowActivity(String title, ArrayList<Bitmap> bitmaps, ArrayList<String> bitmapUrls,
+                                             int maxWidth, int maxHeight) {
+
+        // Navigate to the SlideShowActivity
+        SlideShowActivity.start(this, title, bitmaps, bitmapUrls, maxWidth, maxHeight);
 
     }
 

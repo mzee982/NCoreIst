@@ -37,29 +37,11 @@ public class SlideShowPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
-        //
-        Fragment slideShowFragment = new SlideShowFragment();
-        Bundle args = new Bundle();
-
-        // Bitmap argument
-        if (position < mBitmaps.size()) {
-            args.putParcelable(SlideShowFragment.ARGUMENT_IN_BITMAP, mBitmaps.get(position));
-        }
-
-        // Bitmap URL argument
-        else {
-            args.putString(SlideShowFragment.ARGUMENT_IN_BITMAP_URL, mBitmapUrls.get(position - mBitmaps.size()));
-        }
-
-        // Bitmap dimensions
-        args.putInt(SlideShowFragment.ARGUMENT_IN_BITMAP_WIDTH, mBitmapWidth);
-        args.putInt(SlideShowFragment.ARGUMENT_IN_BITMAP_HEIGHT, mBitmapHeight);
-
-        // Set fragment arguments
-        slideShowFragment.setArguments(args);
-
-        return slideShowFragment;
+        return SlideShowFragment.create(
+                position < mBitmaps.size() ? mBitmaps.get(position) : null,
+                position >= mBitmaps.size() ? mBitmapUrls.get(position - mBitmaps.size()) : null,
+                mBitmapWidth,
+                mBitmapHeight);
     }
 
 }

@@ -1,10 +1,14 @@
 package com.example.NCore;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ public final class NCoreParser {
 
     // Exceptions
     private static final String EXCEPTION_LOGIN_PAGE_PARSE = "Error occured during parsing the login page.";
+    private static final String EXCEPTION_RECAPTCHA_CHALLENGE_SCRIPT_PARSE =
+            "Error occured during parsing the reCAPTCHA challenge script.";
     private static final String EXCEPTION_INDEX_PAGE_PARSE = "Error occured during parsing the index page.";
     private static final String EXCEPTION_TORRENT_LIST_PAGE_PARSE =
             "Error occured during parsing the torrent list page.";
@@ -27,6 +33,7 @@ public final class NCoreParser {
             "Error occured during parsing the other versions page.";
 
     // Parameters
+    public static final String PARAM_CAPTCHA_CHALLENGE_SCRIPT_URL = "PARAM_CAPTCHA_CHALLENGE_SCRIPT_URL";
     public static final String PARAM_CAPTCHA_CHALLENGE_VALUE = "PARAM_CAPTCHA_CHALLENGE_VALUE";
     public static final String PARAM_CAPTCHA_IMAGE_URL = "PARAM_CAPTCHA_IMAGE_URL";
     public static final String PARAM_LOGOUT_URL = "PARAM_LOGOUT_URL";
@@ -42,7 +49,12 @@ public final class NCoreParser {
     private static final String HTML_ID_LOGOUT_LINK = "menu_11";
     private static final String HTML_ID_NPA = "nPa";
 
+    // JSON fields
+    public static final String JSON_FIELD_RECAPTCHA_CHALLENGE = "challenge";
+
     // Regex patterns
+    private static final Pattern REGEX_PATTERN_RECAPTCHA_CHALLENGE_SCRIPT_JSON =
+            Pattern.compile("(?s)^.*(\\{.*\\}).*$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_CATEGORY = Pattern.compile("^.*tipus=(.*)$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_ID = Pattern.compile("^.*id=(.*)$"); // "^.*\\((.*)\\).*$"
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_IMDB = Pattern.compile("^\\[imdb:\\s(.*)\\]$");
@@ -50,6 +62,11 @@ public final class NCoreParser {
             Pattern.compile("^.*\\('.*'.*'(.*)'.*'(.*)'.*\\).*$");
 
     // CSS selectors
+    public static final String CSS_SELECTOR_RECAPTCHA_CHALLENGE_SCRIPT =
+            "#login > form > table > tbody > tr:nth-child(3) > td > center > script:nth-child(1)";
+    public static final String CSS_SELECTOR_RECAPTCHA_TABLE = "#recaptcha_table";
+    public static final String CSS_SELECTOR_RECAPTCHA_CHALLENGE_IMAGE = "#recaptcha_challenge_image";
+    public static final String CSS_SELECTOR_RECAPTCHA_CHALLENGE_FIELD = "#recaptcha_challenge_field";
     public static final String CSS_SELECTOR_TORRENT_LIST_ITEM =
             "#main_tartalom > div.lista_all > div.box_torrent_all > div.box_torrent";
     public static final String CSS_SELECTOR_TORRENT_ITEM_CATEGORY = "div.box_alap_img > a";
@@ -89,12 +106,13 @@ public final class NCoreParser {
             "#profil_right > div > div.box_torrent_all_mini > div";
     public static final String CSS_SELECTOR_MORE_VERSIONS_ID_NAME =
             "div.box_nagy_mini > div.box_nev_mini_ownfree > div > div > a";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_CATEGORY = "div.box_alap_img > a";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_UPLOADED = "div.box_nagy_mini > div.box_feltoltve_other_short";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_SIZE = "div.box_nagy_mini > div.box_meret2";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_DOWNLOADED = "div.box_nagy_mini > div.box_d2";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_SEEDERS = "div.box_nagy_mini > div.box_s2 > a";
-    public static final String CSS_SELECTOR_MORE_VERSIONS_LEECHERS = "div.box_nagy_mini > div.box_l2 > a";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_CATEGORY = "div.box_alap_img > a";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_UPLOADED =
+            "div.box_nagy_mini > div.box_feltoltve_other_short";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_SIZE = "div.box_nagy_mini > div.box_meret2";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_DOWNLOADED = "div.box_nagy_mini > div.box_d2";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_SEEDERS = "div.box_nagy_mini > div.box_s2 > a";
+    public static final String CSS_SELECTOR_OTHER_VERSIONS_LEECHERS = "div.box_nagy_mini > div.box_l2 > a";
 
     /**
      * Private constructor to prevent instantiation
@@ -108,33 +126,29 @@ public final class NCoreParser {
      *
      * @param inputStream Input stream containing HTML data
      * @return            Extracted reCAPTCHA related data:
-     *                    - reCAPTCHA challenge value
-     *                    - reCAPTCHA image
+     *                    - reCAPTCHA challenge script URL
      * @throws IOException
      */
     public static Map<String,String> parseLoginForCaptcha(InputStream inputStream) throws IOException {
-        String captchaChallengeValue = null;
-        String captchaImageUrl = null;
+        String captchaChallengeScriptUrl = null;
 
         // Parse the input stream
         try {
-            Document document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8, NCoreConnectionManager.BASE_URI);
+            Document document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8,
+                    NCoreConnectionManager.BASE_URI);
 
-            // Looking for reCAPTCHA elements
-            Element captchaChallenge = document.getElementById(HTML_ID_RECAPTCHA_CHALLENGE);
-            Element captchaImage = document.getElementById(HTML_ID_RECAPTCHA_IMAGE);
+            Elements recaptchaChallengeScriptElements = document.select(CSS_SELECTOR_RECAPTCHA_CHALLENGE_SCRIPT);
 
-            // Extract the reCAPTCHA related data
-            if ((captchaChallenge != null) && (captchaImage != null)) {
-                captchaChallengeValue = captchaChallenge.attr(HTML_ATTR_VALUE);
-                captchaImageUrl = captchaImage.absUrl(HTML_ATTR_SRC);
+            // Get CAPTCHA CHALLENGE SCRIPT URL
+            if ((recaptchaChallengeScriptElements != null) && (recaptchaChallengeScriptElements.size() > 0)) {
+                captchaChallengeScriptUrl = recaptchaChallengeScriptElements.get(0).attr(HTML_ATTR_SRC);
             }
 
             // Return
-            if ((captchaChallengeValue != null) && (captchaImageUrl != null)) {
+            if (captchaChallengeScriptUrl != null) {
                 HashMap<String,String> result = new HashMap<String,String>();
-                result.put(PARAM_CAPTCHA_CHALLENGE_VALUE, captchaChallengeValue);
-                result.put(PARAM_CAPTCHA_IMAGE_URL, captchaImageUrl);
+
+                result.put(PARAM_CAPTCHA_CHALLENGE_SCRIPT_URL, captchaChallengeScriptUrl);
 
                 return result;
             }
@@ -144,6 +158,74 @@ public final class NCoreParser {
         } catch (IOException e) {
             throw new IOException(EXCEPTION_LOGIN_PAGE_PARSE, e);
         }
+    }
+
+    public static Map<String,String> parseReCaptchaChallengeScript(InputStream inputStream) throws IOException,
+            JSONException {
+        String captchaChallengeValue = null;
+
+        try {
+
+            // Input stream to String
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read = 0;
+            while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                baos.write(buffer, 0, read);
+            }
+            baos.flush();
+            String challengeScriptString = baos.toString(NCoreConnectionManager.CHARSET_UTF8);
+
+            // Find JSON object in script
+            Matcher matcher = REGEX_PATTERN_RECAPTCHA_CHALLENGE_SCRIPT_JSON.matcher(challengeScriptString);
+
+            // Extract JSON object field
+            if (matcher.find()) {
+                String jsonString = matcher.group(1);
+                JSONTokener tokener = new JSONTokener(jsonString);
+                Object next = tokener.nextValue();
+                JSONObject jsonObject = (JSONObject) next;
+                captchaChallengeValue = jsonObject.getString(JSON_FIELD_RECAPTCHA_CHALLENGE);
+            }
+
+            // Return
+            if (captchaChallengeValue != null) {
+                HashMap<String,String> result = new HashMap<String,String>();
+
+                result.put(PARAM_CAPTCHA_CHALLENGE_VALUE, captchaChallengeValue);
+
+                return result;
+            }
+            else {
+                return null;
+            }
+
+        }
+
+        catch (JSONException e) {
+            throw new JSONException(EXCEPTION_RECAPTCHA_CHALLENGE_SCRIPT_PARSE);
+        }
+
+        catch (IOException e) {
+            throw new IOException(EXCEPTION_RECAPTCHA_CHALLENGE_SCRIPT_PARSE, e);
+        }
+
+
+/*
+var RecaptchaState = {
+    site : '6LfMAt0SAAAAAH_ZwCXukEJaU5WEHE056HhfdsZH',
+    rtl : false,
+    challenge : '03AHJ_VutJndgEWG-OLH1-UosLhA-RR8WKPSCSrgVGpszpJoD11IFlCQ7YSWazTK6xB8Bx36tYgjH04nl46f1XY-p7kd9LGr-OLZn3Hlt_c0KNVIPjp5iQUvwIvel4iYXBom2lghyCSZxdpDqFa3BNwIrWOulXhmw97tcnvD9QzfKyFIn7lFt7pQCL6KF3uZgtN4PojLCjpM6T903WdImYDm4WE_9gINYaYzSR1xREfWW4TR9JfkQCX26rjQ5Zy7ni2RofmeSlNanu',
+    is_incorrect : false,
+    programming_error : '',
+    error_message : '',
+    server : 'https://www.google.com/recaptcha/api/',
+    lang : 'hu',
+    timeout : 1800
+};
+ */
+
+
     }
 
     /**
@@ -159,7 +241,8 @@ public final class NCoreParser {
 
         // Parse the input stream
         try {
-            Document document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8, NCoreConnectionManager.BASE_URI);
+            Document document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8,
+                    NCoreConnectionManager.BASE_URI);
 
             // Looking for the logout link
             Element logoutLink = document.getElementById(HTML_ID_LOGOUT_LINK);
@@ -665,7 +748,7 @@ public final class NCoreParser {
                      * More versions CATEGORY
                      */
 
-                    Elements categoryElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_CATEGORY);
+                    Elements categoryElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_CATEGORY);
 
                     if ((categoryElements != null) && (categoryElements.size() > 0)) {
 
@@ -684,7 +767,7 @@ public final class NCoreParser {
                      * More versions UPLOADED
                      */
 
-                    Elements uploadedElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_UPLOADED);
+                    Elements uploadedElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_UPLOADED);
 
                     if ((uploadedElements != null) && (uploadedElements.size() > 0)) {
 
@@ -697,7 +780,7 @@ public final class NCoreParser {
                      * More versions SIZE
                      */
 
-                    Elements sizeElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_SIZE);
+                    Elements sizeElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_SIZE);
 
                     if ((sizeElements != null) && (sizeElements.size() > 0)) {
 
@@ -710,7 +793,7 @@ public final class NCoreParser {
                      * More versions DOWNLOADED
                      */
 
-                    Elements downloadedElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_DOWNLOADED);
+                    Elements downloadedElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_DOWNLOADED);
 
                     if ((downloadedElements != null) && (downloadedElements.size() > 0)) {
 
@@ -723,7 +806,7 @@ public final class NCoreParser {
                      * More versions SEEDERS
                      */
 
-                    Elements seedersElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_SEEDERS);
+                    Elements seedersElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_SEEDERS);
 
                     if ((seedersElements != null) && (seedersElements.size() > 0)) {
 
@@ -736,7 +819,7 @@ public final class NCoreParser {
                      * More versions LEECHERS
                      */
 
-                    Elements leechersElements = otherVersionElement.select(CSS_SELECTOR_MORE_VERSIONS_LEECHERS);
+                    Elements leechersElements = otherVersionElement.select(CSS_SELECTOR_OTHER_VERSIONS_LEECHERS);
 
                     if ((leechersElements != null) && (leechersElements.size() > 0)) {
 

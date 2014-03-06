@@ -9,32 +9,55 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.Map;
 
-public class LogoutTask extends AsyncTask<Map<String,Object>,Void,Boolean> {
+public class LogoutTask extends NCoreAsyncTask<LogoutTask.LogoutTaskListener,Void> {
 
-    // Parameters
-    public static final String PARAM_IN_EXECUTOR = "PARAM_IN_EXECUTOR";
-    public static final String PARAM_IN_LOGOUT_URL = "PARAM_IN_LOGOUT_URL";
-
-    private LogoutTaskListener mExecutor;
-
+    /**
+     * Interface to communicate with the task executor activity
+     */
     public interface LogoutTaskListener {
-        public void onLogoutTaskResult(Boolean result);
+        public void onLogoutTaskResult(Result result);
+        public void onLogoutTaskException(Exception e);
+    }
+
+    /**
+     * Param object of the task
+     */
+    public static class Param extends AbstractParam<LogoutTaskListener> {
+        public final String logoutUrl;
+
+        public Param(LogoutTaskListener executor, String logoutUrl) {
+            super(executor);
+
+            this.logoutUrl = logoutUrl;
+        }
+
+    }
+
+    /**
+     * Result object of the task
+     */
+    public class Result extends AbstractResult {
+        public final Boolean loggedOut;
+
+        public Result(Boolean loggedOut) {
+            this.loggedOut = loggedOut;
+        }
+
     }
 
     @Override
-    protected Boolean doInBackground(Map<String,Object>... maps) {
+    protected AbstractResult doInBackground(AbstractParam... params) {
         HttpURLConnection logoutConnection = null;
         int responseCode = 0;
         String logoutUrl = null;
 
-        // Get input parameters
-        Map<String,Object> inputParams = maps[0];
+        super.doInBackground(params);
 
-        // Get the executor activity of the task
-        mExecutor = (LogoutTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
+        // Get input parameters
+        Param param = (Param) params[0];
 
         // Extract input parameters
-        logoutUrl = (String) inputParams.get(PARAM_IN_LOGOUT_URL);
+        logoutUrl = param.logoutUrl;
 
         try {
 
@@ -53,10 +76,10 @@ public class LogoutTask extends AsyncTask<Map<String,Object>,Void,Boolean> {
 
                 // Evaluate the logout response
                 if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
-                    return Boolean.TRUE;
+                    return new Result(Boolean.TRUE);
                 }
                 else {
-                    return Boolean.FALSE;
+                    return new Result(Boolean.FALSE);
                 }
 
             }
@@ -76,13 +99,13 @@ public class LogoutTask extends AsyncTask<Map<String,Object>,Void,Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean result) {
-        mExecutor.onLogoutTaskResult(result);
+    protected void onTaskResult(AbstractResult result) {
+        mExecutor.onLogoutTaskResult((Result) result);
     }
 
     @Override
-    protected void onCancelled(Boolean result) {
-        Log.d("onCancelled", "Void");
+    protected void onTaskException(Exception e) {
+        mExecutor.onLogoutTaskException(e);
     }
 
 }

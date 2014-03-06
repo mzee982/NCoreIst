@@ -41,6 +41,7 @@ public final class NCoreConnectionManager {
     public static final String URL_INDEX = BASE_URI + URL_INDEX_PAGE; // "https://ncore.cc/index.php"
     public static final String URL_TORRENT_LIST = BASE_URI + URL_TORRENT_LIST_PAGE; // "https://ncore.cc/torrents.php"
     public static final String URL_OTHER_VERSIONS = BASE_URI + URL_OTHER_VERSIONS_PAGE; // "https://ncore.cc/ajax.php"
+    public static final String URL_RECAPTHA_IMAGE = "https://www.google.com/recaptcha/api/image";
 
     // URL query keys
     private static final String URL_QUERY_KEY_PROBLEM = "problema";
@@ -50,6 +51,7 @@ public final class NCoreConnectionManager {
     private static final String URL_QUERY_KEY_ID = "id";
     private static final String URL_QUERY_KEY_FID = "fid";
     private static final String URL_QUERY_KEY_DETAILS = "details";
+    private static final String URL_QUERY_KEY_RECAPTCHA_CHALLENGE = "c";
 
     // URL query values
     private static final String URL_QUERY_VALUE_TORRENT_CATEGORY_MOVIE = "osszes_film";
@@ -393,6 +395,18 @@ public final class NCoreConnectionManager {
         return postParams;
     }
 
+    public static String prepareReCaptchaImageUrl(String captchaChallengeValue) {
+
+        // URI builder for the base URL
+        Uri uri = Uri.parse(URL_RECAPTHA_IMAGE);
+        Uri.Builder uriBuilder = uri.buildUpon();
+
+        // Append reCAPTCHA challenge query parameter
+        uriBuilder.appendQueryParameter(URL_QUERY_KEY_RECAPTCHA_CHALLENGE, captchaChallengeValue);
+
+        return uriBuilder.build().toString();
+
+    }
 
     /**
      * Prepare the URL for querying torrent list for the given category

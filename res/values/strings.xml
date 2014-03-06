@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
+
+    <!-- nCOREist application -->
     <string name="app_name">nCOREist</string>
 
     <!-- NCoreSession -->
@@ -7,30 +10,29 @@
     <string name="shared_pref_login_password">login_password</string>
     <string name="shared_pref_remember_credentials">remember_credentials</string>
 
-    <!-- Start Activity -->
+    <!-- Start activity -->
     <string name="start_activity_label">nCOREist</string>
-    <string name="logo_text">nCOREist</string>
-    <string name="progress_text">. . .</string>
+    <string name="start_logo_text">nCOREist</string>
+    <string name="start_progress_text">. . .</string>
 
-    <!-- Login Activity -->
-    <string name="login_activity_label">nCOREist Login</string>
+    <!-- Login activity -->
+    <string name="login_activity_label">Bejelentkezés</string>
     <string name="login_name_text">Felhasználónév</string>
     <string name="login_password_text">Jelszó</string>
-    <string name="captcha_text">Captcha</string>
-    <string name="login_remember_text">Bejelentkezési adatok megjegyzése</string>
-    <string name="login_button_text">Bejelentkezés</string>
+    <string name="captcha_text">reCAPTCHA</string>
+    <string name="remember_login_text">Emlékezz rám</string>
+    <string name="login_text">Bejelentkezés</string>
 
-    <!-- Index Activity -->
-    <string name="index_activity_label">nCOREist</string>
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
-    <string name="index_action_search">Torrent search</string>
-    <string name="index_action_refresh">Torrent list refresh</string>
+    <!-- Categories activity -->
+    <string name="categories_activity_label">nCOREist</string>
+    <string name="drawer_open">Navigation drawer open</string>
+    <string name="drawer_close">Navigation drawer close</string>
+    <string name="categories_action_search">Search</string>
 
-    <!-- Search Activity -->
-    <string name="search_activity_label">nCOREist Search</string>
+    <!-- Search Results Activity -->
+    <string name="search_results_activity_label">Keresés</string>
 
-    <!-- Torrent Details Activty -->
+    <!-- Torrent Details Activity -->
     <string name="torrent_details_activity_label">nCOREist</string>
     <string name="torrent_details_action_download">Download</string>
     <string name="torrent_details_name_text">Név:</string>
@@ -51,10 +53,13 @@
     <string name="torrent_details_duration_text">Hossz:</string>
     <string name="torrent_details_labels_text">Címkék:</string>
     <string name="torrent_details_imdb_text">IMDB értékelés:</string>
+    <string name="other_versions_text">Más verziók:</string>
 
     <!-- SlideShow Activty -->
     <string name="slideshow_activity_label">nCOREist</string>
 
     <!-- Torrent List Fragment -->
-    <string name="more_button_label">More</string>
+    <string name="torrent_list_action_refresh">Frissítés</string>
+    <string name="torrent_list_more_label">Tovább</string>
+
 </resources>

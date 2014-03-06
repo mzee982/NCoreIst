@@ -1,6 +1,5 @@
 package com.example.NCore;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -13,12 +12,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class TorrentListFragment extends ListFragment
-        implements LoaderManager.LoaderCallbacks<List<TorrentEntry>> {
+public class TorrentListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<TorrentEntry>> {
 
     // Arguments
-    public static final String ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX = "ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX";
-    public static final String ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY = "ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY";
+    private static final String ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX = "ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX";
+    private static final String ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY = "ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY";
 
     // Toast
     private static final String TOAST_NO_MORE_RESULTS = "No more results";
@@ -46,16 +44,33 @@ public class TorrentListFragment extends ListFragment
         }
     }
 
+    public static TorrentListFragment create(int categoryIndex, String searchQuery) {
+        TorrentListFragment torrentListFragment = new TorrentListFragment();
+        Bundle fragmentArguments = new Bundle();
+
+        // Set input arguments
+        fragmentArguments.putInt(TorrentListFragment.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, categoryIndex);
+        fragmentArguments.putString(TorrentListFragment.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, searchQuery);
+        torrentListFragment.setArguments(fragmentArguments);
+
+        return torrentListFragment;
+    }
+
+    private void getInputArguments(Bundle args) {
+
+        if (args != null) {
+            mTorrentListCategoryIndex = args.getInt(ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX);
+            mTorrentListSearchQuery = args.getString(ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY);
+        }
+
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Input arguments
-        Bundle args = getArguments();
-        if (args != null) {
-            mTorrentListCategoryIndex = args.getInt(ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX);
-            mTorrentListSearchQuery = args.getString(ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY);
-        }
+        getInputArguments(getArguments());
 
         // Action bar
         setHasOptionsMenu(true);
@@ -64,13 +79,6 @@ public class TorrentListFragment extends ListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
-
-        /*
-         * Layout
-         */
-
-        //return inflater.inflate(R.layout.torrent_list_fragment, container, false);
-
     }
 
     @Override
@@ -82,7 +90,7 @@ public class TorrentListFragment extends ListFragment
          */
 
         mMoreButton = new Button(getActivity());
-        mMoreButton.setText(getResources().getText(R.string.more_button_label));
+        mMoreButton.setText(getResources().getText(R.string.torrent_list_more_label));
         mMoreButton.setLayoutParams(
                 new AbsListView.LayoutParams(
                         AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
@@ -131,7 +139,7 @@ public class TorrentListFragment extends ListFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.index_action_refresh) {
+        if (item.getItemId() == R.id.torrent_list_action_refresh) {
             onRefresh();
 
             return true;
@@ -188,12 +196,8 @@ public class TorrentListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-        // Start the search activity
-        Intent intent = new Intent(getActivity(), TorrentDetailsActivity.class);
-
-        intent.putExtra(TorrentDetailsActivity.EXTRA_TORRENT_DETAILS_ID, id);
-
-        startActivity(intent);
+        // Navigate to the TorrentDetailsActivity
+        navigateToTorrentDetailsActivity(id);
 
     }
 
@@ -255,6 +259,13 @@ public class TorrentListFragment extends ListFragment
 
         // Reset adapter
         mAdapter.clear();
+
+    }
+
+    private void navigateToTorrentDetailsActivity(long torrentId) {
+
+        // Navigate to the TorrentDetailsActivity
+        TorrentDetailsActivity.start(getActivity(), torrentId);
 
     }
 

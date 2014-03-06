@@ -110,11 +110,11 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
             holder = new ViewHolder();
 
-            holder.category = (ImageView) convertView.findViewById(R.id.imageCategory);
-            holder.name = (TextView) convertView.findViewById(R.id.textName);
-            holder.title = (TextView) convertView.findViewById(R.id.textTitle);
-            holder.imdb = (TextView) convertView.findViewById(R.id.textImdb);
-            holder.size = (TextView) convertView.findViewById(R.id.textSize);
+            holder.category = (ImageView) convertView.findViewById(R.id.category_image);
+            holder.name = (TextView) convertView.findViewById(R.id.name_value);
+            holder.title = (TextView) convertView.findViewById(R.id.title_value);
+            holder.imdb = (TextView) convertView.findViewById(R.id.imdb_value);
+            holder.size = (TextView) convertView.findViewById(R.id.size_value);
 
             convertView.setTag(holder);
         } else {
@@ -154,13 +154,13 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
             holder = new ViewHolder();
 
-            holder.category = (ImageView) convertView.findViewById(R.id.imageCategory);
-            holder.name = (TextView) convertView.findViewById(R.id.textName);
-            holder.uploaded = (TextView) convertView.findViewById(R.id.textUploaded);
-            holder.size = (TextView) convertView.findViewById(R.id.textSize);
-            holder.downloaded = (TextView) convertView.findViewById(R.id.textDownloaded);
-            holder.seeders = (TextView) convertView.findViewById(R.id.textSeeders);
-            holder.leechers = (TextView) convertView.findViewById(R.id.textLeechers);
+            holder.category = (ImageView) convertView.findViewById(R.id.category_image);
+            holder.name = (TextView) convertView.findViewById(R.id.name_value);
+            holder.uploaded = (TextView) convertView.findViewById(R.id.uploaded_value);
+            holder.size = (TextView) convertView.findViewById(R.id.size_value);
+            holder.downloaded = (TextView) convertView.findViewById(R.id.downloaded_value);
+            holder.seeders = (TextView) convertView.findViewById(R.id.seeders_value);
+            holder.leechers = (TextView) convertView.findViewById(R.id.leechers_value);
 
             convertView.setTag(holder);
         } else {

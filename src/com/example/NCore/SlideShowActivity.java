@@ -1,5 +1,7 @@
 package com.example.NCore;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -11,49 +13,63 @@ import java.util.ArrayList;
 
 public class SlideShowActivity extends ActionBarActivity {
 
-    //
-    public static final String EXTRA_IN_TITLE = "EXTRA_IN_TITLE";
-    public static final String EXTRA_IN_BITMAPS = "EXTRA_IN_BITMAPS";
-    public static final String EXTRA_IN_BITMAP_URLS = "EXTRA_IN_BITMAP_URLS";
-    public static final String EXTRA_IN_BITMAP_WIDTH = "EXTRA_IN_BITMAP_WIDTH";
-    public static final String EXTRA_IN_BITMAP_HEIGHT = "EXTRA_IN_BITMAP_HEIGHT";
+    // Intent extras
+    private static final String EXTRA_IN_TITLE = "EXTRA_IN_TITLE";
+    private static final String EXTRA_IN_BITMAPS = "EXTRA_IN_BITMAPS";
+    private static final String EXTRA_IN_BITMAP_URLS = "EXTRA_IN_BITMAP_URLS";
+    private static final String EXTRA_IN_MAX_WIDTH = "EXTRA_IN_MAX_WIDTH";
+    private static final String EXTRA_IN_MAX_HEIGHT = "EXTRA_IN_MAX_HEIGHT";
 
     // Members
-    private SlideShowPagerAdapter mSlideShowAdapter;
-    private ViewPager mSlideShowPager;
+    private SlideShowPagerAdapter mSlideshowAdapter;
+    private ViewPager mSlideshowPager;
+    private String mTitle;
     private ArrayList<Bitmap> mBitmaps;
     private ArrayList<String> mBitmapUrls;
     private int mBitmapWidth;
     private int mBitmapHeight;
 
+    public static void start(Context context, String title, ArrayList<Bitmap> bitmaps, ArrayList<String> bitmapUrls,
+                             int maxWidth, int maxHeight) {
+        Intent intent = new Intent(context, SlideShowActivity.class);
+
+        intent.putExtra(SlideShowActivity.EXTRA_IN_TITLE, title);
+        intent.putParcelableArrayListExtra(SlideShowActivity.EXTRA_IN_BITMAPS, bitmaps);
+        intent.putStringArrayListExtra(SlideShowActivity.EXTRA_IN_BITMAP_URLS, bitmapUrls);
+        intent.putExtra(SlideShowActivity.EXTRA_IN_MAX_WIDTH, maxWidth);
+        intent.putExtra(SlideShowActivity.EXTRA_IN_MAX_HEIGHT, maxHeight);
+
+        context.startActivity(intent);
+    }
+
+    private void getIntentExtras(Intent intent) {
+        mTitle = intent.getStringExtra(EXTRA_IN_TITLE);
+        mBitmaps = intent.getParcelableArrayListExtra(EXTRA_IN_BITMAPS);
+        mBitmapUrls = intent.getStringArrayListExtra(EXTRA_IN_BITMAP_URLS);
+        mBitmapWidth = intent.getIntExtra(EXTRA_IN_MAX_WIDTH, 0);
+        mBitmapHeight = intent.getIntExtra(EXTRA_IN_MAX_HEIGHT, 0);
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Input EXTRAs
-        String title = getIntent().getStringExtra(EXTRA_IN_TITLE);
-        mBitmaps = getIntent().getParcelableArrayListExtra(EXTRA_IN_BITMAPS);
-        mBitmapUrls = getIntent().getStringArrayListExtra(EXTRA_IN_BITMAP_URLS);
-        mBitmapWidth = getIntent().getIntExtra(EXTRA_IN_BITMAP_WIDTH, 0);
-        mBitmapHeight = getIntent().getIntExtra(EXTRA_IN_BITMAP_HEIGHT, 0);
+        // Intent extras
+        getIntentExtras(getIntent());
 
         // Setup layout
-        setContentView(R.layout.slideshow);
+        setContentView(R.layout.slideshow_activity);
 
         // Action bar
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().hide();
 
         // Title
-        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setTitle(mTitle);
 
         // Setup view pager
-        mSlideShowAdapter = new SlideShowPagerAdapter(
-                getSupportFragmentManager(), mBitmaps, mBitmapUrls, mBitmapWidth, mBitmapHeight);
-        mSlideShowPager = (ViewPager) findViewById(R.id.SlideShowPager);
-        mSlideShowPager.setAdapter(mSlideShowAdapter);
+        mSlideshowAdapter = new SlideShowPagerAdapter(getSupportFragmentManager(), mBitmaps, mBitmapUrls, mBitmapWidth,
+                mBitmapHeight);
+        mSlideshowPager = (ViewPager) findViewById(R.id.slideshow_pager);
+        mSlideshowPager.setAdapter(mSlideshowAdapter);
 
     }
 

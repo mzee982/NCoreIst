@@ -1,89 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp">
 
-    <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageCategory"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:paddingRight="4dp"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp">
 
-    <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Name"
-            android:id="@+id/textName"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@id/imageCategory"
-            android:singleLine="true"
-            android:textStyle="bold"
-            android:textColor="@color/torrent_list_item_text1"/>
+    <ImageView android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/category_image"
+               android:layout_alignParentStart="true"
+               android:layout_centerVertical="true"
+               android:paddingTop="4dp"
+               android:paddingBottom="4dp"
+               android:paddingRight="4dp"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="L3"
-            android:id="@+id/textLeechers"
-            android:layout_below="@+id/textUploaded"
-            android:layout_alignParentRight="true"
-            android:singleLine="true"
-            android:textColor="@color/torrent_list_item_text2"
-            android:paddingLeft="4dp"/>
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/name_value"
+              android:text="Name"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:layout_alignParentTop="true"
+              android:layout_toRightOf="@id/category_image"
+              android:singleLine="true"
+              android:textStyle="bold"
+              android:textColor="@color/torrent_list_item_text1"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="S2"
-            android:id="@+id/textSeeders"
-            android:layout_below="@+id/textUploaded"
-            android:layout_toLeftOf="@id/textLeechers"
-            android:singleLine="true"
-            android:textColor="@color/torrent_list_item_text2"
-            android:paddingLeft="4dp"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/leechers_value"
+              android:text="L3"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:layout_below="@+id/uploaded_value"
+              android:layout_alignParentRight="true"
+              android:singleLine="true"
+              android:textColor="@color/torrent_list_item_text2"
+              android:paddingLeft="4dp"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="D1"
-            android:id="@+id/textDownloaded"
-            android:layout_below="@+id/textUploaded"
-            android:layout_toLeftOf="@id/textSeeders"
-            android:singleLine="true"
-            android:textColor="@color/torrent_list_item_text2"
-            android:paddingLeft="4dp"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:id="@+id/seeders_value"
+              android:text="S2"
+              android:layout_below="@+id/uploaded_value"
+              android:layout_toLeftOf="@id/leechers_value"
+              android:singleLine="true"
+              android:textColor="@color/torrent_list_item_text2"
+              android:paddingLeft="4dp"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Size"
-            android:id="@+id/textSize"
-            android:layout_below="@+id/textUploaded"
-            android:layout_toRightOf="@id/imageCategory"
-            android:singleLine="true"
-            android:textColor="@color/torrent_list_item_text2"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/downloaded_value"
+              android:text="D1"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:layout_below="@+id/uploaded_value"
+              android:layout_toLeftOf="@id/seeders_value"
+              android:singleLine="true"
+              android:textColor="@color/torrent_list_item_text2"
+              android:paddingLeft="4dp"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Uploaded"
-            android:id="@+id/textUploaded"
-            android:layout_below="@+id/textName"
-            android:layout_toRightOf="@id/imageCategory"
-            android:singleLine="true"
-            android:textColor="@color/torrent_list_item_text2"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/size_value"
+              android:text="Size"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:layout_below="@+id/uploaded_value"
+              android:layout_toRightOf="@id/category_image"
+              android:singleLine="true"
+              android:textColor="@color/torrent_list_item_text2"/>
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/uploaded_value"
+              android:text="Uploaded"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:layout_below="@+id/name_value"
+              android:layout_toRightOf="@id/category_image"
+              android:singleLine="true"
+              android:textColor="@color/torrent_list_item_text2"/>
 
 </RelativeLayout>

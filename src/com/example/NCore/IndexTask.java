@@ -1,44 +1,58 @@
 package com.example.NCore;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.Map;
 
-public class IndexTask extends AsyncTask<IndexTask.IndexTaskListener,Void,Map<String,Object>> {
+public class IndexTask extends NCoreAsyncTask<IndexTask.IndexTaskListener,Void> {
 
     // Exceptions
     private static final String EXCEPTION_GET_INDEX_PAGE = "Cannot get the index page. HTTP response code: %";
-
-    // Parameters
-    public static final String PARAM_OUT_LOGOUT_URL = "PARAM_OUT_LOGOUT_URL";
-
-    // Members
-    private IndexTaskListener mExecutor;
 
     /**
      * Interface to communicate with the task executor activity
      */
     public interface IndexTaskListener {
-        public void onIndexTaskResult(Map<String,Object> result);
+        public void onIndexTaskResult(Result result);
+        public void onIndexTaskException(Exception e);
+
+    }
+
+    /**
+     * Param object of the task
+     */
+    public static class Param extends AbstractParam<IndexTaskListener> {
+
+        public Param(IndexTaskListener executor) {
+            super(executor);
+        }
+
+    }
+
+    /**
+     * Result object of the task
+     */
+    public class Result extends AbstractResult {
+        public final String logoutUrl;
+
+        public Result(String logoutUrl) {
+            this.logoutUrl = logoutUrl;
+        }
+
     }
 
     @Override
-    protected Map<String,Object> doInBackground(IndexTaskListener... listeners) {
+    protected AbstractResult doInBackground(AbstractParam... params) {
         HttpURLConnection indexConnection = null;
         int responseCode = 0;
         InputStream indexInputStream = null;
         String logoutUrl = null;
 
-        // Get the executor activity of the task
-        mExecutor = listeners[0];
+        super.doInBackground(params);
 
         try {
             try {
@@ -86,12 +100,7 @@ public class IndexTask extends AsyncTask<IndexTask.IndexTaskListener,Void,Map<St
                  */
 
                 if (!isCancelled() && (logoutUrl != null)) {
-
-                    HashMap<String,Object> result = new HashMap<String,Object>();
-                    result.put(PARAM_OUT_LOGOUT_URL, logoutUrl);
-
-                    return result;
-
+                    return new Result(logoutUrl);
                 }
 
                 else {
@@ -99,16 +108,20 @@ public class IndexTask extends AsyncTask<IndexTask.IndexTaskListener,Void,Map<St
                 }
 
             } catch (UnsupportedEncodingException e) {
+                mException = e;
                 e.printStackTrace();
             } catch (MalformedURLException e) {
+                mException = e;
                 e.printStackTrace();
             } catch (IOException e) {
+                mException = e;
                 e.printStackTrace();
             } finally {
                 if (indexInputStream != null) indexInputStream.close();
                 if (indexConnection != null) indexConnection.disconnect();
             }
         } catch (IOException e) {
+            mException = e;
             e.printStackTrace();
         }
 
@@ -116,13 +129,13 @@ public class IndexTask extends AsyncTask<IndexTask.IndexTaskListener,Void,Map<St
     }
 
     @Override
-    protected void onPostExecute(Map<String,Object> result) {
-        mExecutor.onIndexTaskResult(result);
+    protected void onTaskResult(AbstractResult result) {
+        mExecutor.onIndexTaskResult((Result) result);
     }
 
     @Override
-    protected void onCancelled(Map<String,Object> result) {
-        Log.d("onCancelled", "Void");
+    protected void onTaskException(Exception e) {
+        mExecutor.onIndexTaskException(e);
     }
 
 }

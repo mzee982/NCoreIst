@@ -1,62 +1,79 @@
 package com.example.NCore;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
-public class LoginTask extends AsyncTask<Map<String,Object>,Void,String> {
-
-    // Parameters
-    public static final String PARAM_IN_EXECUTOR = "PARAM_IN_EXECUTOR";
-    public static final String PARAM_IN_LOGIN_NAME = "PARAM_IN_LOGIN_NAME";
-    public static final String PARAM_IN_LOGIN_PASSWORD = "PARAM_IN_LOGIN_PASSWORD";
-    public static final String PARAM_IN_LOGIN_WITH_CAPTCHA = "PARAM_IN_LOGIN_WITH_CAPTCHA";
-    public static final String PARAM_IN_CAPTCHA_CHALLENGE_VALUE = "PARAM_IN_CAPTCHA_CHALLENGE_VALUE";
-    public static final String PARAM_IN_CAPTCHA_RESPONSE_VALUE = "PARAM_IN_CAPTCHA_RESPONSE_VALUE";
-
-    // Members
-    private LoginTaskListener mExecutor;
+public class LoginTask extends NCoreAsyncTask<LoginTask.LoginTaskListener,Void> {
 
     /**
      * Interface to communicate with the task executor activity
      */
     public interface LoginTaskListener {
-        public void onLoginTaskResult(String response);
+        public void onLoginTaskResult(Result result);
+        public void onLoginTaskException(Exception e);
+    }
+
+    /**
+     * Param object of the task
+     */
+    public static class Param extends AbstractParam<LoginTaskListener> {
+        public final String loginName;
+        public final String loginPassword;
+        public final boolean loginWithCaptcha;
+        public final String captchaChallengeValue;
+        public final String captchaResponseValue;
+
+        public Param(LoginTaskListener executor, String loginName, String loginPassword, boolean loginWithCaptcha,
+                     String captchaChallengeValue, String captchaResponseValue) {
+            super(executor);
+
+            this.loginName = loginName;
+            this.loginPassword = loginPassword;
+            this.loginWithCaptcha = loginWithCaptcha;
+            this.captchaChallengeValue = captchaChallengeValue;
+            this.captchaResponseValue = captchaResponseValue;
+        }
+
+    }
+
+    /**
+     * Result object of the task
+     */
+    public class Result extends AbstractResult {
+        public final String result;
+
+        public Result(String result) {
+            this.result = result;
+        }
+
     }
 
     @Override
-    protected String doInBackground(Map<String,Object>... maps) {
+    protected AbstractResult doInBackground(AbstractParam... params) {
         HttpURLConnection loginConnection = null;
         int responseCode = 0;
         Map<String, List<String>> headerFields = null;
 
-        // Get input parameters
-        Map<String,Object> inputParams = maps[0];
+        super.doInBackground(params);
 
-        // Get the executor activity of the task
-        mExecutor = (LoginTaskListener) inputParams.get(PARAM_IN_EXECUTOR);
+        // Get input parameters
+        Param param = (Param) params[0];
 
         // Extract input parameters
-        String loginName = (String) inputParams.get(PARAM_IN_LOGIN_NAME);
-        String loginPassword = (String) inputParams.get(PARAM_IN_LOGIN_PASSWORD);
-        boolean loginWithCaptcha = ((Boolean) inputParams.get(PARAM_IN_LOGIN_WITH_CAPTCHA)).booleanValue();
-        String captchaChallengeValue = (String) inputParams.get(PARAM_IN_CAPTCHA_CHALLENGE_VALUE);
-        String captchaResponseValue = (String) inputParams.get(PARAM_IN_CAPTCHA_RESPONSE_VALUE);
+        String loginName = param.loginName;
+        String loginPassword = param.loginPassword;
+        boolean loginWithCaptcha = param.loginWithCaptcha;
+        String captchaChallengeValue = param.captchaChallengeValue;
+        String captchaResponseValue = param.captchaResponseValue;
 
         try {
 
             // Collect the POST parameters
-            Map<String,String> postParamsMap = NCoreConnectionManager.prepareLoginPostParams(
-                                                       loginName,
-                                                       loginPassword,
-                                                       captchaChallengeValue,
-                                                       captchaResponseValue,
-                                                       loginWithCaptcha);
+            Map<String,String> postParamsMap = NCoreConnectionManager.prepareLoginPostParams( loginName, loginPassword,
+                    captchaChallengeValue, captchaResponseValue, loginWithCaptcha);
 
             /*
              * POST the login page
@@ -79,14 +96,17 @@ public class LoginTask extends AsyncTask<Map<String,Object>,Void,String> {
              */
 
             if (!isCancelled()) {
-                return NCoreConnectionManager.evaluateLoginResponse(responseCode, headerFields);
+                return new Result(NCoreConnectionManager.evaluateLoginResponse(responseCode, headerFields));
             }
 
         } catch (UnsupportedEncodingException e) {
+            mException = e;
             e.printStackTrace();
         } catch (MalformedURLException e) {
+            mException = e;
             e.printStackTrace();
         } catch (IOException e) {
+            mException = e;
             e.printStackTrace();
         } finally {
             if (loginConnection != null) loginConnection.disconnect();
@@ -96,13 +116,13 @@ public class LoginTask extends AsyncTask<Map<String,Object>,Void,String> {
     }
 
     @Override
-    protected void onPostExecute(String response) {
-        mExecutor.onLoginTaskResult(response);
+    protected void onTaskResult(AbstractResult result) {
+        mExecutor.onLoginTaskResult((Result) result);
     }
 
     @Override
-    protected void onCancelled(String response) {
-        Log.d("onCancelled", "");
+    protected void onTaskException(Exception e) {
+        mExecutor.onLoginTaskException(e);
     }
 
 }

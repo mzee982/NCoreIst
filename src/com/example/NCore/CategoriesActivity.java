@@ -1,6 +1,7 @@
 package com.example.NCore;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -19,49 +20,27 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class IndexActivity
-        extends ActionBarActivity
-        implements
-                QuestionDialogFragment.QuestionDialogListener,
-                AlertDialogFragment.AlertDialogListener,
-                LogoutTask.LogoutTaskListener,
-                IndexTask.IndexTaskListener {
-
-    // Request codes
-    private static final int REQUEST_CODE_LOGIN = 1;
+public class CategoriesActivity extends ActionBarActivity implements QuestionDialogFragment.QuestionDialogListener,
+        AlertDialogFragment.AlertDialogListener, LogoutTask.LogoutTaskListener, IndexTask.IndexTaskListener {
 
     // Dialog fragment tags
     private static final String TAG_LOGOUT_QUESTION_DIALOG_FRAGMENT = "TAG_LOGOUT_QUESTION_DIALOG_FRAGMENT";
     private static final String TAG_LOGOUT_ALERT_DIALOG_FRAGMENT = "TAG_LOGOUT_ALERT_DIALOG_FRAGMENT";
 
-    // Torrent list fragment tags
-    public static final String TAG_TORRENT_LIST_ALL_FRAGMENT = "TAG_TORRENT_LIST_ALL_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_MOVIE_FRAGMENT = "TAG_TORRENT_LIST_MOVIE_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_SERIES_FRAGMENT = "TAG_TORRENT_LIST_SERIES_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_MUSIC_FRAGMENT = "TAG_TORRENT_LIST_MUSIC_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_XXX_FRAGMENT = "TAG_TORRENT_LIST_XXX_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_GAME_FRAGMENT = "TAG_TORRENT_LIST_GAME_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_SOFTWARE_FRAGMENT = "TAG_TORRENT_LIST_SOFTWARE_FRAGMENT";
-    public static final String TAG_TORRENT_LIST_BOOK_FRAGMENT = "TAG_TORRENT_LIST_BOOK_FRAGMENT";
-
-    //
-    private static final String QUESTION_LOGOUT = "Do you really want to logout?";
-    private static final String ALERT_LOGOUT = "Logout failed. Try again.";
+    // Dialog labels
+    private static final String QUESTION_LOGOUT = "Tényleg kilépsz?";
+    private static final String ALERT_LOGOUT = "Sikertelen kijelentkezés, próbáld újra!";
 
     // Members
+    private IndexTask mIndexTask;
+    private LogoutTask mLogoutTask;
     private MenuItem mSearchItem;
     private String[] mIndexLeftDrawerItems;
-    private DrawerLayout mIndexDrawerLayout;
+    private DrawerLayout mCategoriesDrawerLayout;
     private IndexActionBarDrawerToggle mIndexDrawerToggle;
     private ListView mIndexLeftDrawerListView;
     private NCoreSession mNCoreSession;
-    private LogoutTask mLogoutTask;
-    private IndexTask mIndexTask;
-    private String mFragmentTag;
-    private IndexPagerAdapter mIndexPagerAdapter;
+    private CategoriesPagerAdapter mCategoriesPagerAdapter;
     private ViewPager mViewPager;
 
     /**
@@ -77,16 +56,8 @@ public class IndexActivity
     }
 
     /**
-     * Drop-down navigation listener
+     * Tab navigation listener
      */
-    private class IndexNavigationListener implements ActionBar.OnNavigationListener {
-
-        @Override
-        public boolean onNavigationItemSelected(int position, long itemId) {
-            return selectIndexNavigationItem(position, itemId);
-        }
-    }
-
     private class IndexTabNavigationListener implements ActionBar.TabListener {
 
         @Override
@@ -106,6 +77,9 @@ public class IndexActivity
 
     }
 
+    /**
+     * View pager listener
+     */
     private class IndexViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
 
         @Override
@@ -131,7 +105,7 @@ public class IndexActivity
     }
 
     /**
-     *
+     * Navigation drawer toggle
      */
     private class IndexActionBarDrawerToggle extends ActionBarDrawerToggle {
 
@@ -158,6 +132,14 @@ public class IndexActivity
 
     }
 
+    public static void start(Context context) {
+        Intent intent = new Intent(context, CategoriesActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        context.startActivity(intent);
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -167,8 +149,8 @@ public class IndexActivity
         // Check the login status
         if (!mNCoreSession.isLoggedIn()) {
 
-            // Jump to login
-            jumpToLoginActivity();
+            // Navigate to the LoginActivity
+            navigateToLoginActivity();
 
         }
 
@@ -176,13 +158,13 @@ public class IndexActivity
         else {
 
             // Execute the IndexTask
-            mIndexTask = (IndexTask) new IndexTask().execute(new IndexTask.IndexTaskListener[]{this});
+            mIndexTask = (IndexTask) new IndexTask().execute(new IndexTask.Param[]{new IndexTask.Param(this)});
 
             /*
              * Layout
              */
 
-            setContentView(R.layout.index);
+            setContentView(R.layout.categories_activity);
 
             /*
              * Navigation drawer
@@ -190,13 +172,13 @@ public class IndexActivity
 
             // Index left drawer
             mIndexLeftDrawerItems = getResources().getStringArray(R.array.index_left_drawer_items);
-            mIndexDrawerLayout = (DrawerLayout) findViewById(R.id.IndexDrawerLayout);
+            mCategoriesDrawerLayout = (DrawerLayout) findViewById(R.id.categories_drawer_layout);
 
-            mIndexDrawerToggle = new IndexActionBarDrawerToggle(this, mIndexDrawerLayout,
+            mIndexDrawerToggle = new IndexActionBarDrawerToggle(this, mCategoriesDrawerLayout,
                     R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
-            mIndexDrawerLayout.setDrawerListener(mIndexDrawerToggle);
+            mCategoriesDrawerLayout.setDrawerListener(mIndexDrawerToggle);
 
-            mIndexLeftDrawerListView = (ListView) findViewById(R.id.IndexLeftDrawer);
+            mIndexLeftDrawerListView = (ListView) findViewById(R.id.categories_drawer);
 
             // Set the adapter for the list view
             mIndexLeftDrawerListView.setAdapter(
@@ -225,10 +207,10 @@ public class IndexActivity
              * View pager
              */
 
-            mIndexPagerAdapter = new IndexPagerAdapter(getSupportFragmentManager(), tabs);
-            mViewPager = (ViewPager) findViewById(R.id.IndexContentPager);
+            mCategoriesPagerAdapter = new CategoriesPagerAdapter(getSupportFragmentManager(), tabs);
+            mViewPager = (ViewPager) findViewById(R.id.categories_pager);
             mViewPager.setOnPageChangeListener(new IndexViewPagerListener());
-            mViewPager.setAdapter(mIndexPagerAdapter);
+            mViewPager.setAdapter(mCategoriesPagerAdapter);
 
             // Tab navigation
             getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -266,18 +248,14 @@ public class IndexActivity
     protected void onDestroy() {
 
         // Cancel the running LogoutTask
-        if ((mLogoutTask != null) && (mLogoutTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mLogoutTask != null) && (mLogoutTask.getStatus() != AsyncTask.Status.FINISHED)) {
             mLogoutTask.cancel(true);
         }
 
         // Cancel the running IndexTask
-        if ((mIndexTask != null) && (mIndexTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((mIndexTask != null) && (mIndexTask.getStatus() != AsyncTask.Status.FINISHED)) {
             mIndexTask.cancel(true);
         }
-
-        // Release
-        mLogoutTask = null;
-        mIndexTask = null;
 
         super.onDestroy();
 
@@ -294,8 +272,8 @@ public class IndexActivity
     public boolean onCreateOptionsMenu(Menu menu) {
 
         // Inflate the menu items for use in the action bar
-        getMenuInflater().inflate(R.menu.index_activity_actions, menu);
-        mSearchItem = menu.findItem(R.id.index_action_search);
+        getMenuInflater().inflate(R.menu.categories_activity_actions, menu);
+        mSearchItem = menu.findItem(R.id.categories_action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
 
         // Configure the search info and add any event listeners
@@ -318,29 +296,6 @@ public class IndexActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == REQUEST_CODE_LOGIN) {
-
-            switch (resultCode) {
-                case Activity.RESULT_CANCELED:
-                    finish();
-
-                    break;
-
-                // Activity.RESULT_OK, ...
-                default:
-
-                    // Restart the index activity
-                    restartActivity(data);
-
-            }
-
-        }
-
     }
 
     @Override
@@ -387,10 +342,10 @@ public class IndexActivity
     }
 
     @Override
-    public void onLogoutTaskResult(Boolean result) {
+    public void onLogoutTaskResult(LogoutTask.Result result) {
 
         // Successful logout
-        if ((result != null) && result.booleanValue()) {
+        if ((result != null) && result.loggedOut) {
 
             // Close the session
             mNCoreSession.logout(this);
@@ -402,22 +357,36 @@ public class IndexActivity
         else {
 
             // Inform the user
-            AlertDialogFragment alertDialog = new AlertDialogFragment(ALERT_LOGOUT);
-            alertDialog.show(getSupportFragmentManager(), TAG_LOGOUT_ALERT_DIALOG_FRAGMENT);
+            new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, ALERT_LOGOUT).show();
 
         }
 
     }
 
     @Override
-    public void onIndexTaskResult(Map<String, Object> result) {
+    public void onLogoutTaskException(Exception e) {
+
+        // Alert toast
+        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
+
+    }
+
+    @Override
+    public void onIndexTaskResult(IndexTask.Result result) {
 
         if (result != null) {
-            String logoutUrl = (String) result.get(IndexTask.PARAM_OUT_LOGOUT_URL);
 
             // Store the logout URL in the session
-            mNCoreSession.setLogoutUrl(logoutUrl);
+            mNCoreSession.setLogoutUrl(result.logoutUrl);
         }
+
+    }
+
+    @Override
+    public void onIndexTaskException(Exception e) {
+
+        // Alert toast
+        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
 
     }
 
@@ -428,40 +397,13 @@ public class IndexActivity
         QuestionDialogFragment questionDialog = new QuestionDialogFragment(QUESTION_LOGOUT);
         questionDialog.show(getSupportFragmentManager(), TAG_LOGOUT_QUESTION_DIALOG_FRAGMENT);
 
-        //super.onBackPressed();
-    }
-
-    private void jumpToLoginActivity() {
-
-        // Jump to the login activity
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_LOGIN);
-
     }
 
     private void logout() {
-
-        // Setup LogoutTask input parameters
-        HashMap<String,Object> inputParams = new HashMap<String,Object>();
-
-        inputParams.put(LogoutTask.PARAM_IN_EXECUTOR, this);
-        inputParams.put(LogoutTask.PARAM_IN_LOGOUT_URL, mNCoreSession.getLogoutUrl());
-
-        HashMap<String,Object>[] inputParamsArray = new HashMap[1];
-        inputParamsArray[0] = inputParams;
+        LogoutTask.Param logoutTaskParam = new LogoutTask.Param(this, mNCoreSession.getLogoutUrl());
 
         // Execute the Logout task
-        mLogoutTask = (LogoutTask) new LogoutTask().execute(inputParamsArray);
-
-    }
-
-    private void restartActivity(Intent data) {
-
-        // Restart the index activity
-        Intent intent = new Intent(this, IndexActivity.class);
-        intent.putExtras(data);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        mLogoutTask = (LogoutTask) new LogoutTask().execute(new LogoutTask.Param[]{logoutTaskParam});
 
     }
 
@@ -470,7 +412,7 @@ public class IndexActivity
         // Highlight the selected item, update the title, and close the drawer
         //mIndexLeftDrawerListView.setItemChecked(position, true);
         //setTitle(mIndexLeftDrawerItems[position]);
-        mIndexDrawerLayout.closeDrawer(mIndexLeftDrawerListView);
+        mCategoriesDrawerLayout.closeDrawer(mIndexLeftDrawerListView);
 
     }
 
@@ -525,18 +467,31 @@ public class IndexActivity
 
     private boolean submitIndexQueryText(String query) {
 
-        // Start the search activity
-        Intent intent = new Intent(this, SearchActivity.class);
-
-        intent.putExtra(SearchActivity.EXTRA_TORRENT_LIST_CATEGORY_INDEX, getSupportActionBar().getSelectedNavigationIndex());
-        intent.putExtra(SearchActivity.EXTRA_TORRENT_LIST_SEARCH_QUERY, query);
-
-        startActivity(intent);
+        // Start the SearchResultsActivity
+        navigateToSearchResultsActivity(getSupportActionBar().getSelectedNavigationIndex(), query);
 
         // Close the search action view
         MenuItemCompat.collapseActionView(mSearchItem);
 
         return true;
+    }
+
+    private void navigateToLoginActivity() {
+
+        // Navigate to the LoginActivity
+        // TODO: LoginActivity felkészítése
+        LoginActivity.start(this, null, null, null);
+
+        // This activity should be finished
+        finish();
+
+    }
+
+    private void navigateToSearchResultsActivity(int categoryIndex, String searchQuery) {
+
+        // Navigate to the SearchResultsActivity
+        SearchResultsActivity.start(this, categoryIndex, searchQuery);
+
     }
 
 }
