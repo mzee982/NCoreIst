@@ -12,7 +12,7 @@
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical"
-                      android:background="@color/torrent_list_item_bg_even">
+                      android:background="@color/ncore_background">
 
             <TextView android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -21,10 +21,7 @@
                       android:gravity="center_horizontal"
                       android:layout_margin="4dp"
                       android:padding="4dp"
-                      android:background="@drawable/torrent_list_item_odd_selector"
-                      android:textColor="@color/torrent_list_item_text1"
-                      android:textStyle="bold"
-                      android:textAppearance="?android:attr/textAppearanceMedium"/>
+                      style="@style/TorrentDetailsText.Title"/>
 
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -32,7 +29,7 @@
                             android:gravity="center"
                             android:layout_margin="4dp"
                             android:padding="4dp"
-                            android:background="@drawable/torrent_list_item_odd_selector"
+                            android:background="@color/ncore_foreground"
                             android:clickable="true"
                             android:onClick="onImagesClick"
                             android:visibility="gone">
@@ -83,18 +80,17 @@
                          android:layout_margin="4dp"
                          android:padding="4dp"
                          android:shrinkColumns="1"
-                         android:background="@color/torrent_list_item_bg_odd">
+                         android:background="@color/ncore_foreground">
 
                 <TableRow>
 
                     <TextView android:id="@+id/torrent_details_name_text"
                               android:text="@string/torrent_details_name_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_name_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -103,11 +99,10 @@
                     <TextView android:id="@+id/torrent_details_type_text"
                               android:text="@string/torrent_details_type_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_type_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -116,11 +111,10 @@
                     <TextView android:id="@+id/torrent_details_uploaded_text"
                               android:text="@string/torrent_details_uploaded_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_uploaded_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -129,11 +123,10 @@
                     <TextView android:id="@+id/torrent_details_uploader_text"
                               android:text="@string/torrent_details_uploader_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_uploader_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -142,11 +135,10 @@
                     <TextView android:id="@+id/torrent_details_seeders_text"
                               android:text="@string/torrent_details_seeders_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_seeders_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -155,11 +147,10 @@
                     <TextView android:id="@+id/torrent_details_leechers_text"
                               android:text="@string/torrent_details_leechers_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_leechers_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -168,11 +159,10 @@
                     <TextView android:id="@+id/torrent_details_downloaded_text"
                               android:text="@string/torrent_details_downloaded_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_downloaded_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -181,11 +171,10 @@
                     <TextView android:id="@+id/torrent_details_speed_text"
                               android:text="@string/torrent_details_speed_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_speed_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -194,11 +183,10 @@
                     <TextView android:id="@+id/torrent_details_size_text"
                               android:text="@string/torrent_details_size_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_size_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -207,11 +195,10 @@
                     <TextView android:id="@+id/torrent_details_files_text"
                               android:text="@string/torrent_details_files_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_files_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -223,7 +210,7 @@
                          android:layout_margin="4dp"
                          android:padding="4dp"
                          android:shrinkColumns="1"
-                         android:background="@color/torrent_list_item_bg_odd"
+                         android:background="@color/ncore_foreground"
                          android:visibility="gone">
 
                 <TableRow android:id="@+id/torrent_details_title_row"
@@ -232,11 +219,10 @@
                     <TextView android:id="@+id/torrent_details_title_text"
                               android:text="@string/torrent_details_title_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_title_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -246,11 +232,10 @@
                     <TextView android:id="@+id/torrent_details_release_date_text"
                               android:text="@string/torrent_details_release_date_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_release_date_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -260,11 +245,10 @@
                     <TextView android:id="@+id/torrent_details_director_text"
                               android:text="@string/torrent_details_director_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_director_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -274,11 +258,10 @@
                     <TextView android:id="@+id/torrent_details_cast_text"
                               android:text="@string/torrent_details_cast_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_cast_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -288,11 +271,10 @@
                     <TextView android:id="@+id/torrent_details_country_text"
                               android:text="@string/torrent_details_country_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_country_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -302,11 +284,10 @@
                     <TextView android:id="@+id/torrent_details_duration_text"
                               android:text="@string/torrent_details_duration_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_duration_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -316,11 +297,10 @@
                     <TextView android:id="@+id/torrent_details_labels_text"
                               android:text="@string/torrent_details_labels_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_labels_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -330,11 +310,10 @@
                     <TextView android:id="@+id/torrent_details_imdb_text"
                               android:text="@string/torrent_details_imdb_text"
                               android:paddingRight="8dp"
-                              android:textColor="@color/torrent_list_item_text1"
-                              android:textStyle="bold"/>
+                              style="@style/TorrentDetailsText.Primary"/>
 
                     <TextView android:id="@+id/torrent_details_imdb_value"
-                              android:textColor="@color/torrent_list_item_text1"/>
+                              style="@style/TorrentDetailsText.Secondary"/>
 
                 </TableRow>
 
@@ -346,7 +325,7 @@
                           android:id="@+id/other_versions_layout"
                           android:layout_margin="4dp"
                           android:padding="4dp"
-                          android:background="@color/torrent_list_item_bg_odd"
+                          android:background="@color/ncore_background"
                           android:visibility="gone">
 
                 <TextView android:layout_width="match_parent"
@@ -356,10 +335,7 @@
                           android:gravity="center_horizontal"
                           android:layout_margin="4dp"
                           android:padding="4dp"
-                          android:background="@drawable/torrent_list_item_odd_selector"
-                          android:textColor="@color/torrent_list_item_text1"
-                          android:textStyle="bold"
-                          android:textAppearance="?android:attr/textAppearanceMedium"/>
+                          style="@style/TorrentDetailsText.Title"/>
 
             </LinearLayout>
 
@@ -374,7 +350,6 @@
               android:layout_gravity="start"
               android:choiceMode="singleChoice"
               android:divider="@android:color/transparent"
-              android:dividerHeight="0dp"
-              android:background="#111"/>
+              android:dividerHeight="0dp"/>
 
 </android.support.v4.widget.DrawerLayout>

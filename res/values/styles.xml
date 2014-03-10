@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Application -->
+    <style name="NCoreTheme" parent="@style/Theme.AppCompat.Light">
+        <item name="android:buttonStyle">@style/NCoreWidgetButton</item>
+        <item name="android:imageButtonStyle">@style/NCoreWidgetImageButton</item>
+        <item name="android:actionBarStyle">@style/NCoreActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/abc_ic_ab_back_holo_dark</item>
+        <item name="android:actionBarTabStyle">@style/NCoreActionBarTab</item>
+        <item name="android:actionDropDownStyle">@style/NCoreActionBarDropDown</item>
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/NCoreActionBar</item>
+        <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_holo_dark</item>
+        <item name="actionBarTabStyle">@style/NCoreActionBarTab</item>
+        <item name="actionDropDownStyle">@style/NCoreActionBarDropDown</item>
+    </style>
+
+    <!-- Button -->
+    <style name="NCoreWidgetButton" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@drawable/btn_ncore</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:minWidth">64dip</item>
+    </style>
+
+    <!-- Image Button -->
+    <style name="NCoreWidgetImageButton" parent="android:Widget.Holo.Light.ImageButton">
+        <item name="android:background">@drawable/btn_ncore</item>
+    </style>
+
+    <!-- Action Bar -->
+    <style name="NCoreActionBar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:titleTextStyle">@style/NCoreActionBarTitleText</item>
+        <item name="android:background">@drawable/action_bar_background</item>
+        <!-- Support library compatibility -->
+        <item name="titleTextStyle">@style/NCoreActionBarTitleText</item>
+        <item name="background">@drawable/action_bar_background</item>
+    </style>
+
+    <!-- Action Bar Title Text -->
+    <style name="NCoreActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <!-- Action Bar Tab -->
+    <style name="NCoreActionBarTab" parent="@style/Widget.AppCompat.Light.ActionBar.TabView">
+        <item name="android:background">@drawable/action_bar_tab_indicator_ncore</item>
+    </style>
+
+    <!-- Action Bar Drop Down -->
+    <style name="NCoreActionBarDropDown" parent="@style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
+        <item name="android:dropDownSelector">@drawable/action_bar_drop_down_selector_ncore</item>
+        <item name="android:popupBackground">@drawable/abc_menu_dropdown_panel_ncore</item>
+        <item name="android:background">@drawable/action_bar_spinner_background_ncore</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <!-- Torrent List -->
+    <style name="TorrentListItemText" parent="android:TextAppearance">
+        <item name="android:singleLine">true</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TorrentListItemText.Primary">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TorrentListItemText.Secondary">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Torrent Details -->
+    <style name="TorrentDetailsText" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TorrentDetailsText.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@color/ncore_foreground</item>
+    </style>
+
+    <style name="TorrentDetailsText.Primary">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TorrentDetailsText.Secondary">
+    </style>
+
+
+</resources>

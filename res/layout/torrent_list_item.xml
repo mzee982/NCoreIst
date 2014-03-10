@@ -12,52 +12,44 @@
                android:layout_alignParentStart="true"
                android:paddingTop="4dp"
                android:paddingBottom="4dp"
-               android:paddingRight="4dp"/>
+               android:paddingRight="4dp"
+               android:layout_centerVertical="true"/>
 
     <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:id="@+id/name_value"
               android:text="Name"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_alignParentTop="true"
               android:layout_toRightOf="@id/category_image"
-              android:singleLine="true"
-              android:textStyle="bold"
-              android:textColor="@color/torrent_list_item_text1"/>
+              style="@style/TorrentListItemText.Primary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/imdb_value"
               android:text="Imdb"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:gravity="right"
               android:layout_below="@+id/name_value"
               android:layout_alignParentEnd="true"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"
-              android:paddingLeft="2dp"/>
+              android:paddingLeft="2dp"
+              style="@style/TorrentListItemText.Secondary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/size_value"
               android:text="Size"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:gravity="right"
               android:layout_below="@+id/name_value"
               android:layout_toLeftOf="@id/imdb_value"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"
-              android:paddingLeft="2dp"/>
+              android:paddingLeft="2dp"
+              style="@style/TorrentListItemText.Secondary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/title_value"
               android:text="Title"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_below="@+id/name_value"
               android:layout_toRightOf="@id/category_image"
               android:layout_toLeftOf="@id/size_value"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"/>
+              style="@style/TorrentListItemText.Secondary"/>
 
 </RelativeLayout>

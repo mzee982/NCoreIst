@@ -2,18 +2,26 @@
 
 <resources>
 
+    <!-- Base -->
+    <color name="ncore_light_green">#ff629a00</color>
+    <color name="ncore_dark_green">#ff4a6c10</color>
+    <color name="ncore_light_orange">#ffffd000</color>
+    <color name="ncore_dark_orange">#ffffa500</color>
+    <color name="ncore_foreground">#aad0d0d0</color>
+    <color name="ncore_background">@android:color/transparent</color>
+
     <!-- Info Alert Toast -->
     <color name="info_alert_toast_bg_info">#dd00ff00</color>
     <color name="info_alert_toast_bg_alert">#ddff0000</color>
 
     <!-- Torrent List -->
-    <color name="torrent_list_item_bg_odd">#ff616161</color>
-    <color name="torrent_list_item_bg_even">#ff545454</color>
-    <color name="torrent_list_item_highlighted">#ffffa500</color>
-    <color name="torrent_list_item_focused">#ffffd000</color>
+    <color name="torrent_list_item_bg_odd">@color/ncore_foreground</color>
+    <color name="torrent_list_item_bg_even">@color/ncore_background</color>
+    <color name="torrent_list_item_highlighted">@color/ncore_dark_orange</color>
+    <color name="torrent_list_item_focused">@color/ncore_light_orange</color>
     <color name="torrent_list_item_text1">#ffe7e7e7</color>
     <color name="torrent_list_item_text2">#ffbfbfbf</color>
-    <color name="torrent_list_item_text_highlighted">#ffffa500</color>
-    <color name="torrent_list_item_text_focused">#ffffd000</color>
+    <color name="torrent_list_item_text_highlighted">@color/ncore_dark_orange</color>
+    <color name="torrent_list_item_text_focused">@color/ncore_light_orange</color>
 
 </resources>

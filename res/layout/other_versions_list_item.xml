@@ -19,64 +19,51 @@
               android:layout_height="wrap_content"
               android:id="@+id/name_value"
               android:text="Name"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_alignParentTop="true"
               android:layout_toRightOf="@id/category_image"
-              android:singleLine="true"
-              android:textStyle="bold"
-              android:textColor="@color/torrent_list_item_text1"/>
+              style="@style/TorrentListItemText.Primary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/leechers_value"
               android:text="L3"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_below="@+id/uploaded_value"
               android:layout_alignParentRight="true"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"
+              style="@style/TorrentListItemText.Secondary"
               android:paddingLeft="4dp"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:id="@+id/seeders_value"
               android:text="S2"
               android:layout_below="@+id/uploaded_value"
               android:layout_toLeftOf="@id/leechers_value"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"
+              style="@style/TorrentListItemText.Secondary"
               android:paddingLeft="4dp"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/downloaded_value"
               android:text="D1"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_below="@+id/uploaded_value"
               android:layout_toLeftOf="@id/seeders_value"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"
+              style="@style/TorrentListItemText.Secondary"
               android:paddingLeft="4dp"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/size_value"
               android:text="Size"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_below="@+id/uploaded_value"
               android:layout_toRightOf="@id/category_image"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"/>
+              style="@style/TorrentListItemText.Secondary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:id="@+id/uploaded_value"
               android:text="Uploaded"
-              android:textAppearance="?android:attr/textAppearanceSmall"
               android:layout_below="@+id/name_value"
               android:layout_toRightOf="@id/category_image"
-              android:singleLine="true"
-              android:textColor="@color/torrent_list_item_text2"/>
+              style="@style/TorrentListItemText.Secondary"/>
 
 </RelativeLayout>
