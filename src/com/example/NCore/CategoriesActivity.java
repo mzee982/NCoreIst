@@ -175,7 +175,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
             mCategoriesDrawerLayout = (DrawerLayout) findViewById(R.id.categories_drawer_layout);
 
             mIndexDrawerToggle = new IndexActionBarDrawerToggle(this, mCategoriesDrawerLayout,
-                    R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+                    R.drawable.ic_navigation_drawer, R.string.drawer_open, R.string.drawer_close);
             mCategoriesDrawerLayout.setDrawerListener(mIndexDrawerToggle);
 
             mIndexLeftDrawerListView = (ListView) findViewById(R.id.categories_drawer);

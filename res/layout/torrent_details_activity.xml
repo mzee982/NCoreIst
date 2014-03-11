@@ -17,6 +17,7 @@
             <TextView android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:id="@+id/torrent_details_main_title_value"
+                      android:text="Main Title"
                       android:layout_gravity="center_horizontal"
                       android:gravity="center_horizontal"
                       android:layout_margin="4dp"
@@ -29,7 +30,7 @@
                             android:gravity="center"
                             android:layout_margin="4dp"
                             android:padding="4dp"
-                            android:background="@color/ncore_foreground"
+                            android:background="@drawable/torrent_details_images_selector"
                             android:clickable="true"
                             android:onClick="onImagesClick"
                             android:visibility="gone">
@@ -80,7 +81,7 @@
                          android:layout_margin="4dp"
                          android:padding="4dp"
                          android:shrinkColumns="1"
-                         android:background="@color/ncore_foreground">
+                         android:background="@drawable/foreground">
 
                 <TableRow>
 
@@ -210,7 +211,7 @@
                          android:layout_margin="4dp"
                          android:padding="4dp"
                          android:shrinkColumns="1"
-                         android:background="@color/ncore_foreground"
+                         android:background="@drawable/foreground"
                          android:visibility="gone">
 
                 <TableRow android:id="@+id/torrent_details_title_row"
@@ -323,8 +324,6 @@
                           android:layout_height="match_parent"
                           android:orientation="vertical"
                           android:id="@+id/other_versions_layout"
-                          android:layout_margin="4dp"
-                          android:padding="4dp"
                           android:background="@color/ncore_background"
                           android:visibility="gone">
 

@@ -8,6 +8,7 @@ public class TorrentEntry {
     private String name;
     private String title;
     private String imdb;
+    private Float imdbValue;
     private String size;
     private String uploaded;
     private String downloaded;
@@ -24,6 +25,7 @@ public class TorrentEntry {
         name = null;
         title = null;
         imdb = null;
+        imdbValue = null;
         uploaded = null;
         downloaded = null;
         seeders = null;
@@ -68,6 +70,14 @@ public class TorrentEntry {
 
     public void setImdb(String aImdb) {
         imdb = aImdb;
+    }
+
+    public Float getImdbValue() {
+        return imdbValue;
+    }
+
+    public void setImdbValue(Float imdbValue) {
+        this.imdbValue = imdbValue;
     }
 
     public long getId() {

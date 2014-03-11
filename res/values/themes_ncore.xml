@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Theme.Ncore" parent="@style/_Ncore"/>
+
+    <style name="_Ncore" parent="Theme.AppCompat.Light">
+
+        <!-- Actionbar -->
+        <item name="actionBarItemBackground">@drawable/selectable_background_ncoreab</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Ncoreab</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Ncoreab</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Ncoreab</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Ncoreab</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Ncoreab</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_ncoreab</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_ncoreab</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Ncoreab</item>
+        <item name="homeAsUpIndicator">@drawable/ic_abc_ic_ab_back</item>
+
+        <!-- SearchView -->
+        <item name="searchViewTextField">@drawable/abc_textfield_searchview_ncore</item>
+        <!--
+        <item name="searchViewTextFieldRight">@drawable/abc_textfield_searchview_right_ncore</item>
+        <item name="searchDropdownBackground">@drawable/abc_search_dropdown_light</item>
+        <item name="searchViewCloseIcon">@drawable/abc_ic_clear_holo_light</item>
+        <item name="searchViewSearchIcon">@drawable/abc_ic_search_api_holo_light</item>
+        <item name="searchViewGoIcon">@drawable/abc_ic_go_search_api_holo_light</item>
+        <item name="searchViewVoiceIcon">@drawable/abc_ic_voice_search_api_holo_light</item>
+        <item name="searchViewEditQuery">@drawable/abc_ic_commit_search_api_holo_light</item>
+        <item name="searchViewEditQueryBackground">?attr/selectableItemBackground</item>
+        <item name="searchViewAutoCompleteTextView">@style/Widget.AppCompat.Light.AutoCompleteTextView</item>
+        <item name="textColorSearchUrl">@color/abc_search_url_text_holo</item>
+        <item name="textAppearanceSearchResultTitle">@style/TextAppearance.AppCompat.Light.SearchResult.Title</item>
+        <item name="textAppearanceSearchResultSubtitle">@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle</item>
+        -->
+
+        <!-- Holo Colors -->
+        <item name="android:editTextStyle">@style/EditTextNcore</item>
+        <item name="android:checkboxStyle">@style/CheckBoxNcore</item>
+        <item name="android:buttonStyle">@style/ButtonNcore</item>
+        <item name="android:imageButtonStyle">@style/ImageButtonNcore</item>
+        <item name="android:textColorHighlight">#99669900</item>
+
+    </style>
+
+</resources>

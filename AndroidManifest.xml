@@ -15,7 +15,7 @@
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/ic_launcher"
-                 android:theme="@style/Theme.AppCompat.Light">
+                 android:theme="@style/Theme.Ncore">
 
         <provider
                 android:name="android.support.v4.content.FileProvider"
@@ -27,7 +27,8 @@
         </provider>
 
         <activity android:name=".StartActivity"
-                  android:label="@string/start_activity_label">
+                  android:label="@string/start_activity_label"
+                  android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

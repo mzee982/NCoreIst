@@ -114,13 +114,13 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
         // Show
         if (loginPassword.getTransformationMethod() != null) {
             loginPassword.setTransformationMethod(null);
-            showPasswordButton.setImageResource(R.drawable.ic_secure_light);
+            showPasswordButton.setImageResource(R.drawable.ic_secure);
         }
 
         // Hide
         else {
             loginPassword.setTransformationMethod(new PasswordTransformationMethod());
-            showPasswordButton.setImageResource(R.drawable.ic_not_secure_light);
+            showPasswordButton.setImageResource(R.drawable.ic_not_secure);
         }
 
     }

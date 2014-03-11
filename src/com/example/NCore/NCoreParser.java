@@ -379,7 +379,20 @@ var RecaptchaState = {
 
                             // Add IMDB
                             if (matcher.find()) {
-                                torrentEntry.setImdb("[" + matcher.group(1) + "]");
+                                String imdbString = matcher.group(1);
+
+                                // Formatted string
+                                torrentEntry.setImdb("[" + imdbString + "]");
+
+                                // Float value
+                                try {
+                                    torrentEntry.setImdbValue(Float.parseFloat(imdbString));
+                                }
+
+                                catch (NumberFormatException e) {
+                                    // TODO: Handle exception
+                                }
+
                             }
 
                         }
