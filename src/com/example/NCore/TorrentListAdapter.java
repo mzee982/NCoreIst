@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -26,7 +27,9 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         ImageView category;
         TextView name;
         TextView title;
+        ImageView imdbLogo;
         TextView imdb;
+        ProgressBar imdbMeter;
         TextView size;
         TextView uploaded;
         TextView downloaded;
@@ -36,6 +39,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
     // Members
     private final LayoutInflater mInflater;
+    private final Context mContext;
     private int mLastShowedPageIndex;
     private boolean mHasMoreResults;
     private int mAdapterType;
@@ -48,8 +52,9 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         super(context, android.R.layout.simple_list_item_1);
 
         mAdapterType = adapterType;
+        mContext = context;
 
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // Defaults
         mLastShowedPageIndex = 0;
@@ -113,7 +118,9 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
             holder.category = (ImageView) convertView.findViewById(R.id.category_image);
             holder.name = (TextView) convertView.findViewById(R.id.name_value);
             holder.title = (TextView) convertView.findViewById(R.id.title_value);
+            holder.imdbLogo = (ImageView) convertView.findViewById(R.id.imdb_logo);
             holder.imdb = (TextView) convertView.findViewById(R.id.imdb_value);
+            holder.imdbMeter = (ProgressBar) convertView.findViewById(R.id.imdb_meter);
             holder.size = (TextView) convertView.findViewById(R.id.size_value);
 
             convertView.setTag(holder);
@@ -130,8 +137,29 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
             holder.category.setImageResource(getIconResIdByTorrentCategory(item.getCategory()));
             holder.name.setText(item.getName());
             holder.title.setText(item.getTitle());
-            holder.imdb.setText(item.getImdb());
             holder.size.setText(item.getSize());
+
+            // Hide IMDB section
+            if (item.getImdb() == null) {
+                holder.imdbLogo.setVisibility(ImageView.GONE);
+                holder.imdb.setVisibility(TextView.GONE);
+                holder.imdbMeter.setVisibility(ProgressBar.GONE);
+            }
+
+            // Show IMDB section
+            else {
+                holder.imdbLogo.setVisibility(ImageView.VISIBLE);
+                holder.imdb.setVisibility(TextView.VISIBLE);
+                holder.imdbMeter.setVisibility(ProgressBar.VISIBLE);
+
+                // Calculate linear progress
+                int progress = Math.round(item.getImdbValue() * 10);
+                //int progress = (int) Math.round(Math.pow(item.getImdbValue(), 2) / Math.pow(10, 2) * 100);
+
+                holder.imdb.setText(item.getImdb());
+                holder.imdbMeter.setProgress(progress);
+            }
+
         }
 
         // Background color of the odd/even row

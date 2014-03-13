@@ -24,4 +24,8 @@
     <color name="torrent_list_item_text_highlighted">@color/ncore_dark_orange</color>
     <color name="torrent_list_item_text_focused">@color/ncore_light_orange</color>
 
+    <!-- Horizontal Meter Bar -->
+    <color name="horizontal_meter_bar_background">#ffbfbfbf</color>
+    <color name="horizontal_meter_bar_progress">@color/ncore_light_green</color>
+
 </resources>

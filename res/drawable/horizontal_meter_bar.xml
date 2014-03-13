@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@android:id/background"
+          android:drawable="@color/horizontal_meter_bar_background" />
+
+    <item android:id="@android:id/secondaryProgress">
+        <scale android:scaleWidth="100%"
+               android:drawable="@android:color/transparent" />
+    </item>
+
+    <item android:id="@android:id/progress">
+        <scale android:scaleWidth="100%"
+               android:drawable="@color/horizontal_meter_bar_progress" />
+    </item>
+
+</layer-list>
+
+<!--
+        <clip>
+            <shape>
+                <gradient android:angle="0"
+                          android:startColor="@color/horizontal_meter_bar_low"
+                          android:endColor="@color/horizontal_meter_bar_high"
+                          android:centerColor="@color/horizontal_meter_bar_medium"
+                          android:centerX="0.25" />
+            </shape>
+        </clip>
+-->

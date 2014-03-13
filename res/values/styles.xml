@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
 
     <!-- Torrent List -->
@@ -14,6 +15,16 @@
     <style name="TorrentListItemText.Secondary">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Horizontal Meter Bar -->
+    <style name="HorizontalMeterBar" parent="android:Widget.Holo.Light.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/horizontal_meter_bar</item>
+        <item name="android:minHeight">4dip</item>
+        <item name="android:maxHeight">4dip</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:max">100</item>
     </style>
 
     <!-- Torrent Details -->

@@ -25,21 +25,11 @@
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:id="@+id/imdb_value"
-              android:text="Imdb"
-              android:gravity="right"
-              android:layout_below="@+id/name_value"
-              android:layout_alignParentEnd="true"
-              android:paddingLeft="2dp"
-              style="@style/TorrentListItemText.Secondary"/>
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
               android:id="@+id/size_value"
               android:text="Size"
               android:gravity="right"
               android:layout_below="@+id/name_value"
-              android:layout_toLeftOf="@id/imdb_value"
+              android:layout_alignParentEnd="true"
               android:paddingLeft="2dp"
               style="@style/TorrentListItemText.Secondary"/>
 
@@ -51,5 +41,30 @@
               android:layout_toRightOf="@id/category_image"
               android:layout_toLeftOf="@id/size_value"
               style="@style/TorrentListItemText.Secondary"/>
+
+    <ImageView android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/imdb_logo"
+               android:src="@drawable/ic_imdb_logo"
+               android:layout_below="@id/title_value"
+               android:layout_toRightOf="@id/category_image"
+               android:paddingTop="4dp"
+               android:paddingRight="2dp" />
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/imdb_value"
+              android:layout_below="@id/title_value"
+              android:layout_toRightOf="@id/imdb_logo"
+              android:paddingRight="4dp"
+              android:text="[imdb]"
+              style="@style/TorrentListItemText.Secondary"/>
+
+    <ProgressBar style="@style/HorizontalMeterBar"
+                 android:id="@+id/imdb_meter"
+                 android:layout_below="@id/title_value"
+                 android:layout_toRightOf="@id/imdb_value"
+                 android:paddingTop="10dp"
+                 android:progress="80"/>
 
 </RelativeLayout>
