@@ -19,6 +19,14 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
     public static final int TYPE_TORRENT_LIST = 1;
     public static final int TYPE_OTHER_VERSIONS = 2;
 
+    // Item view types
+    private static final int TORRENT_LIST_ITEM_VIEW_TYPE = 0;
+    private static final int OTHER_VERSIONS_ITEM_VIEW_TYPE = 1;
+    private static final int PROGRESS_ITEM_VIEW_TYPE = 2;
+
+    // List item view tags
+    public static final String TAG_PROGRESS_ITEM = "TAG_PROGRESS_ITEM";
+
     /**
      * ViewHolder
      */
@@ -93,6 +101,45 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         }
     }
 
+    @Override
+    public int getViewTypeCount() {
+
+        /*
+         * View types
+         * - Torrent list item
+         * - Other versions item
+         * - Progress item
+         */
+
+        return 3;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        // Torrent item list
+        if (TYPE_TORRENT_LIST == mAdapterType) {
+
+            // Torrent item view
+            if (!hasMoreResults() || (position < (getCount() - 1))) {
+                return TORRENT_LIST_ITEM_VIEW_TYPE;
+            }
+
+            // Progress item view
+            else {
+                return PROGRESS_ITEM_VIEW_TYPE;
+            }
+
+        }
+
+        // Other versions list
+        else if (TYPE_OTHER_VERSIONS == mAdapterType) return OTHER_VERSIONS_ITEM_VIEW_TYPE;
+
+        // Ignore the item
+        else return IGNORE_ITEM_VIEW_TYPE;
+
+    }
+
     /**
      * Populate new items in the list.
      */
@@ -100,9 +147,16 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        if (TYPE_TORRENT_LIST == mAdapterType) return getTorrentListView(position, convertView, parent);
-        else if (TYPE_OTHER_VERSIONS == mAdapterType) return getOtherVersionsView(position, convertView, parent);
-        else return null;
+        switch (getItemViewType(position)) {
+            case TORRENT_LIST_ITEM_VIEW_TYPE:
+                return getTorrentListView(position, convertView, parent);
+            case OTHER_VERSIONS_ITEM_VIEW_TYPE:
+                return getOtherVersionsListView(position, convertView, parent);
+            case PROGRESS_ITEM_VIEW_TYPE:
+                return getProgressListView(position, convertView, parent);
+            default:
+                return null;
+        }
 
     }
 
@@ -173,7 +227,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         return convertView;
     }
 
-    public View getOtherVersionsView(int position, View convertView, ViewGroup parent) {
+    public View getOtherVersionsListView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
         // List row view and holder
@@ -221,7 +275,26 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
         return convertView;
     }
 
-    @Override
+    public View getProgressListView(int position, View convertView, ViewGroup parent) {
+
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.progress_list_item, parent, false);
+            convertView.setTag(TAG_PROGRESS_ITEM);
+        }
+
+        // Background color of the odd/even row
+//        if (position % 2 == 0) {
+//            convertView.setBackgroundResource(R.drawable.torrent_list_item_even_selector);
+//        }
+//        else {
+//            convertView.setBackgroundResource(R.drawable.torrent_list_item_odd_selector);
+//        }
+
+        return convertView;
+    }
+
+
+        @Override
     public void clear() {
 
         // Reset

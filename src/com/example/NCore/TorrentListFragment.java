@@ -6,9 +6,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -18,9 +16,6 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     private static final String ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX = "ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX";
     private static final String ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY = "ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY";
 
-    // Toast
-    private static final String TOAST_NO_MORE_RESULTS = "No more results";
-
     // File provider authority
     private static final String FILE_PROVIDER_AUTHORITY = "com.example.NCore.FileProvider";
 
@@ -28,20 +23,28 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     private static final int LOADER_TORRENT_LIST = 1;
     private static final int LOADER_TORRENT_SEARCH_LIST = 2;
 
+    // Instance states
+    private static final String INSTANCE_STATE_LOAD_IN_PROGRESS = "INSTANCE_STATE_LOAD_IN_PROGRESS";
+
     // Members
     private int mTorrentListCategoryIndex;
     private String mTorrentListSearchQuery;
     private TorrentListAdapter mAdapter;
-    private Button mMoreButton;
+    private boolean bLoadInProgress;
 
     /**
-     * More button click listener
+     * List scroll listener
      */
-    private class MoreButtonClickListener implements View.OnClickListener {
+    private class ListScrollListener implements AbsListView.OnScrollListener {
+
         @Override
-        public void onClick(View view) {
-            onMoreButtonClick(view);
+        public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            onListScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
         }
+
     }
 
     public static TorrentListFragment create(int categoryIndex, String searchQuery) {
@@ -72,6 +75,11 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         // Input arguments
         getInputArguments(getArguments());
 
+        // Previous instance state
+        if (savedInstanceState != null) {
+            bLoadInProgress = savedInstanceState.getBoolean(INSTANCE_STATE_LOAD_IN_PROGRESS, false);
+        }
+
         // Action bar
         setHasOptionsMenu(true);
     }
@@ -86,17 +94,16 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         super.onActivityCreated(savedInstanceState);
 
         /*
-         * Torrent list
+         * Torrent list view
          */
 
-        mMoreButton = new Button(getActivity());
-        mMoreButton.setText(getResources().getText(R.string.torrent_list_more_label));
-        mMoreButton.setLayoutParams(
-                new AbsListView.LayoutParams(
-                        AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
-        mMoreButton.setOnClickListener(new MoreButtonClickListener());
-        getListView().addFooterView(mMoreButton);
+        // Enabling fast scroll on ListView
+        getListView().setFastScrollEnabled(true);
 
+        // List scroll listener
+        getListView().setOnScrollListener(new ListScrollListener());
+
+        // List adapter
         mAdapter = new TorrentListAdapter(getActivity(), TorrentListAdapter.TYPE_TORRENT_LIST);
         setListAdapter(mAdapter);
 
@@ -127,6 +134,13 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(INSTANCE_STATE_LOAD_IN_PROGRESS, bLoadInProgress);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         // Inflate the menu items for use in the action bar
@@ -151,7 +165,7 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     @Override
     public Loader onCreateLoader(int i, Bundle bundle) {
 
-        // Torrent list loader/Torrent search loader
+        // Torrent list loader / Torrent search loader
         if ((i == LOADER_TORRENT_LIST) || (i == LOADER_TORRENT_SEARCH_LIST)) {
             return new TorrentListLoader(getActivity(), bundle);
         }
@@ -166,17 +180,8 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         if ((listLoader.getId() == LOADER_TORRENT_LIST) || (listLoader.getId() == LOADER_TORRENT_SEARCH_LIST)) {
             mAdapter.appendData(torrentEntries);
             mAdapter.setHasMoreResults(((TorrentListLoader) listLoader).hasMoreResults());
+            bLoadInProgress = false;
         }
-
-        // Show/hide more button
-        /*
-        if (mAdapter.hasMoreResults()) {
-            mMoreButton.setVisibility(View.VISIBLE);
-        }
-        else {
-            mMoreButton.setVisibility(View.GONE);
-        }
-        */
 
         // The list should now be shown
         if (isResumed()) {
@@ -190,24 +195,30 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onLoaderReset(Loader loader) {
+        bLoadInProgress = false;
         mAdapter.clear();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-        // Navigate to the TorrentDetailsActivity
-        navigateToTorrentDetailsActivity(id);
+        // Filter out progress list item
+        if (v.getTag() != TorrentListAdapter.TAG_PROGRESS_ITEM) {
+
+            // Navigate to the TorrentDetailsActivity
+            navigateToTorrentDetailsActivity(id);
+
+        }
 
     }
 
-    public void onMoreButtonClick(View view) {
+    public void onListScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-        // Has more results
-        if (mAdapter.hasMoreResults()) {
+        //
+        if ((mAdapter != null) && mAdapter.hasMoreResults() && !bLoadInProgress
+                && ((firstVisibleItem + visibleItemCount - 1) >= (totalItemCount - 2 * visibleItemCount))) {
 
-            // Start out with a progress indicator
-            setListShown(false);
+            bLoadInProgress = true;
 
             // Set input arguments
             Bundle args = new Bundle();
@@ -227,13 +238,14 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
         }
 
-        else {
-            Toast.makeText(getActivity(), TOAST_NO_MORE_RESULTS, Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     public void onRefresh() {
+
+        // Reset list adapter
+        setListAdapter(null);
+        mAdapter.clear();
+        setListAdapter(mAdapter);
 
         // Start out with a progress indicator
         setListShown(false);
@@ -253,12 +265,6 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         else {
             getLoaderManager().restartLoader(LOADER_TORRENT_LIST, args, this);
         }
-
-        // List view
-        getListView().setSelectionAfterHeaderView();
-
-        // Reset adapter
-        mAdapter.clear();
 
     }
 
