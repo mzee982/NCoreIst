@@ -26,7 +26,7 @@
         <item name="android:progressBarStyle">@style/ProgressBar.Ncoreab</item>
 
         <!-- Customized -->
-        <item name="android:titleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionBar.Title.Inverse</item>
+        <item name="android:titleTextStyle">@style/ActionBarTitle.Ncoreab</item>
         <item name="android:subtitleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle.Inverse</item>
 
     </style>

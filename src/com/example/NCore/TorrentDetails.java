@@ -2,13 +2,19 @@ package com.example.NCore;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TorrentDetails {
 
+    // Movie properties
+    private static final String MOVIE_PROPERTY_1080P = "1080p";
+    private static final String MOVIE_PROPERTY_720P = "720p";
+
     // Properties
     private String name;
     private String type;
+    private String category;
     private String uploaded;
     private String uploader;
     private String seeders;
@@ -39,6 +45,7 @@ public class TorrentDetails {
     private String otherVersionsId;
     private String otherVersionsFid;
     private List<TorrentEntry> otherVersions;
+    private List<Integer> moviePropertyIcons;
 
     /*
      * Constructor
@@ -46,6 +53,8 @@ public class TorrentDetails {
 
     public TorrentDetails() {
         name = null;
+        type = null;
+        category = null;
         uploaded = null;
         uploader = null;
         seeders = null;
@@ -76,6 +85,7 @@ public class TorrentDetails {
         otherVersionsId = null;
         otherVersionsFid = null;
         otherVersions = null;
+        moviePropertyIcons = null;
     }
 
     public boolean hasMovieDetails() {
@@ -86,12 +96,90 @@ public class TorrentDetails {
         return (sampleImg1Url != null);
     }
 
+    public boolean hasOtherVersions() {
+        return (otherVersionsId != null) && (otherVersionsFid != null);
+    }
+
+    public boolean hasMovieProperties() {
+        return (getMoviePropertyIcons() != null) && (getMoviePropertyIcons().size() > 0);
+    }
+
     public String getMainTitle() {
         return (title != null) ? title : name;
     }
 
-    public boolean hasOtherVersions() {
-        return (otherVersionsId != null) && (otherVersionsFid != null);
+    public int getCategoryIconResId() {
+        return getCategoryIconResId(category);
+    }
+
+    public static int getCategoryIconResId(String torrentCategory) {
+
+        // Movie
+        if ("xvid_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid_hun;
+        if ("xvid".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvid;
+        if ("dvd_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd_hun;
+        if ("dvd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd;
+        if ("dvd9_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9_hun;
+        if ("dvd9".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvd9;
+        if ("hd_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd_hun;
+        if ("hd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hd;
+
+        // Series
+        if ("xvidser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser_hun;
+        if ("xvidser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xvidser;
+        if ("dvdser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser_hun;
+        if ("dvdser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_dvdser;
+        if ("hdser_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser_hun;
+        if ("hdser".equals(torrentCategory)) return R.drawable.ic_torrent_cat_hdser;
+
+        // Music
+        if ("mp3_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3_hun;
+        if ("mp3".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mp3;
+        if ("lossless_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless_hun;
+        if ("lossless".equals(torrentCategory)) return R.drawable.ic_torrent_cat_lossless;
+        if ("clip".equals(torrentCategory)) return R.drawable.ic_torrent_cat_clip;
+
+        // XXX
+        if ("xxx_xvid".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_xvid;
+        if ("xxx_dvd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_dvd;
+        if ("xxx_imageset".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_imageset;
+        if ("xxx_hd".equals(torrentCategory)) return R.drawable.ic_torrent_cat_xxx_hd;
+
+        // Game
+        if ("game_iso".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_iso;
+        if ("game_rip".equals(torrentCategory)) return R.drawable.ic_torrent_cat_game_rip;
+        if ("console".equals(torrentCategory)) return R.drawable.ic_torrent_cat_console;
+
+        // Software
+        if ("iso".equals(torrentCategory)) return R.drawable.ic_torrent_cat_iso;
+        if ("misc".equals(torrentCategory)) return R.drawable.ic_torrent_cat_misc;
+        if ("mobil".equals(torrentCategory)) return R.drawable.ic_torrent_cat_mobil;
+
+        // Book
+        if ("ebook_hun".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook_hun;
+        if ("ebook".equals(torrentCategory)) return R.drawable.ic_torrent_cat_ebook;
+
+        //
+        return android.R.drawable.ic_dialog_alert;
+    }
+
+    public List<Integer> getMoviePropertyIcons() {
+
+        // Build on first access
+        if (moviePropertyIcons == null) buildMovieProperties();
+
+        return moviePropertyIcons;
+    }
+
+    private void buildMovieProperties() {
+        moviePropertyIcons = new ArrayList<Integer>();
+
+        if (name.toLowerCase().contains(MOVIE_PROPERTY_1080P))
+            moviePropertyIcons.add(R.drawable.ic_fullhd1080p);
+
+        if (name.toLowerCase().contains(MOVIE_PROPERTY_720P))
+            moviePropertyIcons.add(R.drawable.ic_hd720p);
+
     }
 
     /*
@@ -112,6 +200,14 @@ public class TorrentDetails {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getUploaded() {

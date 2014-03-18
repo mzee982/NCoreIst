@@ -1,7 +1,9 @@
 package com.example.NCore;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -21,7 +23,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class CategoriesActivity extends ActionBarActivity implements QuestionDialogFragment.QuestionDialogListener,
-        AlertDialogFragment.AlertDialogListener, LogoutTask.LogoutTaskListener, IndexTask.IndexTaskListener {
+        AlertDialogFragment.AlertDialogListener, LogoutTask.LogoutTaskListener, IndexTask.IndexTaskListener,
+        DialogInterface.OnCancelListener {
 
     // Dialog fragment tags
     private static final String TAG_LOGOUT_QUESTION_DIALOG_FRAGMENT = "TAG_LOGOUT_QUESTION_DIALOG_FRAGMENT";
@@ -30,6 +33,9 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     // Dialog labels
     private static final String QUESTION_LOGOUT = "Tényleg kilépsz?";
     private static final String ALERT_LOGOUT = "Sikertelen kijelentkezés, próbáld újra!";
+
+    // Progress dialog
+    private static final String PROGRESS_MESSAGE_LOGOUT = "Kijelentkezés...";
 
     // Members
     private IndexTask mIndexTask;
@@ -42,6 +48,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     private NCoreSession mNCoreSession;
     private CategoriesPagerAdapter mCategoriesPagerAdapter;
     private ViewPager mViewPager;
+    private ProgressDialog mProgressDialog;
 
     /**
      * Navigation drawer listener
@@ -257,6 +264,9 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
             mIndexTask.cancel(true);
         }
 
+        // Cancel the progress dialog
+        if ((mProgressDialog != null) && (mProgressDialog.isShowing())) mProgressDialog.cancel();
+
         super.onDestroy();
 
     }
@@ -344,6 +354,9 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     @Override
     public void onLogoutTaskResult(LogoutTask.Result result) {
 
+        // Cancel the progress dialog
+        mProgressDialog.cancel();
+
         // Successful logout
         if ((result != null) && result.loggedOut) {
 
@@ -365,6 +378,9 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
     @Override
     public void onLogoutTaskException(Exception e) {
+
+        // Cancel the progress dialog
+        mProgressDialog.cancel();
 
         // Alert toast
         new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
@@ -399,7 +415,21 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
     }
 
+    @Override
+    public void onCancel(DialogInterface dialogInterface) {
+
+        // Cancel the running LogoutTask
+        if ((mLogoutTask != null) && (mLogoutTask.getStatus() != AsyncTask.Status.FINISHED)) {
+            mLogoutTask.cancel(true);
+        }
+
+    }
+
     private void logout() {
+
+        // Show progress dialog
+        mProgressDialog = ProgressDialog.show(this, null, PROGRESS_MESSAGE_LOGOUT, true, true, this);
+
         LogoutTask.Param logoutTaskParam = new LogoutTask.Param(this, mNCoreSession.getLogoutUrl());
 
         // Execute the Logout task

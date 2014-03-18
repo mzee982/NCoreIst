@@ -26,9 +26,13 @@
         <item name="progressBarStyle">@style/ProgressBar.Ncoreab</item>
 
         <!-- Customized -->
-        <item name="titleTextStyle">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+        <item name="titleTextStyle">@style/ActionBarTitle.Ncoreab</item>
         <item name="subtitleTextStyle">@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle.Inverse</item>
 
+    </style>
+
+    <style name="ActionBarTitle.Ncoreab" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
     <style name="ActionBar.Transparent.Ncoreab" parent="@style/Widget.AppCompat.Light.ActionBar">

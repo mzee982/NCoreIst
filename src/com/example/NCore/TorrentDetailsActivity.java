@@ -54,6 +54,7 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
     private long mTorrentId;
     private TorrentDetails mTorrentDetails;
     private TorrentListAdapter mOtherVersionsAdapter;
+    private InfoAlertToast mInfoToast;
 
     //
     private class OnOtherVersionsItemClickListener implements View.OnClickListener {
@@ -296,10 +297,11 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
         if (result != null) {
 
             // Info toast
-            InfoAlertToast infoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
+            if (mInfoToast != null) mInfoToast.cancel();
+            mInfoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
                     TOAST_TORRENT_DOWNLOAD_READY);
-            infoToast.setDuration(Toast.LENGTH_SHORT);
-            infoToast.show();
+            mInfoToast.setDuration(Toast.LENGTH_SHORT);
+            mInfoToast.show();
 
             // Get torrent file from the file provider
             Uri torrentUri = Uri.fromFile(result.file);
@@ -334,6 +336,7 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
     public void onDownloadTorrentTaskException(Exception e) {
 
         // Alert toast
+        if (mInfoToast != null) mInfoToast.cancel();
         new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
 
     }
@@ -343,12 +346,19 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
 
         if ((result != null) && (result.bitmap != null)) {
 
-            // Show images layout
-            RelativeLayout torrentDetailsImageLayout = (RelativeLayout) findViewById(
+            // Show images layout and divider
+            ImageView torrentDetailsImagesHeaderDivider = (ImageView) findViewById(
+                    R.id.torrent_details_images_header_divider);
+            RelativeLayout torrentDetailsImagesLayout = (RelativeLayout) findViewById(
                     R.id.torrent_details_images_layout);
+            ImageView torrentDetailsImagesFooterDivider = (ImageView) findViewById(
+                    R.id.torrent_details_images_footer_divider);
 
-            if (torrentDetailsImageLayout.getVisibility() != RelativeLayout.VISIBLE)
-                torrentDetailsImageLayout.setVisibility(RelativeLayout.VISIBLE);
+            if (torrentDetailsImagesLayout.getVisibility() != RelativeLayout.VISIBLE) {
+                torrentDetailsImagesHeaderDivider.setVisibility(ImageView.VISIBLE);
+                torrentDetailsImagesLayout.setVisibility(RelativeLayout.VISIBLE);
+                torrentDetailsImagesFooterDivider.setVisibility(ImageView.VISIBLE);
+            }
 
             switch (result.imageId) {
 
@@ -446,17 +456,24 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
         ((TextView) findViewById(R.id.torrent_details_downloaded_value)).setText(mTorrentDetails.getDownloaded());
         ((TextView) findViewById(R.id.torrent_details_speed_value)).setText(mTorrentDetails.getSpeed());
         ((TextView) findViewById(R.id.torrent_details_size_value)).setText(mTorrentDetails.getSize());
-        ((TextView) findViewById(R.id.torrent_details_files_value)).setText(mTorrentDetails.getFiles());
+        //((TextView) findViewById(R.id.torrent_details_files_value)).setText(mTorrentDetails.getFiles());
+
+        ((ImageView) findViewById(R.id.torrent_details_category_icon)).setImageResource(
+                mTorrentDetails.getCategoryIconResId());
+
+        if (mTorrentDetails.hasMovieProperties()) {
+            ((ImageView) findViewById(R.id.torrent_details_movie_property_icon)).setImageResource(
+                    mTorrentDetails.getMoviePropertyIcons().get(0));
+        }
 
         // Movie details
         if (mTorrentDetails.hasMovieDetails()) {
 
-            ((TableLayout) findViewById(R.id.torrent_details_movie_table)).setVisibility(TableLayout.VISIBLE);
+            ((LinearLayout) findViewById(R.id.torrent_details_movie_layout)).setVisibility(TableLayout.VISIBLE);
 
             if (mTorrentDetails.getTitle() != null) {
                 TextView title = ((TextView) findViewById(R.id.torrent_details_title_value));
                 title.setText(mTorrentDetails.getTitle());
-                ((TableRow) findViewById(R.id.torrent_details_title_row)).setVisibility(TableRow.VISIBLE);
             }
 
             if (mTorrentDetails.getReleaseDate() != null) {
@@ -515,10 +532,10 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
     private void downloadTorrent() {
 
         // Info toast
-        InfoAlertToast infoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
+        mInfoToast = new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO,
                 TOAST_TORRENT_DOWNLOAD_IN_PROGRESS);
-        infoToast.setDuration(Toast.LENGTH_SHORT);
-        infoToast.show();
+        mInfoToast.setDuration(Toast.LENGTH_SHORT);
+        mInfoToast.show();
 
         /*
          * Download the torrent

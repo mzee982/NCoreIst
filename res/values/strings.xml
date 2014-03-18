@@ -16,7 +16,8 @@
     <string name="start_progress_text">. . .</string>
 
     <!-- Login activity -->
-    <string name="login_activity_label">Bejelentkezés</string>
+    <string name="login_activity_label">nCOREist</string>
+    <string name="login_activity_title">Bejelentkezés</string>
     <string name="login_name_text">Felhasználónév</string>
     <string name="login_password_text">Jelszó</string>
     <string name="captcha_text">reCAPTCHA</string>

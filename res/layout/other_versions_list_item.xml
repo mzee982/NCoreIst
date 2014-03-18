@@ -25,30 +25,11 @@
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:id="@+id/leechers_value"
-              android:text="L3"
-              android:layout_below="@+id/uploaded_value"
-              android:layout_alignParentRight="true"
-              style="@style/TorrentListItemText.Secondary"
-              android:paddingLeft="4dp"/>
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/seeders_value"
-              android:text="S2"
-              android:layout_below="@+id/uploaded_value"
-              android:layout_toLeftOf="@id/leechers_value"
-              style="@style/TorrentListItemText.Secondary"
-              android:paddingLeft="4dp"/>
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/downloaded_value"
-              android:text="D1"
-              android:layout_below="@+id/uploaded_value"
-              android:layout_toLeftOf="@id/seeders_value"
-              style="@style/TorrentListItemText.Secondary"
-              android:paddingLeft="4dp"/>
+              android:id="@+id/uploaded_value"
+              android:text="Uploaded"
+              android:layout_below="@+id/name_value"
+              android:layout_toRightOf="@id/category_image"
+              style="@style/TorrentListItemText.Secondary"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -58,12 +39,52 @@
               android:layout_toRightOf="@id/category_image"
               style="@style/TorrentListItemText.Secondary"/>
 
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/uploaded_value"
-              android:text="Uploaded"
-              android:layout_below="@+id/name_value"
-              android:layout_toRightOf="@id/category_image"
-              style="@style/TorrentListItemText.Secondary"/>
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center_vertical"
+                  android:layout_alignParentRight="true"
+                  android:layout_below="@id/uploaded_value">
+
+        <ImageView android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:id="@+id/seeders_icon"
+                   android:src="@drawable/ic_seeders"
+                   android:maxHeight="16dp"
+                   android:adjustViewBounds="true"/>
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/seeders_value"
+                  android:text="S1"
+                  style="@style/TorrentListItemText.Secondary"/>
+
+        <ImageView android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:id="@+id/leechers_icon"
+                   android:src="@drawable/ic_leechers"
+                   android:maxHeight="16dp"
+                   android:adjustViewBounds="true"/>
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/leechers_value"
+                  android:text="L2"
+                  style="@style/TorrentListItemText.Secondary"/>
+
+        <ImageView android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:id="@+id/downloaded_icon"
+                   android:src="@drawable/ic_downloaded"
+                   android:maxHeight="16dp"
+                   android:adjustViewBounds="true"/>
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/downloaded_value"
+                  android:text="D3"
+                  style="@style/TorrentListItemText.Secondary"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

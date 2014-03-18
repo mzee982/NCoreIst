@@ -57,9 +57,13 @@ public final class NCoreParser {
             Pattern.compile("(?s)^.*(\\{.*\\}).*$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_CATEGORY = Pattern.compile("^.*tipus=(.*)$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_ID = Pattern.compile("^.*id=(.*)$"); // "^.*\\((.*)\\).*$"
+    private static final Pattern REGEX_PATTERN_TORRENT_ITEM_DOWNLOADED = Pattern.compile("^(\\d*).*$");
+    private static final Pattern REGEX_PATTERN_TORRENT_ITEM_SPEED = Pattern.compile("^(.*)\\s\\(.*$");
+    private static final Pattern REGEX_PATTERN_TORRENT_ITEM_SIZE = Pattern.compile("^(.*)\\s\\(.*$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_IMDB = Pattern.compile("^\\[imdb:\\s(.*)\\]$");
     private static final Pattern REGEX_PATTERN_TORRENT_ITEM_OTHER_VERSIONS =
             Pattern.compile("^.*\\('.*'.*'(.*)'.*'(.*)'.*\\).*$");
+    private static final Pattern REGEX_PATTERN_TORRENT_DETAILS_CATEGORY = Pattern.compile("^.*tipus=(.*)$");
 
     // CSS selectors
     public static final String CSS_SELECTOR_RECAPTCHA_CHALLENGE_SCRIPT =
@@ -79,6 +83,7 @@ public final class NCoreParser {
     public static final String CSS_SELECTOR_TORRENT_DETAILS_NAME = "div.torrent_reszletek_cim";
     public static final String CSS_SELECTOR_TORRENT_DETAILS_COL1 = "div.torrent_reszletek > div.torrent_col1";
     public static final String CSS_SELECTOR_TORRENT_DETAILS_TYPE = "div:nth-child(2)";
+    public static final String CSS_SELECTOR_TORRENT_DETAILS_CATEGORY = "div:nth-child(2) > a:nth-child(2)";
     public static final String CSS_SELECTOR_TORRENT_DETAILS_UPLOADED = "div:nth-child(4)";
     public static final String CSS_SELECTOR_TORRENT_DETAILS_UPLOADER = "div:nth-child(6) > a";
     public static final String CSS_SELECTOR_TORRENT_DETAILS_COL2 = "div.torrent_col2";
@@ -531,6 +536,26 @@ var RecaptchaState = {
                     }
 
                     /*
+                     * Torrent details CATEGORY
+                     */
+
+                    Elements categoryElements = col1Elements.get(0).select(CSS_SELECTOR_TORRENT_DETAILS_CATEGORY);
+
+                    // Add CATEGORY
+                    if ((categoryElements != null) && (categoryElements.size() > 0)) {
+
+                        // Extract CATEGORY
+                        Matcher matcher = REGEX_PATTERN_TORRENT_DETAILS_CATEGORY.matcher(
+                                categoryElements.get(0).attr(HTML_ATTR_HREF));
+
+                        // Add CATEGORY
+                        if (matcher.find()) {
+                            torrentDetails.setCategory(matcher.group(1));
+                        }
+
+                    }
+
+                    /*
                      * Torrent details UPLOADED
                      */
 
@@ -592,7 +617,16 @@ var RecaptchaState = {
 
                     // Add DOWNLOADED
                     if ((downloadedElements != null) && (downloadedElements.size() > 0)) {
-                        torrentDetails.setDownloaded(downloadedElements.get(0).text());
+
+                        // Extract DOWNLOADED
+                        Matcher matcher =
+                                REGEX_PATTERN_TORRENT_ITEM_DOWNLOADED.matcher(downloadedElements.get(0).text());
+
+                        // Add DOWNLOADED
+                        if (matcher.find()) {
+                            torrentDetails.setDownloaded(matcher.group(1));
+                        }
+
                     }
 
                     /*
@@ -603,7 +637,16 @@ var RecaptchaState = {
 
                     // Add SPEED
                     if ((speedElements != null) && (speedElements.size() > 0)) {
-                        torrentDetails.setSpeed(speedElements.get(0).text());
+
+                        // Extract SPEED
+                        Matcher matcher =
+                                REGEX_PATTERN_TORRENT_ITEM_SPEED.matcher(speedElements.get(0).text());
+
+                        // Add SPEED
+                        if (matcher.find()) {
+                            torrentDetails.setSpeed(matcher.group(1));
+                        }
+
                     }
 
                     /*
@@ -614,7 +657,16 @@ var RecaptchaState = {
 
                     // Add SIZE
                     if ((sizeElements != null) && (sizeElements.size() > 0)) {
-                        torrentDetails.setSize(sizeElements.get(0).text());
+
+                        // Extract SIZE
+                        Matcher matcher =
+                                REGEX_PATTERN_TORRENT_ITEM_SIZE.matcher(sizeElements.get(0).text());
+
+                        // Add SIZE
+                        if (matcher.find()) {
+                            torrentDetails.setSize(matcher.group(1));
+                        }
+
                     }
 
                     /*

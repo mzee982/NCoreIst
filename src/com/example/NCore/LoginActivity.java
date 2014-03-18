@@ -1,20 +1,21 @@
 package com.example.NCore;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.method.PasswordTransformationMethod;
+import android.view.KeyEvent;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.view.inputmethod.EditorInfo;
+import android.widget.*;
 
 public class LoginActivity extends FragmentActivity implements AlertDialogFragment.AlertDialogListener,
-        LoginTask.LoginTaskListener {
+        LoginTask.LoginTaskListener, DialogInterface.OnCancelListener {
 
     // Intent extras
     private static final String EXTRA_LOGIN_WITH_CAPTCHA = "EXTRA_LOGIN_WITH_CAPTCHA";
@@ -25,6 +26,9 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
     private static final String VALIDATION_FAILED_LOGIN_NAME = "Felhasználónév kötelező!";
     private static final String VALIDATION_FAILED_LOGIN_PASSWORD = "Jelszó kötelező!";
     private static final String VALIDATION_FAILED_CAPTCHA_RESPONSE = "reCAPTCHA kötelező!";
+
+    // Progress dialog
+    private static final String PROGRESS_MESSAGE_LOGIN = "Bejelentkezés...";
 
     // Dialog fragment tags
     private static final String TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT = "TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT";
@@ -37,6 +41,27 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
     private boolean bLoginWithCaptcha;
     private String mCaptchaChallengeValue;
     private Bitmap mCaptchaChallengeBitmap;
+    private ProgressDialog mProgressDialog;
+
+    /**
+     * Login editor action listener
+     */
+    private class LoginEditorActionListener implements TextView.OnEditorActionListener {
+
+        @Override
+        public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+
+            // Action DONE
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                Button loginButton = (Button) findViewById(R.id.login_button);
+                loginButton.performClick();
+                return true;
+            }
+
+            return false;
+        }
+
+    }
 
     public static void start(Context context, Boolean loginWithCaptcha, String captchaChallengeValue,
                         Bitmap captchaChallengeBitmap) {
@@ -76,11 +101,18 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
             ImageView captchaImageView = (ImageView) findViewById(R.id.captcha_image);
             if (captchaImageView != null) captchaImageView.setImageBitmap(mCaptchaChallengeBitmap);
 
+            // Default action: Login
+            EditText captchaValueEditText = (EditText) findViewById(R.id.captcha_value);
+            captchaValueEditText.setOnEditorActionListener(new LoginEditorActionListener());
         }
 
         // Simple login layout
         else {
             setContentView(R.layout.login_activity);
+
+            // Default action: Login
+            EditText loginPasswordEditText = (EditText) findViewById(R.id.login_password_value);
+            loginPasswordEditText.setOnEditorActionListener(new LoginEditorActionListener());
         }
 
         // Set default field values
@@ -104,6 +136,9 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
             mLoginTask.cancel(true);
         }
 
+        // Cancel the progress dialog
+        if ((mProgressDialog != null) && (mProgressDialog.isShowing())) mProgressDialog.cancel();
+
         super.onDestroy();
     }
 
@@ -126,6 +161,9 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
     }
 
     public void onLogin(View aView) {
+
+        // Show progress dialog
+        mProgressDialog = ProgressDialog.show(this, null, PROGRESS_MESSAGE_LOGIN, true, true, this);
 
         // Validate input field values
         String validationResult = validateLoginInputs();
@@ -161,6 +199,7 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
          * Validation failed
          */
         else {
+            mProgressDialog.cancel();
 
             // Inform the user
             new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, validationResult).show();
@@ -172,6 +211,7 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
     @Override
     public void onLoginTaskResult(LoginTask.Result result) {
 
+
         // Successful login
         if ((result != null) && (result.result == null)) {
             loginSuccess();
@@ -179,6 +219,8 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
 
         // Login failed
         else {
+            mProgressDialog.cancel();
+
             loginFailure(result.result);
         }
 
@@ -186,6 +228,8 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
 
     @Override
     public void onLoginTaskException(Exception e) {
+
+        mProgressDialog.cancel();
 
         // Alert toast
         new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
@@ -198,6 +242,16 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
         // Login failure alert
         if (TAG_LOGIN_FAILURE_ALERT_DIALOG_FRAGMENT.equals(dialogFragment.getTag())) {
             navigateToStartActivity();
+        }
+
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialogInterface) {
+
+        // Cancel the LoginTask if not finished yet
+        if ((mLoginTask != null) && (mLoginTask.getStatus() != LoginTask.Status.FINISHED)) {
+            mLoginTask.cancel(true);
         }
 
     }
@@ -263,6 +317,9 @@ public class LoginActivity extends FragmentActivity implements AlertDialogFragme
 
         // Navigate to the CategoriesActivity
         CategoriesActivity.start(this);
+
+        // Cancel the progress dialog
+        mProgressDialog.cancel();
 
         // This activity should be finished
         finish();

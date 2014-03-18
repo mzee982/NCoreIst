@@ -4,15 +4,17 @@
 
     <!-- Base -->
     <color name="ncore_light_green">#ff629a00</color>
+    <color name="ncore_light_green_alpha">#ee629a00</color>
     <color name="ncore_dark_green">#ff4a6c10</color>
     <color name="ncore_light_orange">#ffffd000</color>
     <color name="ncore_dark_orange">#ffffa500</color>
-    <color name="ncore_foreground">#aad0d0d0</color>
-    <color name="ncore_background">@android:color/transparent</color>
+    <color name="ncore_dark_orange_alpha">#eeffa500</color>
+    <color name="ncore_foreground">#ffffffff</color>
+    <color name="ncore_background">#aad0d0d0</color>
 
     <!-- Info Alert Toast -->
-    <color name="info_alert_toast_bg_info">#dd00ff00</color>
-    <color name="info_alert_toast_bg_alert">#ddff0000</color>
+    <color name="info_alert_toast_bg_info">@color/ncore_light_green_alpha</color>
+    <color name="info_alert_toast_bg_alert">@color/ncore_dark_orange_alpha</color>
 
     <!-- Torrent List -->
     <color name="torrent_list_item_bg_odd">@color/ncore_foreground</color>
@@ -27,5 +29,13 @@
     <!-- Horizontal Meter Bar -->
     <color name="horizontal_meter_bar_background">#ffbfbfbf</color>
     <color name="horizontal_meter_bar_progress">@color/ncore_light_green</color>
+
+    <!-- Torrent Details Images  -->
+    <color name="torrent_details_images_pressed">@color/ncore_dark_orange</color>
+    <color name="torrent_details_images_focused">@color/ncore_light_orange</color>
+    <color name="torrent_details_images_default">@android:color/transparent</color>
+
+    <!-- Divider Horizontal -->
+    <color name="divider_horizontal">@color/ncore_light_green</color>
 
 </resources>

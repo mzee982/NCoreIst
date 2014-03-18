@@ -25,7 +25,7 @@ public class InfoAlertToast extends Toast {
         // Custom toast layout
         LayoutInflater inflater =
                 (LayoutInflater) activity.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View alertToastLayout = inflater.inflate(R.layout.alert_toast,
+        View alertToastLayout = inflater.inflate(R.layout.info_alert_toast,
                 (ViewGroup) activity.findViewById(R.id.alert_toast_layout));
 
         // Set toast message

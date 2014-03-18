@@ -11,6 +11,6 @@
               android:layout_height="wrap_content"
               android:text="Alert toast!"
               android:id="@+id/alert_toast_text"
-              android:padding="8dp"/>
+              style="@style/InfoAlertToastText"/>
 
 </LinearLayout>

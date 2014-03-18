@@ -4,8 +4,8 @@
 
     <!-- Torrent List -->
     <style name="TorrentListItemText" parent="android:TextAppearance">
-        <item name="android:singleLine">true</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:singleLine">true</item>
     </style>
 
     <style name="TorrentListItemText.Primary">
@@ -29,20 +29,35 @@
 
     <!-- Torrent Details -->
     <style name="TorrentDetailsText" parent="android:TextAppearance">
-        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
     <style name="TorrentDetailsText.Title">
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:background">@drawable/foreground</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="TorrentDetailsText.Header">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TorrentDetailsText.Footer">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TorrentDetailsText.Primary">
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TorrentDetailsText.Secondary">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <!-- Info Alert Toast -->
+    <style name="InfoAlertToastText" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:padding">8dp</item>
     </style>
 
 </resources>
