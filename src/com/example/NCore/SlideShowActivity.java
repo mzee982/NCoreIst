@@ -11,7 +11,7 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 
-public class SlideShowActivity extends ActionBarActivity {
+public class SlideShowActivity extends ActionBarActivity implements SlideShowFragment.SlideShowFragmentListener {
 
     // Intent extras
     private static final String EXTRA_IN_TITLE = "EXTRA_IN_TITLE";
@@ -23,6 +23,7 @@ public class SlideShowActivity extends ActionBarActivity {
     // Members
     private SlideShowPagerAdapter mSlideshowAdapter;
     private ViewPager mSlideshowPager;
+    private SlideShowRetainFragment mSlideShowRetainFragment;
     private String mTitle;
     private ArrayList<Bitmap> mBitmaps;
     private ArrayList<String> mBitmapUrls;
@@ -65,9 +66,12 @@ public class SlideShowActivity extends ActionBarActivity {
         // Title
         getSupportActionBar().setTitle(mTitle);
 
+        // SlideShow retain fragment
+        mSlideShowRetainFragment = SlideShowRetainFragment.findOrCreateRetainFragment(getSupportFragmentManager());
+
         // Setup view pager
-        mSlideshowAdapter = new SlideShowPagerAdapter(getSupportFragmentManager(), mBitmaps, mBitmapUrls, mBitmapWidth,
-                mBitmapHeight);
+        mSlideshowAdapter = new SlideShowPagerAdapter(getSupportFragmentManager(), mSlideShowRetainFragment, mBitmaps,
+                mBitmapUrls, mBitmapWidth, mBitmapHeight);
         mSlideshowPager = (ViewPager) findViewById(R.id.slideshow_pager);
         mSlideshowPager.setAdapter(mSlideshowAdapter);
 
@@ -86,6 +90,11 @@ public class SlideShowActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        mSlideShowRetainFragment.addBitmapToMemoryCache(key, bitmap);
     }
 
 }

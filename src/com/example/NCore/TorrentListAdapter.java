@@ -163,7 +163,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
     public View getTorrentListView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
-        // List row view and holder
+        // Inflate new list item view and create holder object
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.torrent_list_item, parent, false);
 
@@ -177,15 +177,19 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
             holder.imdbMeter = (ProgressBar) convertView.findViewById(R.id.imdb_meter);
             holder.size = (TextView) convertView.findViewById(R.id.size_value);
 
+            // Store holder object in created view
             convertView.setTag(holder);
-        } else {
+        }
+
+        // Retrieve holder object from view
+        else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         // Item to show
         TorrentEntry item = getItem(position);
 
-        // Populate values to views
+        // Populate values
         if (item != null) {
             holder.id = item.getId();
             holder.category.setImageResource(TorrentDetails.getCategoryIconResId(item.getCategory()));
@@ -216,7 +220,7 @@ public class TorrentListAdapter extends ArrayAdapter<TorrentEntry> {
 
         }
 
-        // Background color of the odd/even row
+        // Background color of the odd/even rows
         if (position % 2 == 0) {
             convertView.setBackgroundResource(R.drawable.torrent_list_item_even_selector);
         }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class SlideShowPagerAdapter extends FragmentStatePagerAdapter {
 
     // Members
+    private SlideShowRetainFragment mSlideShowRetainFragment;
     private ArrayList<Bitmap> mBitmaps;
     private ArrayList<String> mBitmapUrls;
     private int mBitmapWidth;
@@ -17,12 +18,14 @@ public class SlideShowPagerAdapter extends FragmentStatePagerAdapter {
 
     public SlideShowPagerAdapter(
             FragmentManager fragmentManager,
+            SlideShowRetainFragment slideShowRetainFragment,
             ArrayList<Bitmap> aBitmaps,
             ArrayList<String> aBitmapUrls,
             int aBitmapWidth,
             int aBitmapHeight) {
         super(fragmentManager);
 
+        mSlideShowRetainFragment = slideShowRetainFragment;
         mBitmaps = aBitmaps;
         mBitmapUrls = aBitmapUrls;
         mBitmapWidth = aBitmapWidth;
@@ -36,11 +39,30 @@ public class SlideShowPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return SlideShowFragment.create(
-                position < mBitmaps.size() ? mBitmaps.get(position) : null,
-                position >= mBitmaps.size() ? mBitmapUrls.get(position - mBitmaps.size()) : null,
-                mBitmapWidth,
-                mBitmapHeight);
+
+        // Bitmap already loaded
+        if (position < mBitmaps.size()) {
+            return SlideShowFragment.create(mBitmaps.get(position), null, mBitmapWidth, mBitmapHeight);
+
+        }
+
+        // Load bitmap from cache or pass the image URL
+        else {
+            String bitmapUrl = mBitmapUrls.get(position - mBitmaps.size());
+
+            // Lookup in bitmap memory cache
+            Bitmap bitmap = mSlideShowRetainFragment.getBitmapFromMemCache(bitmapUrl);
+
+            if (bitmap != null) {
+                return SlideShowFragment.create(bitmap, null, mBitmapWidth, mBitmapHeight);
+            }
+
+            else {
+                return SlideShowFragment.create(null, bitmapUrl, mBitmapWidth, mBitmapHeight);
+            }
+
+        }
+
     }
 
 }

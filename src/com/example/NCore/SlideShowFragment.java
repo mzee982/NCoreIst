@@ -1,5 +1,6 @@
 package com.example.NCore;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,12 +22,20 @@ public class SlideShowFragment extends Fragment implements DownloadImageTask.Dow
 
     // Members
     private DownloadImageTask mDownloadImageTask;
+    private SlideShowFragmentListener mListener;
     private Bitmap mBitmap;
     private String mBitmapUrl;
     private ImageView mSlideShowImageView;
     private ProgressBar mSlideShowImageProgress;
     private int mLayoutWidth;
     private int mLayoutHeight;
+
+    /**
+     * SlideShow fragment listener
+     */
+    public interface SlideShowFragmentListener {
+        public void addBitmapToMemoryCache(String key, Bitmap bitmap);
+    }
 
     public static SlideShowFragment create(Bitmap bitmap, String bitmapUrl, int mLayoutWidth, int mLayoutHeight) {
         SlideShowFragment slideShowFragment = new SlideShowFragment();
@@ -50,6 +59,18 @@ public class SlideShowFragment extends Fragment implements DownloadImageTask.Dow
             mBitmapUrl = getArguments().getString(ARGUMENT_IN_BITMAP_URL);
             mLayoutWidth = getArguments().getInt(ARGUMENT_IN_BITMAP_WIDTH, 0);
             mLayoutHeight = getArguments().getInt(ARGUMENT_IN_BITMAP_HEIGHT, 0);
+        }
+
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mListener = (SlideShowFragmentListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement SlideShowFragmentListener");
         }
 
     }
@@ -98,6 +119,10 @@ public class SlideShowFragment extends Fragment implements DownloadImageTask.Dow
         mSlideShowImageView.setImageBitmap(result.bitmap);
         mSlideShowImageProgress.setVisibility(ProgressBar.GONE);
         mSlideShowImageView.setVisibility(ImageView.VISIBLE);
+
+        // Cache image in memory
+        mListener.addBitmapToMemoryCache(mBitmapUrl, result.bitmap);
+
     }
 
     @Override
