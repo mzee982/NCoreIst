@@ -120,6 +120,13 @@ public final class NCoreParser {
     public static final String CSS_SELECTOR_OTHER_VERSIONS_LEECHERS = "div.box_nagy_mini > div.box_l2 > a";
 
     /**
+     * Interface
+     */
+    public interface CancellationListener {
+        public boolean isCancelled();
+    }
+
+    /**
      * Private constructor to prevent instantiation
      */
     private NCoreParser() {
@@ -287,139 +294,151 @@ var RecaptchaState = {
      *                      - Torrent item size attribute
      * @throws IOException
      */
-    public static List<TorrentEntry> parseTorrentList(InputStream inputStream) throws IOException {
+    public static List<TorrentEntry> parseTorrentList(InputStream inputStream, CancellationListener listener)
+            throws IOException {
+        CancellationListener cancellationListener;
+        Document document = null;
         List<TorrentEntry> entries = new ArrayList<TorrentEntry>();
+
+        // Listener for job cancel event
+        cancellationListener = listener;
 
         // Parse the input stream
         try {
 
             // Build up DOM
-            Document document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8, NCoreConnectionManager.BASE_URI);
+            if (!cancellationListener.isCancelled()) {
+                document = Jsoup.parse(inputStream, NCoreConnectionManager.CHARSET_UTF8,
+                        NCoreConnectionManager.BASE_URI);
+            }
 
             /*
              * Torrent list items
              */
 
-            Elements torrentElements = document.select(CSS_SELECTOR_TORRENT_LIST_ITEM);
+            if (!cancellationListener.isCancelled()) {
+                Elements torrentElements = document.select(CSS_SELECTOR_TORRENT_LIST_ITEM);
 
-            if (torrentElements != null) {
+                if (torrentElements != null) {
 
-                // Iterate through torrent list items
-                for (Element torrentElement : torrentElements) {
-                    TorrentEntry torrentEntry = new TorrentEntry();
+                    // Iterate through torrent list items
+                    for (Element torrentElement : torrentElements) {
+                        TorrentEntry torrentEntry = new TorrentEntry();
 
                     /*
                      * Torrent item CATEGORY
                      */
 
-                    Elements categoryElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_CATEGORY);
+                        Elements categoryElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_CATEGORY);
 
-                    if ((categoryElements != null) && (categoryElements.size() > 0)) {
+                        if ((categoryElements != null) && (categoryElements.size() > 0)) {
 
-                        // Extract CATEGORY
-                        Matcher matcher = REGEX_PATTERN_TORRENT_ITEM_CATEGORY.matcher(categoryElements.get(0).attr(HTML_ATTR_HREF));
+                            // Extract CATEGORY
+                            Matcher matcher = REGEX_PATTERN_TORRENT_ITEM_CATEGORY.matcher(categoryElements.get(0).attr(HTML_ATTR_HREF));
 
-                        // Add CATEGORY
-                        if (matcher.find()) {
-                            torrentEntry.setCategory(matcher.group(1));
+                            // Add CATEGORY
+                            if (matcher.find()) {
+                                torrentEntry.setCategory(matcher.group(1));
+                            }
+
                         }
-
-                    }
 
                     /*
                      * Torrent item section
                      */
 
-                    Elements tablaSzovegElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_SECTION_TABLE_SZOVEG);
+                        Elements tablaSzovegElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_SECTION_TABLE_SZOVEG);
 
-                    if ((tablaSzovegElements != null) && (tablaSzovegElements.size() > 0)) {
+                        if ((tablaSzovegElements != null) && (tablaSzovegElements.size() > 0)) {
 
                         /*
                          * Torrent item NAME and ID
                          */
 
-                        Elements nameElements = tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_NAME);
+                            Elements nameElements = tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_NAME);
 
-                        if ((nameElements != null) && (nameElements.size() > 0)) {
+                            if ((nameElements != null) && (nameElements.size() > 0)) {
 
-                            // Add NAME
-                            torrentEntry.setName(nameElements.get(0).attr(HTML_ATTR_TITLE));
+                                // Add NAME
+                                torrentEntry.setName(nameElements.get(0).attr(HTML_ATTR_TITLE));
 
-                            // Extract ID
-                            Matcher matcher =
-                                    REGEX_PATTERN_TORRENT_ITEM_ID.matcher(nameElements.get(0).attr(HTML_ATTR_HREF));
+                                // Extract ID
+                                Matcher matcher =
+                                        REGEX_PATTERN_TORRENT_ITEM_ID.matcher(nameElements.get(0).attr(HTML_ATTR_HREF));
 
-                            // Add ID
-                            if (matcher.find()) {
-                                torrentEntry.setId(Long.parseLong(matcher.group(1)));
+                                // Add ID
+                                if (matcher.find()) {
+                                    torrentEntry.setId(Long.parseLong(matcher.group(1)));
+                                }
+
                             }
-
-                        }
 
                         /*
                          * Torrent item TITLE
                          */
 
-                        Elements titleElements =
-                                tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_TITLE);
+                            Elements titleElements =
+                                    tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_TITLE);
 
-                        if ((titleElements != null) && (titleElements.size() > 0)) {
+                            if ((titleElements != null) && (titleElements.size() > 0)) {
 
-                            // Add TITLE
-                            torrentEntry.setTitle(titleElements.get(0).attr(HTML_ATTR_TITLE));
+                                // Add TITLE
+                                torrentEntry.setTitle(titleElements.get(0).attr(HTML_ATTR_TITLE));
 
-                        }
+                            }
 
                         /*
                          * Torrent item IMDB
                          */
 
-                        Elements imdbElements =
-                                tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_IMDB);
+                            Elements imdbElements =
+                                    tablaSzovegElements.get(0).select(CSS_SELECTOR_TORRENT_ITEM_IMDB);
 
-                        if ((imdbElements != null) && (imdbElements.size() > 0)) {
+                            if ((imdbElements != null) && (imdbElements.size() > 0)) {
 
-                            // Extract IMDB
-                            Matcher matcher = REGEX_PATTERN_TORRENT_ITEM_IMDB.matcher(imdbElements.get(0).text());
+                                // Extract IMDB
+                                Matcher matcher = REGEX_PATTERN_TORRENT_ITEM_IMDB.matcher(imdbElements.get(0).text());
 
-                            // Add IMDB
-                            if (matcher.find()) {
-                                String imdbString = matcher.group(1);
+                                // Add IMDB
+                                if (matcher.find()) {
+                                    String imdbString = matcher.group(1);
 
-                                // Formatted string
-                                torrentEntry.setImdb("[" + imdbString + "]");
+                                    // Formatted string
+                                    torrentEntry.setImdb("[" + imdbString + "]");
 
-                                // Float value
-                                try {
-                                    torrentEntry.setImdbValue(Float.parseFloat(imdbString));
-                                }
+                                    // Float value
+                                    try {
+                                        torrentEntry.setImdbValue(Float.parseFloat(imdbString));
+                                    }
 
-                                catch (NumberFormatException e) {
-                                    // TODO: Handle exception
+                                    catch (NumberFormatException e) {
+                                        // TODO: Handle exception
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                    }
-
                     /*
                      * Torrent item SIZE
                      */
 
-                    Elements sizeElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_SIZE);
+                        Elements sizeElements = torrentElement.select(CSS_SELECTOR_TORRENT_ITEM_SIZE);
 
-                    if ((sizeElements != null) && (sizeElements.size() > 0)) {
+                        if ((sizeElements != null) && (sizeElements.size() > 0)) {
 
-                        // Add SIZE
-                        torrentEntry.setSize(sizeElements.get(0).text());
+                            // Add SIZE
+                            torrentEntry.setSize(sizeElements.get(0).text());
+
+                        }
+
+
+                        // Add torrent entry
+                        entries.add(torrentEntry);
 
                     }
-
-
-                    // Add torrent entry
-                    entries.add(torrentEntry);
 
                 }
 
@@ -429,11 +448,15 @@ var RecaptchaState = {
              * Check for more pages
              */
 
-            // Looking for next list page
-            Element nextPageElement = document.getElementById(HTML_ID_NPA);
+            if (!cancellationListener.isCancelled()) {
 
-            // Has more results
-            if (nextPageElement != null) entries.add(new TorrentEntry());
+                // Looking for next list page
+                Element nextPageElement = document.getElementById(HTML_ID_NPA);
+
+                // Has more results
+                if (nextPageElement != null) entries.add(new TorrentEntry());
+
+            }
 
         } catch (IOException e) {
             throw new IOException(EXCEPTION_TORRENT_LIST_PAGE_PARSE, e);

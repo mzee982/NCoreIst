@@ -1,13 +1,9 @@
 package com.example.NCore;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.Map;
 
 public class LogoutTask extends NCoreAsyncTask<LogoutTask.LogoutTaskListener,Void> {
 
@@ -85,10 +81,13 @@ public class LogoutTask extends NCoreAsyncTask<LogoutTask.LogoutTaskListener,Voi
             }
 
         } catch (UnsupportedEncodingException e) {
+            mException = e;
             e.printStackTrace();
         } catch (MalformedURLException e) {
+            mException = e;
             e.printStackTrace();
         } catch (IOException e) {
+            mException = e;
             e.printStackTrace();
         } finally {
             if (logoutConnection != null) logoutConnection.disconnect();

@@ -62,5 +62,6 @@
     <!-- Torrent List Fragment -->
     <string name="torrent_list_action_refresh">Frissítés</string>
     <string name="torrent_list_more_label">Tovább</string>
+    <string name="torrent_list_empty_label">Nincs találat</string>
 
 </resources>

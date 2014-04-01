@@ -164,8 +164,10 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
         // Logged in
         else {
 
-            // Execute the IndexTask
-            mIndexTask = (IndexTask) new IndexTask().execute(new IndexTask.Param[]{new IndexTask.Param(this)});
+            // Execute the IndexTask (only once in a session)
+            if (mNCoreSession.getLogoutUrl() == null) {
+                mIndexTask = (IndexTask) new IndexTask().execute(new IndexTask.Param[]{new IndexTask.Param(this)});
+            }
 
             /*
              * Layout
@@ -177,7 +179,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
              * Navigation drawer
              */
 
-            // Index left drawer
+            // Categories left drawer
             mIndexLeftDrawerItems = getResources().getStringArray(R.array.index_left_drawer_items);
             mCategoriesDrawerLayout = (DrawerLayout) findViewById(R.id.categories_drawer_layout);
 
@@ -201,20 +203,13 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
              */
 
             // Get tab labels
-            String[] tabs = getResources().getStringArray(R.array.index_action_list);
-
-            // Drop-down navigation
-            //SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
-            //        this, R.array.index_action_list, android.R.layout.simple_spinner_dropdown_item);
-
-            //getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            //getSupportActionBar().setListNavigationCallbacks(spinnerAdapter, new IndexNavigationListener());
+            String[] tabLabels = getResources().getStringArray(R.array.index_action_list);
 
             /*
              * View pager
              */
 
-            mCategoriesPagerAdapter = new CategoriesPagerAdapter(getSupportFragmentManager(), tabs);
+            mCategoriesPagerAdapter = new CategoriesPagerAdapter(getSupportFragmentManager(), tabLabels);
             mViewPager = (ViewPager) findViewById(R.id.categories_pager);
             mViewPager.setOnPageChangeListener(new IndexViewPagerListener());
             mViewPager.setAdapter(mCategoriesPagerAdapter);
@@ -225,11 +220,11 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
             // Add navigation tabs
             IndexTabNavigationListener listener = new IndexTabNavigationListener();
 
-            for (int i = 0; i < tabs.length; i++) {
+            for (int i = 0; i < tabLabels.length; i++) {
                 getSupportActionBar()
                         .addTab(getSupportActionBar()
                                 .newTab()
-                                        .setText(tabs[i])
+                                        .setText(tabLabels[i])
                                                 .setTabListener(listener));
             }
 
@@ -368,10 +363,15 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
         // Logout failed
         else {
+            // Absorb logout failure
 
             // Inform the user
-            new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, ALERT_LOGOUT).show();
+            //new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, ALERT_LOGOUT).show();
 
+            // Close the session
+            mNCoreSession.logout(this);
+
+            finish();
         }
 
     }
@@ -382,9 +382,15 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
         // Cancel the progress dialog
         mProgressDialog.cancel();
 
-        // Alert toast
-        new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
+        // Absorb logout failure
 
+        // Alert toast
+        //new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_ALERT, e.getMessage()).show();
+
+        // Close the session
+        mNCoreSession.logout(this);
+
+        finish();
     }
 
     @Override

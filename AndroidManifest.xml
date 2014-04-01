@@ -36,7 +36,8 @@
         </activity>
 
         <activity android:name=".LoginActivity"
-                  android:label="@string/login_activity_label"/>
+                  android:label="@string/login_activity_label"
+                  android:windowSoftInputMode="stateHidden"/>
 
         <activity android:name=".CategoriesActivity"
                   android:label="@string/categories_activity_label"

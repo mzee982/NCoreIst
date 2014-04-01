@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
-public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
+public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> implements NCoreParser.CancellationListener {
 
     // Exceptions
     private static final String EXCEPTION_GET_TORRENT_LIST_PAGE = "Cannot get the torrent list page. HTTP response code: %";
@@ -23,6 +23,7 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
     public static final String ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY = "ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY";
 
     // Members
+    private boolean cancelled;
     private int mTorrentListCategoryIndex;
     private int mTorrentListPageIndex;
     private String mTorrentListSearchQuery;
@@ -35,6 +36,8 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
 
     public TorrentListLoader(Context aContext, Bundle aArgs) {
         super(aContext);
+
+        cancelled = false;
 
         // Input arguments
         if (aArgs != null) {
@@ -57,7 +60,6 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
         int responseCode = 0;
         List<TorrentEntry> entries = null;
 
-        // TODO: Cancel points
         try {
             try {
 
@@ -65,15 +67,19 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
                  * Prepare the URL
                  */
 
-                // URL for search
-                if (mTorrentListSearchQuery != null) {
-                    torrentListUrlString = NCoreConnectionManager.URL_TORRENT_LIST;
-                }
+                if (!isCancelled()) {
 
-                // URL for category listing
-                else {
-                    torrentListUrlString = NCoreConnectionManager.prepareTorrentListUrlForCategory(
-                            mTorrentListCategoryIndex, mTorrentListPageIndex);
+                    // URL for search
+                    if (mTorrentListSearchQuery != null) {
+                        torrentListUrlString = NCoreConnectionManager.URL_TORRENT_LIST;
+                    }
+
+                    // URL for category listing
+                    else {
+                        torrentListUrlString = NCoreConnectionManager.prepareTorrentListUrlForCategory(
+                                mTorrentListCategoryIndex, mTorrentListPageIndex);
+                    }
+
                 }
 
                 /*
@@ -81,45 +87,55 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
                  */
 
                 // Connection
+                if (!isCancelled()) {
 
-                // Search
-                if (mTorrentListSearchQuery != null) {
+                    // Search
+                    if (mTorrentListSearchQuery != null) {
 
-                    // Prepare POST parameters
-                    Map<String,String> postParams =
-                            NCoreConnectionManager.prepareSearchPostParams(
-                                    mTorrentListCategoryIndex, mTorrentListSearchQuery, mTorrentListPageIndex);
+                        // Prepare POST parameters
+                        Map<String,String> postParams =
+                                NCoreConnectionManager.prepareSearchPostParams(
+                                        mTorrentListCategoryIndex, mTorrentListSearchQuery, mTorrentListPageIndex);
 
-                    //
-                    torrentListConnection =
-                            NCoreConnectionManager.openPostConnectionForResult(torrentListUrlString, postParams);
+                        //
+                        torrentListConnection =
+                                NCoreConnectionManager.openPostConnectionForResult(torrentListUrlString, postParams);
+                    }
+
+                    // Category listing
+                    else {
+                        torrentListConnection = NCoreConnectionManager.openGetConnection(torrentListUrlString);
+                    }
+
+                    torrentListConnection.connect();
+
                 }
-
-                // Category listing
-                else {
-                    torrentListConnection = NCoreConnectionManager.openGetConnection(torrentListUrlString);
-                }
-
-                torrentListConnection.connect();
 
                 // Response
-                responseCode = torrentListConnection.getResponseCode();
+                if (!isCancelled()) {
 
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    torrentListInputStream = new BufferedInputStream(torrentListConnection.getInputStream());
-                }
-                else {
-                    throw new IOException(EXCEPTION_GET_TORRENT_LIST_PAGE.replace("%", String.valueOf(responseCode)));
+                    responseCode = torrentListConnection.getResponseCode();
+
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        torrentListInputStream = new BufferedInputStream(torrentListConnection.getInputStream());
+                    }
+                    else {
+                        throw new IOException(EXCEPTION_GET_TORRENT_LIST_PAGE.replace("%", String.valueOf(responseCode)));
+                    }
+
                 }
 
                 /*
                  * Parse the torrent list
                  */
-
-                if (torrentListInputStream != null) {
+                if (!isCancelled() && (torrentListInputStream != null)) {
 
                     // Parse the HTML torrent list page
-                    entries = NCoreParser.parseTorrentList(torrentListInputStream);
+                    entries = NCoreParser.parseTorrentList(torrentListInputStream, this);
+
+                }
+
+                if (!isCancelled() && (torrentListInputStream != null)) {
 
                     // Has more results
                     mHasMoreResults = (entries.size() > 0) && (entries.get(entries.size() - 1).isEmpty());
@@ -175,6 +191,15 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
     }
 
     @Override
+    public boolean cancelLoad() {
+        boolean superCancelled = super.cancelLoad();
+
+        cancelled = cancelled || superCancelled;
+
+        return cancelled;
+    }
+
+    @Override
     protected void onStartLoading() {
 
         if (mTorrentList != null) {
@@ -195,6 +220,8 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
     @Override
     public void onCanceled(List<TorrentEntry> aTorrentList) {
         super.onCanceled(aTorrentList);
+
+        cancelled = false;
 
         onReleaseResources(aTorrentList);
     }
@@ -217,13 +244,20 @@ public class TorrentListLoader extends AsyncTaskLoader<List<TorrentEntry>> {
 
         if (aTorrentList != null) {
             aTorrentList.clear();
-            aTorrentList = null;
         }
 
     }
 
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
     public boolean hasMoreResults() {
         return mHasMoreResults;
+    }
+
+    public int getTorrentListPageIndex() {
+        return mTorrentListPageIndex;
     }
 
 }

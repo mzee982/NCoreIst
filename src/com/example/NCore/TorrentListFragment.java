@@ -20,8 +20,8 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     private static final String FILE_PROVIDER_AUTHORITY = "com.example.NCore.FileProvider";
 
     // Loaders
-    private static final int LOADER_TORRENT_LIST = 1;
-    private static final int LOADER_TORRENT_SEARCH_LIST = 2;
+    private static final int LOADER_BASE_ID_TORRENT_LIST = 0;
+    private static final int LOADER_ID_TORRENT_SEARCH_LIST = 100;
 
     // Instance states
     private static final String INSTANCE_STATE_LOAD_IN_PROGRESS = "INSTANCE_STATE_LOAD_IN_PROGRESS";
@@ -29,6 +29,7 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     // Members
     private int mTorrentListCategoryIndex;
     private String mTorrentListSearchQuery;
+    private int mLoaderId;
     private TorrentListAdapter mAdapter;
     private boolean bLoadInProgress;
 
@@ -85,11 +86,6 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -102,6 +98,9 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
         // List scroll listener
         getListView().setOnScrollListener(new ListScrollListener());
+
+        // Empty list text
+        setEmptyText(getResources().getText(R.string.torrent_list_empty_label));
 
         // List adapter
         mAdapter = new TorrentListAdapter(getActivity(), TorrentListAdapter.TYPE_TORRENT_LIST);
@@ -121,15 +120,16 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
             args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
         }
 
-        // Init the search loader
+        // Unique loader id
         if (mTorrentListSearchQuery != null) {
-            getLoaderManager().initLoader(LOADER_TORRENT_SEARCH_LIST, args, this);
+            mLoaderId = LOADER_ID_TORRENT_SEARCH_LIST;
+        }
+        else {
+            mLoaderId = LOADER_BASE_ID_TORRENT_LIST + mTorrentListCategoryIndex;
         }
 
-        // Init the torrent list loader
-        else {
-            getLoaderManager().initLoader(LOADER_TORRENT_LIST, args, this);
-        }
+        // Initialize the torrent list/search loader
+        getLoaderManager().initLoader(mLoaderId, args, this);
 
     }
 
@@ -163,10 +163,10 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
-    public Loader onCreateLoader(int i, Bundle bundle) {
+    public Loader onCreateLoader(int id, Bundle bundle) {
 
         // Torrent list loader / Torrent search loader
-        if ((i == LOADER_TORRENT_LIST) || (i == LOADER_TORRENT_SEARCH_LIST)) {
+        if ((id == mLoaderId) || (id == LOADER_ID_TORRENT_SEARCH_LIST)) {
             return new TorrentListLoader(getActivity(), bundle);
         }
 
@@ -177,18 +177,19 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     public void onLoadFinished(Loader<List<TorrentEntry>> listLoader, List<TorrentEntry> torrentEntries) {
 
         // Load data into adapter
-        if ((listLoader.getId() == LOADER_TORRENT_LIST) || (listLoader.getId() == LOADER_TORRENT_SEARCH_LIST)) {
+        if ((listLoader.getId() == mLoaderId) || (listLoader.getId() == LOADER_ID_TORRENT_SEARCH_LIST)) {
             mAdapter.appendData(torrentEntries);
             mAdapter.setHasMoreResults(((TorrentListLoader) listLoader).hasMoreResults());
             bLoadInProgress = false;
-        }
 
-        // The list should now be shown
-        if (isResumed()) {
-            setListShown(true);
-        }
-        else {
-            setListShownNoAnimation(true);
+            // The list should now be shown
+            if (isResumed()) {
+                setListShown(true);
+            }
+            else {
+                setListShownNoAnimation(true);
+            }
+
         }
 
     }
@@ -226,15 +227,8 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
             args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
             args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, mAdapter.getLastShowedPageIndex() + 1);
 
-            // Restart the torrent list loader
-            if (mTorrentListSearchQuery != null) {
-                getLoaderManager().restartLoader(LOADER_TORRENT_SEARCH_LIST, args, this);
-            }
-
-            // Restart the torrent search loader
-            else {
-                getLoaderManager().restartLoader(LOADER_TORRENT_LIST, args, this);
-            }
+            // Restart the torrent list/search loader
+            getLoaderManager().restartLoader(mLoaderId, args, this);
 
         }
 
@@ -256,15 +250,8 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
         args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, 0);
 
-        // Restart the torrent list loader
-        if (mTorrentListSearchQuery != null) {
-            getLoaderManager().restartLoader(LOADER_TORRENT_SEARCH_LIST, args, this);
-        }
-
-        // Restart the torrent search loader
-        else {
-            getLoaderManager().restartLoader(LOADER_TORRENT_LIST, args, this);
-        }
+        // Restart the torrent list/search loader
+        getLoaderManager().restartLoader(mLoaderId, args, this);
 
     }
 
