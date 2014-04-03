@@ -35,53 +35,65 @@
                            android:paddingBottom="4dp"
                            android:visibility="gone"/>
 
-                <RelativeLayout android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/torrent_details_images_layout"
-                                android:gravity="center"
-                                android:background="@drawable/torrent_details_images_selector"
-                                android:onClick="onImagesClick"
-                                android:visibility="gone">
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="vertical"
+                              android:id="@+id/torrent_details_images_layout"
+                              android:background="@drawable/torrent_details_images_selector"
+                              android:onClick="onImagesClick"
+                              android:visibility="gone">
+
+                    <RelativeLayout android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center">
+
+                        <ImageView android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:id="@+id/torrent_details_cover_image"
+                                   android:layout_centerVertical="true"
+                                   android:padding="8dp"
+                                   android:maxHeight="150dp"
+                                   android:maxWidth="150dp"
+                                   android:visibility="gone"/>
+
+                        <ImageView android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:id="@+id/torrent_details_sample_image1"
+                                   android:padding="8dp"
+                                   android:layout_toRightOf="@id/torrent_details_cover_image"
+                                   android:maxHeight="75dp"
+                                   android:maxWidth="75dp"
+                                   android:visibility="gone"/>
+
+                        <ImageView android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:id="@+id/torrent_details_sample_image2"
+                                   android:padding="8dp"
+                                   android:layout_toRightOf="@id/torrent_details_cover_image"
+                                   android:layout_below="@id/torrent_details_sample_image1"
+                                   android:maxHeight="75dp"
+                                   android:maxWidth="75dp"
+                                   android:visibility="gone"/>
+
+                        <ImageView android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:id="@+id/torrent_details_sample_image3"
+                                   android:padding="8dp"
+                                   android:layout_toRightOf="@id/torrent_details_cover_image"
+                                   android:layout_below="@id/torrent_details_sample_image2"
+                                   android:maxHeight="75dp"
+                                   android:maxWidth="75dp"
+                                   android:visibility="gone"/>
+
+                    </RelativeLayout>
 
                     <ImageView android:layout_width="wrap_content"
                                android:layout_height="wrap_content"
-                               android:id="@+id/torrent_details_cover_image"
-                               android:layout_centerVertical="true"
-                               android:padding="8dp"
-                               android:maxHeight="150dp"
-                               android:maxWidth="150dp"
-                               android:visibility="gone"/>
+                               android:id="@+id/torrent_details_images_full_screen_button"
+                               android:src="@drawable/ic_full_screen"
+                               android:layout_gravity="right"/>
 
-                    <ImageView android:layout_width="wrap_content"
-                               android:layout_height="wrap_content"
-                               android:id="@+id/torrent_details_sample_image1"
-                               android:padding="8dp"
-                               android:layout_toRightOf="@id/torrent_details_cover_image"
-                               android:maxHeight="75dp"
-                               android:maxWidth="75dp"
-                               android:visibility="gone"/>
-
-                    <ImageView android:layout_width="wrap_content"
-                               android:layout_height="wrap_content"
-                               android:id="@+id/torrent_details_sample_image2"
-                               android:padding="8dp"
-                               android:layout_toRightOf="@id/torrent_details_cover_image"
-                               android:layout_below="@id/torrent_details_sample_image1"
-                               android:maxHeight="75dp"
-                               android:maxWidth="75dp"
-                               android:visibility="gone"/>
-
-                    <ImageView android:layout_width="wrap_content"
-                               android:layout_height="wrap_content"
-                               android:id="@+id/torrent_details_sample_image3"
-                               android:padding="8dp"
-                               android:layout_toRightOf="@id/torrent_details_cover_image"
-                               android:layout_below="@id/torrent_details_sample_image2"
-                               android:maxHeight="75dp"
-                               android:maxWidth="75dp"
-                               android:visibility="gone"/>
-
-                </RelativeLayout>
+                </LinearLayout>
 
                 <ImageView android:layout_width="match_parent"
                            android:layout_height="wrap_content"

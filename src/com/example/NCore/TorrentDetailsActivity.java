@@ -349,7 +349,7 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
             // Show images layout and divider
             ImageView torrentDetailsImagesHeaderDivider = (ImageView) findViewById(
                     R.id.torrent_details_images_header_divider);
-            RelativeLayout torrentDetailsImagesLayout = (RelativeLayout) findViewById(
+            LinearLayout torrentDetailsImagesLayout = (LinearLayout) findViewById(
                     R.id.torrent_details_images_layout);
             ImageView torrentDetailsImagesFooterDivider = (ImageView) findViewById(
                     R.id.torrent_details_images_footer_divider);

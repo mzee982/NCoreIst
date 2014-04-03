@@ -99,7 +99,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     /**
      * Search view query text listener
      */
-    private class IndexQueryTextListener implements SearchView.OnQueryTextListener {
+    private class CategoriesQueryTextListener implements SearchView.OnQueryTextListener {
         @Override
         public boolean onQueryTextChange(String s) {
             return false;
@@ -107,7 +107,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
         @Override
         public boolean onQueryTextSubmit(String s) {
-            return submitIndexQueryText(s);
+            return submitCategoriesQueryText(s);
         }
     }
 
@@ -278,11 +278,13 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
         // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.categories_activity_actions, menu);
+
+        // Search menu item and view
         mSearchItem = menu.findItem(R.id.categories_action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
 
-        // Configure the search info and add any event listeners
-        searchView.setOnQueryTextListener(new IndexQueryTextListener());
+        // Add event listeners
+        searchView.setOnQueryTextListener(new CategoriesQueryTextListener());
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -501,7 +503,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
         return true;
     }
 
-    private boolean submitIndexQueryText(String query) {
+    private boolean submitCategoriesQueryText(String query) {
 
         // Start the SearchResultsActivity
         navigateToSearchResultsActivity(getSupportActionBar().getSelectedNavigationIndex(), query);

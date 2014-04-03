@@ -3,4 +3,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:yourapp="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/search_results_action_search"
+          android:title="@string/categories_action_search"
+          android:icon="@drawable/ic_action_search"
+          yourapp:showAsAction="ifRoom|collapseActionView"
+          yourapp:actionViewClass="android.support.v7.widget.SearchView"/>
+
 </menu>

@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class SearchResultsActivity extends ActionBarActivity {
 
@@ -22,7 +25,32 @@ public class SearchResultsActivity extends ActionBarActivity {
     // Members
     private int mTorrentListCategoryIndex;
     private String mTorrentListSearchQuery;
-    private String mFragmentTag;
+    private MenuItem mSearchItem;
+
+    /**
+     * Search view query text listener
+     */
+    private class SearchResultsQueryTextListener implements SearchView.OnQueryTextListener {
+        @Override
+        public boolean onQueryTextChange(String s) {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextSubmit(String s) {
+            return submitSearchResultsQueryText(s);
+        }
+    }
+
+    /**
+     * Search click listener
+     */
+    private class SearchResultsSearchClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            clickSearch(view);
+        }
+    }
 
     public static void start(Context context, int categoryIndex, String searchQuery) {
         Intent intent = new Intent(context, SearchResultsActivity.class);
@@ -73,12 +101,11 @@ public class SearchResultsActivity extends ActionBarActivity {
          */
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mFragmentTag = TAG_TORRENT_LIST_SEARCH_FRAGMENT;
         Fragment torrentListFragment = TorrentListFragment.create(mTorrentListCategoryIndex, mTorrentListSearchQuery);
 
         // Insert the fragment by replacing any existing fragment
-        fragmentManager.beginTransaction().replace(R.id.search_results_frame, torrentListFragment, mFragmentTag)
-                .commit();
+        fragmentManager.beginTransaction().replace(R.id.search_results_frame, torrentListFragment,
+                TAG_TORRENT_LIST_SEARCH_FRAGMENT).commit();
 
     }
 
@@ -87,6 +114,14 @@ public class SearchResultsActivity extends ActionBarActivity {
 
         // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.search_results_activity_actions, menu);
+
+        // Search menu item and view
+        mSearchItem = menu.findItem(R.id.search_results_action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
+
+        // Add event listeners
+        searchView.setOnQueryTextListener(new SearchResultsQueryTextListener());
+        searchView.setOnSearchClickListener(new SearchResultsSearchClickListener());
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -108,6 +143,32 @@ public class SearchResultsActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean submitSearchResultsQueryText(String query) {
+
+        // Start a new SearchResultsActivity
+        navigateToSearchResultsActivity(mTorrentListCategoryIndex, query);
+
+        // Close the search action view
+        MenuItemCompat.collapseActionView(mSearchItem);
+
+        return true;
+    }
+
+    private void clickSearch(View view) {
+
+        // Set search view default query text
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
+        searchView.setQuery(mTorrentListSearchQuery, false);
+
+    }
+
+    private void navigateToSearchResultsActivity(int categoryIndex, String searchQuery) {
+
+        // Navigate to the SearchResultsActivity
+        SearchResultsActivity.start(this, categoryIndex, searchQuery);
+
     }
 
 }

@@ -1,9 +1,11 @@
 package com.example.NCore;
 
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -76,10 +78,8 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         // Input arguments
         getInputArguments(getArguments());
 
-        // Previous instance state
-        if (savedInstanceState != null) {
-            bLoadInProgress = savedInstanceState.getBoolean(INSTANCE_STATE_LOAD_IN_PROGRESS, false);
-        }
+        // Default instance state
+        bLoadInProgress = true;
 
         // Action bar
         setHasOptionsMenu(true);
@@ -134,13 +134,6 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(INSTANCE_STATE_LOAD_IN_PROGRESS, bLoadInProgress);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         // Inflate the menu items for use in the action bar
@@ -148,6 +141,35 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
         super.onCreateOptionsMenu(menu, inflater);
 
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+        // Refresh button
+        MenuItem refreshMenuItem = menu.findItem(R.id.torrent_list_action_refresh);
+
+        // Disable menu items and show progress indicator
+        if (bLoadInProgress) {
+
+            // Refresh button
+            MenuItemCompat.setActionView(refreshMenuItem, R.layout.action_view_progress);
+            MenuItemCompat.setShowAsAction(refreshMenuItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+            refreshMenuItem.setEnabled(false);
+
+        }
+
+        // Enable menu items
+        else {
+
+            // Refresh button
+            MenuItemCompat.setActionView(refreshMenuItem, null);
+            MenuItemCompat.setShowAsAction(refreshMenuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+            refreshMenuItem.setEnabled(true);
+
+        }
+
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -180,7 +202,11 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
         if ((listLoader.getId() == mLoaderId) || (listLoader.getId() == LOADER_ID_TORRENT_SEARCH_LIST)) {
             mAdapter.appendData(torrentEntries);
             mAdapter.setHasMoreResults(((TorrentListLoader) listLoader).hasMoreResults());
+
             bLoadInProgress = false;
+
+            // Refresh action items
+            ActivityCompat.invalidateOptionsMenu(getActivity());
 
             // The list should now be shown
             if (isResumed()) {
@@ -196,8 +222,13 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public void onLoaderReset(Loader loader) {
-        bLoadInProgress = false;
         mAdapter.clear();
+
+        bLoadInProgress = false;
+
+        // Refresh action items
+        ActivityCompat.invalidateOptionsMenu(getActivity());
+
     }
 
     @Override
@@ -221,6 +252,9 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
             bLoadInProgress = true;
 
+            // Refresh action items
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+
             // Set input arguments
             Bundle args = new Bundle();
             args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, mTorrentListCategoryIndex);
@@ -236,22 +270,31 @@ public class TorrentListFragment extends ListFragment implements LoaderManager.L
 
     public void onRefresh() {
 
-        // Reset list adapter
-        setListAdapter(null);
-        mAdapter.clear();
-        setListAdapter(mAdapter);
+        if (!bLoadInProgress) {
 
-        // Start out with a progress indicator
-        setListShown(false);
+            bLoadInProgress = true;
 
-        // Set input arguments
-        Bundle args = new Bundle();
-        args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, mTorrentListCategoryIndex);
-        args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
-        args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, 0);
+            // Refresh action items
+            ActivityCompat.invalidateOptionsMenu(getActivity());
 
-        // Restart the torrent list/search loader
-        getLoaderManager().restartLoader(mLoaderId, args, this);
+            // Reset list adapter
+            setListAdapter(null);
+            mAdapter.clear();
+            setListAdapter(mAdapter);
+
+            // Start out with a progress indicator
+            setListShown(false);
+
+            // Set input arguments
+            Bundle args = new Bundle();
+            args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, mTorrentListCategoryIndex);
+            args.putString(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_SEARCH_QUERY, mTorrentListSearchQuery);
+            args.putInt(TorrentListLoader.ARGUMENT_IN_TORRENT_LIST_PAGE_INDEX, 0);
+
+            // Restart the torrent list/search loader
+            getLoaderManager().restartLoader(mLoaderId, args, this);
+
+        }
 
     }
 
