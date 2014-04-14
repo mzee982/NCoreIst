@@ -60,4 +60,11 @@
         <item name="android:padding">8dp</item>
     </style>
 
+    <!-- Borderless Button -->
+    <style name="BorderlessButton" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@drawable/item_background_holo_light_ncore</item>
+        <item name="android:paddingStart">4dip</item>
+        <item name="android:paddingEnd">4dip</item>
+    </style>
+
 </resources>

@@ -22,21 +22,6 @@
         <!-- SearchView -->
         <item name="searchViewTextField">@drawable/abc_textfield_searchview_ncore</item>
 
-        <!--
-        <item name="searchViewTextFieldRight">@drawable/abc_textfield_searchview_right_ncore</item>
-        <item name="searchDropdownBackground">@drawable/abc_search_dropdown_light</item>
-        <item name="searchViewCloseIcon">@drawable/abc_ic_clear_holo_light</item>
-        <item name="searchViewSearchIcon">@drawable/abc_ic_search_api_holo_light</item>
-        <item name="searchViewGoIcon">@drawable/abc_ic_go_search_api_holo_light</item>
-        <item name="searchViewVoiceIcon">@drawable/abc_ic_voice_search_api_holo_light</item>
-        <item name="searchViewEditQuery">@drawable/abc_ic_commit_search_api_holo_light</item>
-        <item name="searchViewEditQueryBackground">?attr/selectableItemBackground</item>
-        <item name="searchViewAutoCompleteTextView">@style/Widget.AppCompat.Light.AutoCompleteTextView</item>
-        <item name="textColorSearchUrl">@color/abc_search_url_text_holo</item>
-        <item name="textAppearanceSearchResultTitle">@style/TextAppearance.AppCompat.Light.SearchResult.Title</item>
-        <item name="textAppearanceSearchResultSubtitle">@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle</item>
-        -->
-
         <!-- Holo Colors -->
         <item name="android:editTextStyle">@style/EditTextNcore</item>
         <item name="android:checkboxStyle">@style/CheckBoxNcore</item>
