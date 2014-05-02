@@ -1,17 +1,24 @@
 package com.example.NCore;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class SearchResultsActivity extends ActionBarActivity {
 
@@ -23,9 +30,54 @@ public class SearchResultsActivity extends ActionBarActivity {
     private static final String TAG_TORRENT_LIST_SEARCH_FRAGMENT = "TAG_TORRENT_LIST_SEARCH_FRAGMENT";
 
     // Members
+    private NCoreSession mNCoreSession;
+    private DrawerLayout mSearchResultsDrawerLayout;
+    private ListView mSearchResultsDrawerListView;
+    private SearchResultsActionBarDrawerToggle mDrawerToggle;
+    private ArrayList<DrawerListItem> mDrawerItems;
     private int mTorrentListCategoryIndex;
     private String mTorrentListSearchQuery;
     private MenuItem mSearchItem;
+
+    /**
+     * Navigation drawer toggle
+     */
+    private class SearchResultsActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        public SearchResultsActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+                                                   int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            super.onDrawerClosed(drawerView);
+
+            //getSupportActionBar().setTitle();
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+
+            //getSupportActionBar().setTitle();
+            invalidateOptionsMenu();
+        }
+
+    }
+
+    /**
+     * Navigation drawer listener
+     */
+    private class SearchResultsDrawerItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectSearchResultsDrawerItem(position);
+        }
+
+    }
 
     /**
      * Search view query text listener
@@ -72,6 +124,9 @@ public class SearchResultsActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // nCORE session object
+        mNCoreSession = NCoreSession.getInstance(this);
+
         // Get the intent extra content
         getIntentExtras(getIntent());
 
@@ -80,6 +135,32 @@ public class SearchResultsActivity extends ActionBarActivity {
          */
 
         setContentView(R.layout.search_results_activity);
+
+        /*
+         * Navigation drawer
+         */
+
+        // Views
+        mSearchResultsDrawerLayout = (DrawerLayout) findViewById(R.id.search_results_drawer_layout);
+        mSearchResultsDrawerListView = (ListView) findViewById(R.id.search_results_drawer);
+
+        // Drawer listener
+        mDrawerToggle = new SearchResultsActionBarDrawerToggle(this, mSearchResultsDrawerLayout,
+                R.drawable.ic_navigation_drawer, R.string.drawer_open, R.string.drawer_close);
+        mSearchResultsDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // Adapter
+        mDrawerItems = DrawerListItem.buildDrawerItemList(this, mNCoreSession, R.array.drawer_types,
+                R.array.drawer_icons, R.array.drawer_labels);
+        mSearchResultsDrawerListView.setAdapter(new DrawerListAdapter(this, mDrawerItems));
+
+        // Click listener
+        mSearchResultsDrawerListView.setOnItemClickListener(new SearchResultsDrawerItemClickListener());
+
+        // Default
+        mSearchResultsDrawerListView.clearChoices();
+        //mSearchResultsDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+        //mSearchResultsDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
 
         /*
          * Action bar
@@ -92,7 +173,7 @@ public class SearchResultsActivity extends ActionBarActivity {
 
         // Set title
         getSupportActionBar().setTitle(
-                (getResources().getStringArray(R.array.index_action_list))[mTorrentListCategoryIndex] +
+                (getResources().getStringArray(R.array.categories_action_list))[mTorrentListCategoryIndex] +
                 ": " +
                 mTorrentListSearchQuery);
 
@@ -143,6 +224,44 @@ public class SearchResultsActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void selectSearchResultsDrawerItem(int position) {
+
+        switch (position) {
+
+            // CATEGORIES
+            case DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES:
+
+                // Highlight the selected item
+                mSearchResultsDrawerListView.setItemChecked(position, true);
+                mSearchResultsDrawerListView.setSelection(position);
+
+                // Navigate to Categories
+                NavUtils.navigateUpFromSameTask(this);
+
+                break;
+
+            default:
+
+                // Highlight the default item
+                mSearchResultsDrawerListView.clearChoices();
+                ((DrawerListAdapter) mSearchResultsDrawerListView.getAdapter()).notifyDataSetChanged();
+                //mSearchResultsDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+                //mSearchResultsDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
+
+                new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO, getResources()
+                        .getString(R.string.drawer_info_later)).show();
+
+                break;
+        }
+
+        // Update the title
+        //setTitle(mDrawerItems[position]);
+
+        // Close the drawer
+        mSearchResultsDrawerLayout.closeDrawer(mSearchResultsDrawerListView);
+
     }
 
     private boolean submitSearchResultsQueryText(String query) {

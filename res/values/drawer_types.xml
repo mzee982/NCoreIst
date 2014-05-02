@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_types">
+        <item>DRAWER_ITEM_TYPE_HEADER</item>
+        <item>DRAWER_ITEM_TYPE_TITLE</item>
+        <item>DRAWER_ITEM_TYPE_ITEM</item>
+        <item>DRAWER_ITEM_TYPE_ITEM</item>
+        <item>DRAWER_ITEM_TYPE_ITEM</item>
+        <item>DRAWER_ITEM_TYPE_TITLE</item>
+        <item>DRAWER_ITEM_TYPE_ITEM</item>
+        <item>DRAWER_ITEM_TYPE_ITEM</item>
+    </string-array>
+</resources>

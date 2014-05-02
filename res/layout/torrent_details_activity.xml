@@ -12,7 +12,7 @@
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical"
-                      android:background="@color/ncore_background">
+                      android:background="@color/ncore_background_alpha">
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
@@ -424,11 +424,12 @@
     </ScrollView>
 
     <!-- The navigation drawer -->
-    <ListView android:layout_width="240dp"
+    <ListView android:id="@+id/torrent_details_drawer"
+              android:layout_width="240dp"
               android:layout_height="match_parent"
-              android:id="@+id/torrent_details_drawer"
               android:layout_gravity="start"
               android:choiceMode="singleChoice"
+              android:background="@color/navigation_drawer_background"
               android:divider="@android:color/transparent"
               android:dividerHeight="0dp"/>
 

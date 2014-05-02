@@ -67,4 +67,23 @@
         <item name="android:paddingEnd">4dip</item>
     </style>
 
+    <!-- Navigation Drawer -->
+    <style name="NavigationDrawerListHeaderText" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="NavigationDrawerListTitleText" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="NavigationDrawerListItemText" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
 </resources>

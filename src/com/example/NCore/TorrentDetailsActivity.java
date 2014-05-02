@@ -1,11 +1,13 @@
 package com.example.NCore;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
@@ -46,18 +48,65 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
     private static final int IMAGE_ID_SAMPLE_3 = 4;
 
     // Members
+    private NCoreSession mNCoreSession;
     private DownloadTorrentTask mDownloadTorrentTask;
     private DownloadImageTask mDownloadCoverImageTask;
     private DownloadImageTask mDownloadSampleImage1Task;
     private DownloadImageTask mDownloadSampleImage2Task;
     private DownloadImageTask mDownloadSampleImage3Task;
+    private DrawerLayout mTorrentDetailsDrawerLayout;
+    private ListView mTorrentDetailsDrawerListView;
+    private TorrentDetailsActionBarDrawerToggle mDrawerToggle;
+    private ArrayList<DrawerListItem> mDrawerItems;
     private long mTorrentId;
     private TorrentDetails mTorrentDetails;
     private TorrentListAdapter mOtherVersionsAdapter;
     private InfoAlertToast mInfoToast;
 
-    //
-    private class OnOtherVersionsItemClickListener implements View.OnClickListener {
+    /**
+     * Navigation drawer toggle
+     */
+    private class TorrentDetailsActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        public TorrentDetailsActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+                                               int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            super.onDrawerClosed(drawerView);
+
+            //getSupportActionBar().setTitle();
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+
+            //getSupportActionBar().setTitle();
+            invalidateOptionsMenu();
+        }
+
+    }
+
+    /**
+     * Navigation drawer listener
+     */
+    private class TorrentDetailsDrawerItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectTorrentDetailsDrawerItem(position);
+        }
+
+    }
+
+    /**
+     * Other versions listener
+     */
+    private class OtherVersionsItemClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {
@@ -81,6 +130,9 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // nCORE session object
+        mNCoreSession = NCoreSession.getInstance(this);
+
         /*
          * Intent extras
          */
@@ -102,6 +154,32 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
          */
 
         setContentView(R.layout.torrent_details_activity);
+
+        /*
+         * Navigation drawer
+         */
+
+        // Views
+        mTorrentDetailsDrawerLayout = (DrawerLayout) findViewById(R.id.torrent_details_drawer_layout);
+        mTorrentDetailsDrawerListView = (ListView) findViewById(R.id.torrent_details_drawer);
+
+        // Drawer listener
+        mDrawerToggle = new TorrentDetailsActionBarDrawerToggle(this, mTorrentDetailsDrawerLayout,
+                R.drawable.ic_navigation_drawer, R.string.drawer_open, R.string.drawer_close);
+        mTorrentDetailsDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // Adapter
+        mDrawerItems = DrawerListItem.buildDrawerItemList(this, mNCoreSession, R.array.drawer_types,
+                R.array.drawer_icons, R.array.drawer_labels);
+        mTorrentDetailsDrawerListView.setAdapter(new DrawerListAdapter(this, mDrawerItems));
+
+        // Click listener
+        mTorrentDetailsDrawerListView.setOnItemClickListener(new TorrentDetailsDrawerItemClickListener());
+
+        // Default
+        mTorrentDetailsDrawerListView.clearChoices();
+        //mTorrentDetailsDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+        //mTorrentDetailsDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
 
         /*
          * Action bar
@@ -266,14 +344,14 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
                 //otherVersionsList.setOnItemClickListener(); // AdapterView.OnItemClickListener
 
                 // OnClick listener
-                OnOtherVersionsItemClickListener onOtherVersionsItemClickListener =
-                        new OnOtherVersionsItemClickListener();
+                OtherVersionsItemClickListener otherVersionsItemClickListener =
+                        new OtherVersionsItemClickListener();
 
                 // Populate other versions
                 for (int i = 0; i < mOtherVersionsAdapter.getCount(); i++) {
                     View otherVersionsItem = mOtherVersionsAdapter.getView(i, null, otherVersionsLayout);
                     otherVersionsLayout.addView(otherVersionsItem);
-                    otherVersionsItem.setOnClickListener(onOtherVersionsItemClickListener);
+                    otherVersionsItem.setOnClickListener(otherVersionsItemClickListener);
                 }
 
             }
@@ -435,6 +513,44 @@ public class TorrentDetailsActivity extends ActionBarActivity implements LoaderM
 
         // Start the TorrentDetailsActivity
         navigateToTorrentDetailsActivity(torrentId);
+
+    }
+
+    private void selectTorrentDetailsDrawerItem(int position) {
+
+        switch (position) {
+
+            // CATEGORIES
+            case DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES:
+
+                // Highlight the selected item
+                mTorrentDetailsDrawerListView.setItemChecked(position, true);
+                mTorrentDetailsDrawerListView.setSelection(position);
+
+                // Navigate to Categories
+                NavUtils.navigateUpFromSameTask(this);
+
+                break;
+
+            default:
+
+                // Highlight the default item
+                mTorrentDetailsDrawerListView.clearChoices();
+                ((DrawerListAdapter) mTorrentDetailsDrawerListView.getAdapter()).notifyDataSetChanged();
+                //mTorrentDetailsDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+                //mTorrentDetailsDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
+
+                new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO, getResources()
+                        .getString(R.string.drawer_info_later)).show();
+
+                break;
+        }
+
+        // Update the title
+        //setTitle(mDrawerItems[position]);
+
+        // Close the drawer
+        mTorrentDetailsDrawerLayout.closeDrawer(mTorrentDetailsDrawerListView);
 
     }
 

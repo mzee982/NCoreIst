@@ -2,7 +2,7 @@
 
 <resources>
 
-    <!-- nCOREist application -->
+    <!-- nCOREist Application -->
     <string name="app_name">nCOREist</string>
 
     <!-- NCoreSession -->
@@ -10,12 +10,12 @@
     <string name="shared_pref_login_password">login_password</string>
     <string name="shared_pref_remember_credentials">remember_credentials</string>
 
-    <!-- Start activity -->
+    <!-- Start Activity -->
     <string name="start_activity_label">nCOREist</string>
     <string name="start_logo_text">nCOREist</string>
-    <string name="start_progress_text">. . .</string>
+    <string name="start_progress_text">Betöltés...</string>
 
-    <!-- Login activity -->
+    <!-- Login Activity -->
     <string name="login_activity_label">nCOREist</string>
     <string name="login_activity_title">Bejelentkezés</string>
     <string name="login_name_text">Felhasználónév</string>
@@ -24,10 +24,8 @@
     <string name="remember_login_text">Emlékezz rám</string>
     <string name="login_text">Bejelentkezés</string>
 
-    <!-- Categories activity -->
+    <!-- Categories Activity -->
     <string name="categories_activity_label">nCOREist</string>
-    <string name="drawer_open">Navigation drawer open</string>
-    <string name="drawer_close">Navigation drawer close</string>
     <string name="categories_action_search">Search</string>
 
     <!-- Search Results Activity -->
@@ -63,5 +61,10 @@
     <string name="torrent_list_action_refresh">Frissítés</string>
     <string name="torrent_list_more_label">Tovább</string>
     <string name="torrent_list_empty_label">Nincs találat</string>
+
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Navigation drawer open</string>
+    <string name="drawer_close">Navigation drawer close</string>
+    <string name="drawer_info_later">Később...</string>
 
 </resources>

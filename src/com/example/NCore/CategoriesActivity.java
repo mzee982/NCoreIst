@@ -19,8 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class CategoriesActivity extends ActionBarActivity implements QuestionDialogFragment.QuestionDialogListener,
         AlertDialogFragment.AlertDialogListener, LogoutTask.LogoutTaskListener, IndexTask.IndexTaskListener,
@@ -41,23 +42,23 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     private IndexTask mIndexTask;
     private LogoutTask mLogoutTask;
     private MenuItem mSearchItem;
-    private String[] mIndexLeftDrawerItems;
+    private ArrayList<DrawerListItem> mDrawerItems;
     private DrawerLayout mCategoriesDrawerLayout;
-    private IndexActionBarDrawerToggle mIndexDrawerToggle;
-    private ListView mIndexLeftDrawerListView;
+    private CategoriesActionBarDrawerToggle mDrawerToggle;
+    private ListView mCategoriesDrawerListView;
     private NCoreSession mNCoreSession;
     private CategoriesPagerAdapter mCategoriesPagerAdapter;
-    private ViewPager mViewPager;
+    private ViewPager mCategoriesViewPager;
     private ProgressDialog mProgressDialog;
 
     /**
      * Navigation drawer listener
      */
-    private class IndexLeftDrawerItemClickListener implements AdapterView.OnItemClickListener {
+    private class CategoriesDrawerItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectIndexLeftDrawerItem(position);
+            selectCategoriesDrawerItem(position);
         }
 
     }
@@ -65,11 +66,11 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     /**
      * Tab navigation listener
      */
-    private class IndexTabNavigationListener implements ActionBar.TabListener {
+    private class CategoriesTabNavigationListener implements ActionBar.TabListener {
 
         @Override
         public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            mViewPager.setCurrentItem(tab.getPosition());
+            mCategoriesViewPager.setCurrentItem(tab.getPosition());
         }
 
         @Override
@@ -87,7 +88,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     /**
      * View pager listener
      */
-    private class IndexViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
+    private class CategoriesViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
 
         @Override
         public void onPageSelected(int position) {
@@ -114,10 +115,10 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     /**
      * Navigation drawer toggle
      */
-    private class IndexActionBarDrawerToggle extends ActionBarDrawerToggle {
+    private class CategoriesActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public IndexActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
-                                          int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+        public CategoriesActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+                                               int openDrawerContentDescRes, int closeDrawerContentDescRes) {
             super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
         }
 
@@ -179,46 +180,48 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
              * Navigation drawer
              */
 
-            // Categories left drawer
-            mIndexLeftDrawerItems = getResources().getStringArray(R.array.index_left_drawer_items);
+            // Views
             mCategoriesDrawerLayout = (DrawerLayout) findViewById(R.id.categories_drawer_layout);
+            mCategoriesDrawerListView = (ListView) findViewById(R.id.categories_drawer);
 
-            mIndexDrawerToggle = new IndexActionBarDrawerToggle(this, mCategoriesDrawerLayout,
+            // Drawer listener
+            mDrawerToggle = new CategoriesActionBarDrawerToggle(this, mCategoriesDrawerLayout,
                     R.drawable.ic_navigation_drawer, R.string.drawer_open, R.string.drawer_close);
-            mCategoriesDrawerLayout.setDrawerListener(mIndexDrawerToggle);
+            mCategoriesDrawerLayout.setDrawerListener(mDrawerToggle);
 
-            mIndexLeftDrawerListView = (ListView) findViewById(R.id.categories_drawer);
+            // Adapter
+            mDrawerItems = DrawerListItem.buildDrawerItemList(this, mNCoreSession, R.array.drawer_types,
+                    R.array.drawer_icons, R.array.drawer_labels);
+            mCategoriesDrawerListView.setAdapter(new DrawerListAdapter(this, mDrawerItems));
 
-            // Set the adapter for the list view
-            mIndexLeftDrawerListView.setAdapter(
-                    new ArrayAdapter<String>(
-                            this,
-                            android.R.layout.simple_list_item_activated_1, mIndexLeftDrawerItems));
+            // Click listener
+            mCategoriesDrawerListView.setOnItemClickListener(new CategoriesDrawerItemClickListener());
 
-            // Set the list's click listener
-            mIndexLeftDrawerListView.setOnItemClickListener(new IndexLeftDrawerItemClickListener());
+            // Default
+            mCategoriesDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+            mCategoriesDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
 
             /*
              * Action bar
              */
 
             // Get tab labels
-            String[] tabLabels = getResources().getStringArray(R.array.index_action_list);
+            String[] tabLabels = getResources().getStringArray(R.array.categories_action_list);
 
             /*
              * View pager
              */
 
             mCategoriesPagerAdapter = new CategoriesPagerAdapter(getSupportFragmentManager(), tabLabels);
-            mViewPager = (ViewPager) findViewById(R.id.categories_pager);
-            mViewPager.setOnPageChangeListener(new IndexViewPagerListener());
-            mViewPager.setAdapter(mCategoriesPagerAdapter);
+            mCategoriesViewPager = (ViewPager) findViewById(R.id.categories_pager);
+            mCategoriesViewPager.setOnPageChangeListener(new CategoriesViewPagerListener());
+            mCategoriesViewPager.setAdapter(mCategoriesPagerAdapter);
 
             // Tab navigation
             getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
             // Add navigation tabs
-            IndexTabNavigationListener listener = new IndexTabNavigationListener();
+            CategoriesTabNavigationListener listener = new CategoriesTabNavigationListener();
 
             for (int i = 0; i < tabLabels.length; i++) {
                 getSupportActionBar()
@@ -242,7 +245,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
         super.onPostCreate(savedInstanceState);
 
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        if (mIndexDrawerToggle != null) mIndexDrawerToggle.syncState();
+        if (mDrawerToggle != null) mDrawerToggle.syncState();
 
     }
 
@@ -270,7 +273,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        mIndexDrawerToggle.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -298,7 +301,7 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
     public boolean onOptionsItemSelected(MenuItem item) {
 
         // Navigation drawer handler
-        if (mIndexDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
@@ -445,62 +448,37 @@ public class CategoriesActivity extends ActionBarActivity implements QuestionDia
 
     }
 
-    private void selectIndexLeftDrawerItem(int position) {
+    private void selectCategoriesDrawerItem(int position) {
 
-        // Highlight the selected item, update the title, and close the drawer
-        //mIndexLeftDrawerListView.setItemChecked(position, true);
-        //setTitle(mIndexLeftDrawerItems[position]);
-        mCategoriesDrawerLayout.closeDrawer(mIndexLeftDrawerListView);
-
-    }
-
-    private boolean selectIndexNavigationItem(int position, long itemId) {
-/*
-        mFragmentTag = null;
-        Bundle fragmentArguments = null;
-
-        // Select the fragment tag
         switch (position) {
-            case 0:
-                mFragmentTag = TAG_TORRENT_LIST_ALL_FRAGMENT;
+
+            // CATEGORIES
+            case DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES:
+
+                // Highlight the selected item
+                mCategoriesDrawerListView.setItemChecked(position, true);
+                mCategoriesDrawerListView.setSelection(position);
+
                 break;
-            case 1:
-                mFragmentTag = TAG_TORRENT_LIST_MOVIE_FRAGMENT;
-                break;
-            case 2:
-                mFragmentTag = TAG_TORRENT_LIST_SERIES_FRAGMENT;
-                break;
-            case 3:
-                mFragmentTag = TAG_TORRENT_LIST_MUSIC_FRAGMENT;
-                break;
-            case 4:
-                mFragmentTag = TAG_TORRENT_LIST_XXX_FRAGMENT;
-                break;
-            case 5:
-                mFragmentTag = TAG_TORRENT_LIST_GAME_FRAGMENT;
-                break;
-            case 6:
-                mFragmentTag = TAG_TORRENT_LIST_SOFTWARE_FRAGMENT;
-                break;
-            case 7:
-                mFragmentTag = TAG_TORRENT_LIST_BOOK_FRAGMENT;
+
+            default:
+
+                // Highlight the default item
+                mCategoriesDrawerListView.setItemChecked(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES, true);
+                mCategoriesDrawerListView.setSelection(DrawerListItem.DRAWER_ITEM_INDEX_CATEGORIES);
+
+                new InfoAlertToast(this, InfoAlertToast.TOAST_TYPE_INFO, getResources()
+                        .getString(R.string.drawer_info_later)).show();
+
                 break;
         }
 
-        // Create a new fragment based on position
-        Fragment torrentListFragment = new TorrentListFragment();
+        // Update the title
+        //setTitle(mDrawerItems[position]);
 
-        // Set input arguments
-        fragmentArguments = new Bundle();
-        fragmentArguments.putInt(TorrentListFragment.ARGUMENT_IN_TORRENT_LIST_CATEGORY_INDEX, position);
-        torrentListFragment.setArguments(fragmentArguments);
+        // Close the drawer
+        mCategoriesDrawerLayout.closeDrawer(mCategoriesDrawerListView);
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.IndexContentFrame, torrentListFragment, mFragmentTag).commit();
-*/
-
-        return true;
     }
 
     private boolean submitCategoriesQueryText(String query) {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_labels">
+        <item>Username</item>
+        <item>@string/app_name</item>
+        <item>Kategóriák</item>
+        <item>Keresés</item>
+        <item>Toplista</item>
+        <item>Rendszer</item>
+        <item>Beállítások</item>
+        <item>Névjegy</item>
+    </string-array>
+</resources>
