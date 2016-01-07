@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.NCore"
+          package="com.mzee982.android.ncoreist"
           android:versionCode="1"
           android:versionName="1.0">
 
@@ -19,14 +19,14 @@
 
         <provider
                 android:name="android.support.v4.content.FileProvider"
-                android:authorities="com.example.NCore.FileProvider"
+                android:authorities="com.mzee982.android.ncoreist.FileProvider"
                 android:grantUriPermissions="true"
                 android:exported="false">
                 <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
                            android:resource="@xml/filepaths" />
         </provider>
 
-        <activity android:name=".StartActivity"
+        <activity android:name="com.mzee982.android.ncoreist.StartActivity"
                   android:label="@string/start_activity_label"
                   android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
             <intent-filter>
@@ -35,33 +35,33 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity"
+        <activity android:name="com.mzee982.android.ncoreist.LoginActivity"
                   android:label="@string/login_activity_label"
                   android:windowSoftInputMode="stateHidden"/>
 
-        <activity android:name=".CategoriesActivity"
+        <activity android:name="com.mzee982.android.ncoreist.CategoriesActivity"
                   android:label="@string/categories_activity_label"
                   android:launchMode="singleTop"/>
 
-        <activity android:name=".SearchResultsActivity"
+        <activity android:name="com.mzee982.android.ncoreist.SearchResultsActivity"
                   android:label="@string/search_results_activity_label"
-                  android:parentActivityName=".CategoriesActivity">
+                  android:parentActivityName="com.mzee982.android.ncoreist.CategoriesActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value="com.example.NCore.CategoriesActivity"/>
+                       android:value="com.mzee982.android.ncoreist.CategoriesActivity"/>
         </activity>
 
-        <activity android:name="TorrentDetailsActivity"
+        <activity android:name="com.mzee982.android.ncoreist.TorrentDetailsActivity"
                   android:label="@string/torrent_details_activity_label"
-                  android:parentActivityName=".CategoriesActivity">
+                  android:parentActivityName="com.mzee982.android.ncoreist.CategoriesActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value="com.example.NCore.IndexActivity" />
+                       android:value="com.mzee982.android.ncoreist.IndexActivity" />
         </activity>
 
-        <activity android:name="SlideShowActivity"
+        <activity android:name="com.mzee982.android.ncoreist.SlideShowActivity"
                   android:label="@string/slideshow_activity_label"
-                  android:parentActivityName="TorrentDetailsActivity">
+                  android:parentActivityName="com.mzee982.android.ncoreist.TorrentDetailsActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value="com.example.NCore.TorrentDetailsActivity" />
+                       android:value="com.mzee982.android.ncoreist.TorrentDetailsActivity" />
         </activity>
 
     </application>
